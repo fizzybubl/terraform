@@ -22,16 +22,16 @@ locals {
 
 data "aws_ami" "amazon_ami" {
   most_recent = true
-  owners = [ "amazon" ]
+  owners      = ["amazon"]
 
   filter {
-    name = "architecture"
+    name   = "architecture"
     values = ["x86_64"]
   }
 
   filter {
-    name = "image-id"
-    values = [ "ami-0f7204385566b32d0" ]
+    name   = "image-id"
+    values = ["ami-0f7204385566b32d0"]
   }
 }
 
@@ -68,8 +68,8 @@ resource "aws_route_table_association" "route_to_subnet_association" {
 
 
 resource "aws_security_group" "custom_security_group" {
-  vpc_id = aws_vpc.custom_vpc.id
-  name = "allow_vpc"
+  vpc_id      = aws_vpc.custom_vpc.id
+  name        = "allow_vpc"
   description = "Allows all traffic from the same vpc"
 
   tags = local.tags
@@ -77,28 +77,41 @@ resource "aws_security_group" "custom_security_group" {
 
 resource "aws_vpc_security_group_ingress_rule" "allow_vpc" {
   security_group_id = aws_security_group.custom_security_group.id
-  cidr_ipv4 = aws_vpc.custom_vpc.cidr_block
-  from_port = 0
-  to_port = 0
-  ip_protocol = "-1"
+  cidr_ipv4         = aws_vpc.custom_vpc.cidr_block
+  from_port         = 0
+  to_port           = 0
+  ip_protocol       = "-1"
 }
 
 
 resource "aws_vpc_security_group_egress_rule" "allow_vpc" {
   security_group_id = aws_security_group.custom_security_group.id
-  cidr_ipv4 = aws_vpc.custom_vpc.cidr_block
-  from_port = 0
-  to_port = 0
-  ip_protocol = "-1"
+  cidr_ipv4         = aws_vpc.custom_vpc.cidr_block
+  from_port         = 0
+  to_port           = 0
+  ip_protocol       = "-1"
 }
 
 
-
 resource "aws_instance" "first_ec2" {
-  ami           = data.aws_ami.amazon_ami.id
-  instance_type = var.instance_type
-  subnet_id     = aws_subnet.custom_subnet.id
-  vpc_security_group_ids = [ aws_security_group.custom_security_group.id ]
+  ami                    = data.aws_ami.amazon_ami.id
+  instance_type          = var.instance_type
+  subnet_id              = aws_subnet.custom_subnet.id
+  vpc_security_group_ids = [aws_security_group.custom_security_group.id]
 
   depends_on = [aws_subnet.custom_subnet]
+}
+
+
+resource "aws_network_interface" "private_nic" {
+  subnet_id               = aws_subnet.custom_subnet.id
+  private_ip_list_enabled = true
+  private_ip_list         = [cidrhost(var.subnet_cidr_block, 4)]
+
+  attachment {
+    device_index = 1
+    instance     = aws_instance.first_ec2.id
+  }
+
+  depends_on = [aws_instance.first_ec2]
 }
