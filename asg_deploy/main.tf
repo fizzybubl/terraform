@@ -44,68 +44,95 @@ module "create_aws_vpc_and_subnet" {
 }
 
 
-resource "aws_security_group" "ec2_sg" {
+resource "aws_security_group" "alb_sg" {
   vpc_id      = module.create_aws_vpc_and_subnet.vpc.id
-  name        = "allow_vpc"
+  name        = "ALB Security Group"
   description = "Allows all traffic from the same vpc"
 
   tags = local.tags
 }
 
-resource "aws_vpc_security_group_ingress_rule" "allow_vpc" {
-  security_group_id = aws_security_group.ec2_sg.id
-  cidr_ipv4         = var.vpc_data.cidr_block
-  from_port         = 0
-  to_port           = 0
-  ip_protocol       = "-1"
+
+resource "aws_security_group" "ec2_sg" {
+  vpc_id      = module.create_aws_vpc_and_subnet.vpc.id
+  name        = "EC2 Security Group"
+  description = "Allows all traffic from the same vpc"
+
+  tags = local.tags
+}
+
+resource "aws_vpc_security_group_ingress_rule" "allow_traffic_from_alb" {
+  security_group_id            = aws_security_group.ec2_sg.id
+  referenced_security_group_id = aws_security_group.alb_sg.id
+  ip_protocol                  = "-1"
 }
 
 
-resource "aws_vpc_security_group_egress_rule" "allow_vpc" {
-  security_group_id = aws_security_group.ec2_sg.id
-  cidr_ipv4         = var.vpc_data.cidr_block
-  from_port         = 0
-  to_port           = 0
-  ip_protocol       = "-1"
+resource "aws_vpc_security_group_ingress_rule" "allow_public_traffic" {
+  security_group_id = aws_security_group.alb_sg.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 80
+  to_port           = 80
+  ip_protocol       = "tcp"
 }
 
 
-resource "aws_lb" "alb" {
-  name               = "ApplicationLoadBalancer"
-  internal           = false
-  load_balancer_type = "application"
-  subnets = module.create_aws_vpc_and_subnet.public_subnets.*.id
+resource "aws_vpc_security_group_egress_rule" "allow_traffic_to_ec2" {
+  security_group_id            = aws_security_group.alb_sg.id
+  referenced_security_group_id = aws_security_group.ec2_sg.id
+  ip_protocol                  = "-1"
 }
 
 
-resource "aws_placement_group" "test" {
-  name     = "test"
-  strategy = "spread"
-}
+# resource "aws_lb" "alb" {
+#   name               = "ApplicationLoadBalancer"
+#   internal           = false
+#   load_balancer_type = "application"
+#   subnets            = module.create_aws_vpc_and_subnet.public_subnets.*.id
+# }
 
 
-resource "aws_launch_template" "launch_template" {
-  name_prefix          = "foobar"
-  image_id             = data.aws_ami.amazon_ami.id
-  instance_type        = var.instance_type
-  security_group_names = [aws_security_group.ec2_sg.name]
-}
+# resource "aws_placement_group" "test" {
+#   name     = "test"
+#   strategy = "spread"
+# }
 
 
-resource "aws_autoscaling_group" "ec2_asg" {
-  name                      = "auto_scaling_group"
-  max_size                  = 2
-  min_size                  = 1
-  desired_capacity          = 1
-  health_check_grace_period = 300
-  health_check_type         = "ELB"
-  placement_group           = aws_placement_group.test.id
-  vpc_zone_identifier       = module.create_aws_vpc_and_subnet.private_subnets.*.id
+# resource "aws_launch_template" "launch_template" {
+#   name_prefix          = "foobar"
+#   image_id             = data.aws_ami.amazon_ami.id
+#   instance_type        = var.instance_type
+#   vpc_security_group_ids = [aws_security_group.ec2_sg.id]
 
-  target_group_arns = []
+#   depends_on = [aws_security_group.ec2_sg]
+# }
 
-  launch_template {
-    id      = aws_launch_template.launch_template.id
-    version = "$Latest"
-  }
-}
+
+# resource "aws_autoscaling_group" "ec2_asg" {
+#   name                      = "auto_scaling_group"
+#   max_size                  = 2
+#   min_size                  = 1
+#   desired_capacity          = 1
+#   health_check_grace_period = 300
+#   health_check_type         = "ELB"
+#   placement_group           = aws_placement_group.test.id
+#   vpc_zone_identifier       = module.create_aws_vpc_and_subnet.private_subnets.*.id
+
+#   launch_template {
+#     id      = aws_launch_template.launch_template.id
+#     version = "$Latest"
+#   }
+# }
+
+
+# resource "aws_lb_target_group" "lb_target_group" {
+#   name     = "TerraformPractice"
+#   port     = 80
+#   protocol = "HTTP"
+#   vpc_id   = module.create_aws_vpc_and_subnet.vpc.id
+# }
+
+# resource "aws_autoscaling_attachment" "asg_attachment" {
+#   autoscaling_group_name = aws_autoscaling_group.ec2_asg.id
+#   lb_target_group_arn    = aws_lb_target_group.lb_target_group.arn
+# }
