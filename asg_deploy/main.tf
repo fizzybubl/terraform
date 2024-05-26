@@ -84,55 +84,55 @@ resource "aws_vpc_security_group_egress_rule" "allow_traffic_to_ec2" {
 }
 
 
-# resource "aws_lb" "alb" {
-#   name               = "ApplicationLoadBalancer"
-#   internal           = false
-#   load_balancer_type = "application"
-#   subnets            = module.create_aws_vpc_and_subnet.public_subnets.*.id
-# }
+resource "aws_lb" "alb" {
+  name               = "ApplicationLoadBalancer"
+  internal           = false
+  load_balancer_type = "application"
+  subnets            = module.create_aws_vpc_and_subnet.public_subnets.*.id
+}
 
 
-# resource "aws_placement_group" "test" {
-#   name     = "test"
-#   strategy = "spread"
-# }
+resource "aws_placement_group" "test" {
+  name     = "test"
+  strategy = "spread"
+}
 
 
-# resource "aws_launch_template" "launch_template" {
-#   name_prefix          = "foobar"
-#   image_id             = data.aws_ami.amazon_ami.id
-#   instance_type        = var.instance_type
-#   vpc_security_group_ids = [aws_security_group.ec2_sg.id]
+resource "aws_launch_template" "launch_template" {
+  name_prefix          = "foobar"
+  image_id             = data.aws_ami.amazon_ami.id
+  instance_type        = var.instance_type
+  vpc_security_group_ids = [aws_security_group.ec2_sg.id]
 
-#   depends_on = [aws_security_group.ec2_sg]
-# }
-
-
-# resource "aws_autoscaling_group" "ec2_asg" {
-#   name                      = "auto_scaling_group"
-#   max_size                  = 2
-#   min_size                  = 1
-#   desired_capacity          = 1
-#   health_check_grace_period = 300
-#   health_check_type         = "ELB"
-#   placement_group           = aws_placement_group.test.id
-#   vpc_zone_identifier       = module.create_aws_vpc_and_subnet.private_subnets.*.id
-
-#   launch_template {
-#     id      = aws_launch_template.launch_template.id
-#     version = "$Latest"
-#   }
-# }
+  depends_on = [aws_security_group.ec2_sg]
+}
 
 
-# resource "aws_lb_target_group" "lb_target_group" {
-#   name     = "TerraformPractice"
-#   port     = 80
-#   protocol = "HTTP"
-#   vpc_id   = module.create_aws_vpc_and_subnet.vpc.id
-# }
+resource "aws_autoscaling_group" "ec2_asg" {
+  name                      = "auto_scaling_group"
+  max_size                  = 2
+  min_size                  = 1
+  desired_capacity          = 1
+  health_check_grace_period = 300
+  health_check_type         = "ELB"
+  placement_group           = aws_placement_group.test.id
+  vpc_zone_identifier       = module.create_aws_vpc_and_subnet.private_subnets.*.id
 
-# resource "aws_autoscaling_attachment" "asg_attachment" {
-#   autoscaling_group_name = aws_autoscaling_group.ec2_asg.id
-#   lb_target_group_arn    = aws_lb_target_group.lb_target_group.arn
-# }
+  launch_template {
+    id      = aws_launch_template.launch_template.id
+    version = "$Latest"
+  }
+}
+
+
+resource "aws_lb_target_group" "lb_target_group" {
+  name     = "TerraformPractice"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = module.create_aws_vpc_and_subnet.vpc.id
+}
+
+resource "aws_autoscaling_attachment" "asg_attachment" {
+  autoscaling_group_name = aws_autoscaling_group.ec2_asg.id
+  lb_target_group_arn    = aws_lb_target_group.lb_target_group.arn
+}
