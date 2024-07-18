@@ -129,7 +129,7 @@ resource "aws_lb_target_group" "lb_target_group" {
   name     = "TerraformPractice"
   port     = 80
   protocol = "HTTP"
-  vpc_id   = module.create_aws_vpc_and_subnet.vpc.id
+  vpc_id   = data.aws_vpc.main
 }
 
 resource "aws_autoscaling_attachment" "asg_attachment" {
