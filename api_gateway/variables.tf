@@ -15,3 +15,8 @@ variable "profile" {
 variable "region" {
   type = string
 }
+
+variable "stage" {
+  type    = string
+  default = "v1"
+}
