@@ -31,7 +31,7 @@ resource "aws_iam_role_policy" "sqs_policy" {
 
 data "archive_file" "lambda" {
   type        = "zip"
-  source_file = join(path.cwd, "files", "lambda.py")
+  source_file = join("/", [path.cwd, "files", "lambda.py"])
   output_path = "lambda_function_payload.zip"
 }
 
@@ -45,11 +45,17 @@ resource "aws_lambda_function" "test_lambda" {
 
   source_code_hash = data.archive_file.lambda.output_base64sha256
 
-  runtime = "pyhon3.12"
+  runtime = "python3.12"
 
   environment {
     variables = {
       foo = "bar"
     }
   }
+}
+
+resource "aws_lambda_event_source_mapping" "sqs_trigger" {
+  event_source_arn  = aws_sqs_queue.terraform_queue.arn
+  function_name     = aws_lambda_function.test_lambda.arn
+  starting_position = "LATEST"
 }
