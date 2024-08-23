@@ -64,8 +64,8 @@ data "aws_iam_policy_document" "worker_assume_role" {
 
 
 resource "aws_iam_role" "worker" {
-    name = "TestCluster"
-    assume_role_policy = data.aws_iam_policy_document.worker_assume_role.json
+  name               = "TestCluster"
+  assume_role_policy = data.aws_iam_policy_document.worker_assume_role.json
 }
 
 
@@ -132,8 +132,8 @@ resource "aws_iam_role" "cluster_autoscaler" {
 
 
 resource "aws_iam_policy" "cluster_autoscaler" {
-    policy = data.aws_iam_policy_document.cluster_autoscaler.json
-    name = "Cluster-Autoscaler"
+  policy = data.aws_iam_policy_document.cluster_autoscaler.json
+  name   = "Cluster-Autoscaler"
 }
 
 resource "aws_iam_role_policy_attachment" "cluster_autoscaler" {
