@@ -23,8 +23,10 @@ resource "kubernetes_deployment" "cluster_autoscaler" {
         }
 
         annotations = {
-          "prometheus.io/scrape" = "true"
-          "prometheus.io/port"   = "8085"
+          "prometheus.io/scrape" = true
+          "prometheus.io/port"   = 8085
+          "cluster-autoscaler.kubernetes.io/safe-to-evict" = false
+          "eks.amazonaws.com/role-arn" = aws_iam_role.cluster_autoscaler.arn
         }
       }
 
