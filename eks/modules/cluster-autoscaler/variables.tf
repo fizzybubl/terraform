@@ -8,7 +8,6 @@ variable "openid_connect_provider" {
 
 variable "control_plane" {
   type = object({
-    name   = string,
     issuer = string,
     id = string
   })

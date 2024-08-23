@@ -5,7 +5,6 @@ module "cluster_autoscaler" {
   }
   control_plane = {
     issuer = aws_eks_cluster.control_plane.identity.0.oidc.0.issuer
-    name   = aws_eks_cluster.control_plane.name
     id  = aws_eks_cluster.control_plane.id
   }
 }

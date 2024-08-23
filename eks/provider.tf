@@ -24,7 +24,7 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(aws_eks_cluster.control_plane.certificate_authority.0.data)
   exec {
     api_version = "client.authentication.k8s.io/v1"
-    args        = ["eks", "--profile", var.profile, "--region", var.region, "get-token", "--cluster-name", aws_eks_cluster.control_plane.name]
+    args        = ["eks", "--profile", var.profile, "--region", var.region, "get-token", "--cluster-name", aws_eks_cluster.control_plane.id]
     command     = "aws"
   }
 }
@@ -35,7 +35,7 @@ provider "kubernetes" {
 #   cluster_ca_certificate = base64decode(aws_eks_cluster.control_plane.certificate_authority.0.data)
 #   exec {
 #     api_version = "client.authentication.k8s.io/v1"
-#     args        = ["eks", "--profile", var.profile, "--region", var.region, "get-token", "--cluster-name", aws_eks_cluster.control_plane.name]
+#     args        = ["eks", "--profile", var.profile, "--region", var.region, "get-token", "--cluster-name", aws_eks_cluster.control_plane.id]
 #     command     = "aws"
 #   }
 # }
