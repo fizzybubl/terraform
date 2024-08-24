@@ -7,4 +7,5 @@ module "cluster_autoscaler" {
     issuer = aws_eks_cluster.control_plane.identity.0.oidc.0.issuer
     id  = aws_eks_cluster.control_plane.id
   }
+  mixin_instances = []
 }

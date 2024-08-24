@@ -34,7 +34,7 @@ resource "kubernetes_deployment" "cluster_autoscaler" {
         priority_class_name = "system-cluster-critical"
 
         dynamic "affinity" {
-          for_each = [var.mixin_instances]
+          for_each = length(var.mixin_instances) > 0 ? range(1) : range(0)
           content {
             node_affinity {
               required_during_scheduling_ignored_during_execution {
