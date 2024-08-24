@@ -1,5 +1,4 @@
 locals {
-  mount_path = "/etc/ssl/certs/ca-bundle.crt"
   labels = {
     "k8s-addon" = "cluster-autoscaler.addons.k8s.io",
     "k8s-app"   = "cluster-autoscaler"
@@ -9,3 +8,5 @@ locals {
 
   volume_name = "ssl-certs"
 }
+
+data "aws_region" "current" {}

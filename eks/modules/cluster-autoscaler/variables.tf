@@ -22,14 +22,16 @@ variable "namespace" {
 
 variable "mixin_instances" {
   type = set(string)
-  default = [
-    "r5.2xlarge",
-    "r5d.2xlarge",
-    "r5a.2xlarge",
-    "r5ad.2xlarge",
-    "r5n.2xlarge",
-    "r5dn.2xlarge",
-    "r4.2xlarge",
-    "i3.2xlarge",
-  ]
+  # default = [
+  #   "r5.2xlarge",
+  #   "r5d.2xlarge",
+  #   "r5a.2xlarge",
+  #   "r5ad.2xlarge",
+  #   "r5n.2xlarge",
+  #   "r5dn.2xlarge",
+  #   "r4.2xlarge",
+  #   "i3.2xlarge",
+  # ]
+
+  default = []
 }

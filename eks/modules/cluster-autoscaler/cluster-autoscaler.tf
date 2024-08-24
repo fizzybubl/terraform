@@ -85,12 +85,24 @@ resource "kubernetes_deployment" "cluster_autoscaler" {
             "--cloud-provider=aws",
             "--skip-nodes-with-local-storage=false",
             "--expander=least-waste",
+            "--aws-use-static-instance-list=false",
+            "--balance-similar-node-groups",
             "--node-group-auto-discovery=asg:tag=k8s.io/cluster-autoscaler/enabled,k8s.io/cluster-autoscaler/${var.control_plane.id}"
           ]
 
+          env {
+            name = "AWS_REGION"
+            value = data.aws_region.current.name
+          }
+
+          env {
+            name = "AWS_STS_REGIONAL_ENDPOINTS"
+            value = "regional"
+          }
+
           volume_mount {
             name       = local.volume_name
-            mount_path = local.mount_path
+            mount_path = "/etc/ssl/certs/ca-certificates.crt"
             read_only  = true
           }
 
@@ -110,7 +122,7 @@ resource "kubernetes_deployment" "cluster_autoscaler" {
         volume {
           name = local.volume_name
           host_path {
-            path = local.mount_path
+            path = "/etc/ssl/certs/ca-bundle.crt"
           }
         }
       }
