@@ -27,29 +27,19 @@ resource "aws_iam_role" "eks_cluster_role" {
 }
 
 
-resource "aws_iam_role_policy_attachment" "service" {
+resource "aws_iam_role_policy_attachment" "AmazonEKSServicePolicy" {
   role       = aws_iam_role.eks_cluster_role.arn
   policy_arn = data.aws_iam_policy.AmazonEKSServicePolicy.arn
 }
 
 
-resource "aws_iam_role_policy_attachment" "cluster" {
+resource "aws_iam_role_policy_attachment" "AmazonEKSClusterPolicy" {
   role       = aws_iam_role.eks_cluster_role.arn
   policy_arn = data.aws_iam_policy.AmazonEKSClusterPolicy.arn
 }
 
 
 # Worker policies
-data "aws_iam_policy" "AmazonEC2ContainerRegistryReadOnly" {
-  name = "AmazonEC2ContainerRegistryReadOnly"
-}
-
-
-data "aws_iam_policy" "AmazonEKSWorkerNodePolicy" {
-  name = "AmazonEKSWorkerNodePolicy"
-}
-
-
 data "aws_iam_policy_document" "worker_assume_role" {
   statement {
     effect = "Allow"
@@ -69,15 +59,19 @@ resource "aws_iam_role" "worker" {
 }
 
 
-resource "aws_iam_role_policy_attachment" "ecr" {
-  role       = aws_iam_role.eks_cluster_role.arn
-  policy_arn = data.aws_iam_policy.AmazonEC2ContainerRegistryReadOnly.arn
+resource "aws_iam_role_policy_attachment" "AmazonEKSWorkerNodePolicy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+  role       = aws_iam_role.example.name
 }
 
+resource "aws_iam_role_policy_attachment" "AmazonEKS_CNI_Policy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+  role       = aws_iam_role.example.name
+}
 
-resource "aws_iam_role_policy_attachment" "worker" {
-  role       = aws_iam_role.eks_cluster_role.arn
-  policy_arn = data.aws_iam_policy.AmazonEKSWorkerNodePolicy.arn
+resource "aws_iam_role_policy_attachment" "AmazonEC2ContainerRegistryReadOnly" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+  role       = aws_iam_role.example.name
 }
 
 
