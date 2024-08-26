@@ -3,18 +3,11 @@ variable "authorised_ips" {
   description = "IPs from which to allow traffic"
 }
 
+
 variable "profile" {
   type = string
 }
 
-variable "region" {
-  type = string
-}
-
-variable "stage" {
-  type    = string
-  default = "v1"
-}
 
 variable "vpc_data" {
   type = object({
@@ -62,3 +55,24 @@ variable "public_subnets_input" {
   ]
 }
 
+
+variable "instance_type" {
+  type    = string
+  default = "t2.micro"
+
+  validation {
+    condition     = contains(["t2.micro", "t3.micro"], var.instance_type)
+    error_message = "Allowed values are ${join(",", ["t2.micro", "t3.micro"])}"
+  }
+}
+
+
+variable "instance_image" {
+  type    = string
+  default = "ami-01dad638e8f31ab9a"
+}
+
+variable "region" {
+  type    = string
+  default = "eu-central-1"
+}
