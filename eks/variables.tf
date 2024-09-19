@@ -42,15 +42,15 @@ variable "public_subnets_input" {
   default = [
     {
       availability_zone = "eu-central-1a"
-      cidr_block        = "10.200.0.0/24"
+      cidr_block        = "10.0.200.0/24"
     },
     {
       availability_zone = "eu-central-1b",
-      cidr_block        = "10.200.1.0/24"
+      cidr_block        = "10.0.201.0/24"
     },
     {
       availability_zone = "eu-central-1c",
-      cidr_block        = "10.200.2.0/24"
+      cidr_block        = "10.0.202.0/24"
     }
   ]
 }
