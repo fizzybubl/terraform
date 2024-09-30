@@ -7,11 +7,11 @@ locals {
 
 
 resource "aws_vpc" "custom_vpc" {
-  cidr_block       = var.vpc_data.cidr_block
-  instance_tenancy = var.vpc_data.instance_tenancy
-  enable_dns_support = true
+  cidr_block           = var.vpc_data.cidr_block
+  instance_tenancy     = var.vpc_data.instance_tenancy
+  enable_dns_support   = true
   enable_dns_hostnames = true
-  tags             = local.tags
+  tags                 = local.tags
 }
 
 
@@ -51,7 +51,7 @@ resource "aws_subnet" "private_subnet" {
 
   tags = {
     Type = "Private Subnets"
-    Name = "Private Subnet ${count.index}"
+    Name = "Private Subnet ${var.private_subnets_input[count.index].availability_zone}"
   }
 
   depends_on = [aws_vpc.custom_vpc]
@@ -67,7 +67,7 @@ resource "aws_subnet" "public_subnet" {
 
   tags = {
     Type = "Public Subnets"
-    Name = "Public Subnet ${count.index}"
+    Name = "Public Subnet ${var.public_subnets_input[count.index].availability_zone}"
   }
 
   depends_on = [aws_vpc.custom_vpc]
