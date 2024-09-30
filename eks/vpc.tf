@@ -9,6 +9,8 @@ locals {
 resource "aws_vpc" "custom_vpc" {
   cidr_block       = var.vpc_data.cidr_block
   instance_tenancy = var.vpc_data.instance_tenancy
+  enable_dns_support = true
+  enable_dns_hostnames = true
   tags             = local.tags
 }
 
