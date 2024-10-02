@@ -6,7 +6,7 @@ variable "authorised_ips" {
 
 
 variable "profile" {
-  type = string
+  type    = string
   default = "default"
 }
 
@@ -81,6 +81,6 @@ variable "region" {
 
 
 variable "cluster_name" {
-  type = string
+  type    = string
   default = "oidc-cluster"
 }

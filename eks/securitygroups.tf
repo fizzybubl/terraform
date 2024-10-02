@@ -1,8 +1,8 @@
 locals {
   common_sg_tags = {
     "kubernetes.io/cluster/${var.cluster_name}" = "owned"
-    "aws:eks:cluster-name"                                      = var.cluster_name
-    "Name"                                                      = "eks-cluster-sg-${var.cluster_name}"
+    "aws:eks:cluster-name"                      = var.cluster_name
+    "Name"                                      = "eks-cluster-sg-${var.cluster_name}"
   }
 
   control_plange_required_egress = [{ port = 443, protocol = "tcp" }, { port = 53, protocol = "tcp" }, { port = 53, protocol = "udp" }, { port = 10250, protocol = "tcp" }]
