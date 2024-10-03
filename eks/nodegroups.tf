@@ -17,7 +17,7 @@ resource "aws_eks_node_group" "worker_nodes" {
     min_size     = 1
   }
 
-  subnet_ids    = aws_subnet.private_subnet[*].id
+  subnet_ids    = aws_subnet.public_subnet[*].id
   node_role_arn = aws_iam_role.worker.arn
 
   launch_template {
