@@ -34,7 +34,7 @@ resource "aws_eks_node_group" "worker_nodes" {
 
 
 resource "aws_launch_template" "node" {
-  name_prefix            = "foobar"
+  name_prefix            = "eks_worker_template"
   image_id               = data.aws_ami.amazon_ami.id
   instance_type          = var.instance_type
   vpc_security_group_ids = [aws_security_group.worker_nodes.id]
@@ -66,8 +66,8 @@ resource "aws_autoscaling_group_tag" "enabled" {
 resource "aws_autoscaling_group_tag" "cluster_name" {
   autoscaling_group_name = aws_eks_node_group.worker_nodes.resources[0].autoscaling_groups[0].name
   tag {
-    key                 = "k8s.io/cluster-autoscaler/${aws_eks_cluster.control_plane.id}"
-    value               = aws_eks_cluster.control_plane.id
+    key                 = "k8s.io/cluster-autoscaler/${var.cluster_name}"
+    value               = var.cluster_name
     propagate_at_launch = true
   }
 
