@@ -1,15 +1,5 @@
-data "aws_ami" "amazon_ami" {
-  most_recent = true
-  owners      = ["amazon"]
-
-  filter {
-    name   = "architecture"
-    values = ["x86_64"]
-  }
-}
-
 resource "aws_eks_node_group" "worker_nodes" {
-  cluster_name = var.cluster_name
+  cluster_name = aws_eks_cluster.control_plane.name
 
   scaling_config {
     desired_size = 1
@@ -35,17 +25,17 @@ resource "aws_eks_node_group" "worker_nodes" {
 
 resource "aws_launch_template" "node" {
   name_prefix            = "eks_worker_template"
-  image_id               = data.aws_ami.amazon_ami.id
+  image_id               = "ami-0592c673f0b1e7665"
   instance_type          = var.instance_type
   vpc_security_group_ids = [aws_security_group.worker_nodes.id]
 
   depends_on = [aws_security_group.worker_nodes]
 
-  
+
   tag_specifications {
     resource_type = "instance"
     tags = {
-      "kubernetes.io/cluster/${var.cluster_name}" = "owned"
+      "kubernetes.io/cluster/${aws_eks_cluster.control_plane.name}" = "owned"
     }
   }
 }
@@ -66,7 +56,7 @@ resource "aws_autoscaling_group_tag" "enabled" {
 resource "aws_autoscaling_group_tag" "cluster_name" {
   autoscaling_group_name = aws_eks_node_group.worker_nodes.resources[0].autoscaling_groups[0].name
   tag {
-    key                 = "k8s.io/cluster-autoscaler/${var.cluster_name}"
+    key                 = "k8s.io/cluster-autoscaler/${aws_eks_cluster.control_plane.name}"
     value               = var.cluster_name
     propagate_at_launch = true
   }
