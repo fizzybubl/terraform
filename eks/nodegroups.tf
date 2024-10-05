@@ -23,13 +23,17 @@ resource "aws_eks_node_group" "worker_nodes" {
 }
 
 
+data "aws_ssm_parameter" "eks_image" {
+  name = "/aws/service/eks/optimized-ami/1.30/amazon-linux-2023/x86_64/standard/recommended/image_id"
+}
+
 resource "aws_launch_template" "node" {
   name_prefix            = "eks_worker_template"
-  image_id               = "ami-0592c673f0b1e7665"
+  image_id               = data.aws_ssm_parameter.eks_image.value
   instance_type          = var.instance_type
-  vpc_security_group_ids = [aws_security_group.worker_nodes.id]
+  vpc_security_group_ids = [aws_security_group.eks.id]
 
-  depends_on = [aws_security_group.worker_nodes]
+  depends_on = [aws_security_group.eks]
 
 
   tag_specifications {

@@ -4,7 +4,7 @@ resource "aws_eks_cluster" "control_plane" {
 
   vpc_config {
     subnet_ids              = [for subnet in aws_subnet.private_subnet : subnet.id]
-    security_group_ids      = [aws_security_group.control_plane.id]
+    security_group_ids      = [aws_security_group.eks.id]
     endpoint_private_access = true
     endpoint_public_access  = true
   }
