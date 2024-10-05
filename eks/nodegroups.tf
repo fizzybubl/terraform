@@ -28,15 +28,15 @@ data "aws_ssm_parameter" "eks_image" {
 }
 
 
-# data "cloudinit_config" "user_data" {
-#   part {
-#     filename     = "userdata.sh"
-#     content_type = "text/x-shellscript"
-#     content = templatefile("${path.module}/files/userdata.tpl.sh", {
-#       cluster_name = aws_eks_cluster.control_plane.name
-#     })
-#   }
-# }
+data "cloudinit_config" "user_data" {
+  part {
+    filename     = "userdata.sh"
+    content_type = "text/x-shellscript"
+    content = templatefile("${path.module}/files/userdata.tpl.sh", {
+      cluster_name = aws_eks_cluster.control_plane.name
+    })
+  }
+}
 
 
 resource "aws_launch_template" "node" {
@@ -47,9 +47,7 @@ resource "aws_launch_template" "node" {
 
   depends_on = [aws_security_group.eks]
 
-  user_data = base64encode(templatefile("${path.module}/files/userdata.tpl.sh", {
-      cluster_name = aws_eks_cluster.control_plane.name
-    }))
+  user_data = data.cloudinit_config.user_data.rendered
 
 
   tag_specifications {
@@ -80,7 +78,7 @@ resource "aws_autoscaling_group_tag" "cluster_name" {
   autoscaling_group_name = aws_eks_node_group.worker_nodes.resources[0].autoscaling_groups[0].name
   tag {
     key                 = "k8s.io/cluster-autoscaler/${aws_eks_cluster.control_plane.name}"
-    value               = var.cluster_name
+    value               = true
     propagate_at_launch = true
   }
 

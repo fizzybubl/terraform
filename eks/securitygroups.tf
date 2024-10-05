@@ -1,18 +1,13 @@
-locals {
-  common_sg_tags = {
-    "kubernetes.io/cluster/${var.cluster_name}" = "owned"
-    "aws:eks:cluster-name"                      = var.cluster_name
-    "Name"                                      = "eks-cluster-sg-${var.cluster_name}"
-  }
-}
-
-
 # Cluster security group
 resource "aws_security_group" "eks" {
   name   = "ClusterSecurityGroup"
   vpc_id = aws_vpc.custom_vpc.id
 
-  tags = local.common_sg_tags
+  tags = {
+    "kubernetes.io/cluster/${var.cluster_name}" = "owned"
+    "aws:eks:cluster-name"                      = var.cluster_name
+    "Name"                                      = "eks-cluster-sg-${var.cluster_name}"
+  }
 }
 
 resource "aws_vpc_security_group_ingress_rule" "vpc_inbound_access" {
