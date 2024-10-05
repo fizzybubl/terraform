@@ -24,8 +24,20 @@ resource "aws_eks_node_group" "worker_nodes" {
 
 
 data "aws_ssm_parameter" "eks_image" {
-  name = "/aws/service/eks/optimized-ami/1.30/amazon-linux-2023/x86_64/standard/recommended/image_id"
+  name = "/aws/service/eks/optimized-ami/${aws_eks_cluster.control_plane.version}/amazon-linux-2023/x86_64/standard/recommended/image_id"
 }
+
+
+# data "cloudinit_config" "user_data" {
+#   part {
+#     filename     = "userdata.sh"
+#     content_type = "text/x-shellscript"
+#     content = templatefile("${path.module}/files/userdata.tpl.sh", {
+#       cluster_name = aws_eks_cluster.control_plane.name
+#     })
+#   }
+# }
+
 
 resource "aws_launch_template" "node" {
   name_prefix            = "eks_worker_template"
@@ -35,11 +47,18 @@ resource "aws_launch_template" "node" {
 
   depends_on = [aws_security_group.eks]
 
+  user_data = base64encode(templatefile("${path.module}/files/userdata.tpl.sh", {
+      cluster_name = aws_eks_cluster.control_plane.name
+    }))
+
 
   tag_specifications {
     resource_type = "instance"
     tags = {
-      "kubernetes.io/cluster/${aws_eks_cluster.control_plane.name}" = "owned"
+      "kubernetes.io/cluster/${aws_eks_cluster.control_plane.name}"     = "owned",
+      "eks:cluster-name"                                                = aws_eks_cluster.control_plane.name,
+      "k8s.io/cluster-autoscaler/enabled"                               = true,
+      "k8s.io/cluster-autoscaler/${aws_eks_cluster.control_plane.name}" = true
     }
   }
 }

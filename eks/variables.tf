@@ -68,12 +68,6 @@ variable "instance_type" {
   }
 }
 
-
-variable "instance_image" {
-  type    = string
-  default = "ami-01dad638e8f31ab9a"
-}
-
 variable "region" {
   type    = string
   default = "eu-central-1"
