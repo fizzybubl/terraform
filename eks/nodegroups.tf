@@ -24,7 +24,7 @@ resource "aws_eks_node_group" "worker_nodes" {
 
 
 data "aws_ssm_parameter" "eks_image" {
-  name = "/aws/service/eks/optimized-ami/${aws_eks_cluster.control_plane.version}/amazon-linux-2023/x86_64/standard/recommended/image_id"
+  name = "/aws/service/eks/optimized-ami/${aws_eks_cluster.control_plane.version}/amazon-linux-2/recommended/image_id"
 }
 
 
