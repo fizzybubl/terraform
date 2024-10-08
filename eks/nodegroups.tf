@@ -1,5 +1,5 @@
 resource "aws_eks_node_group" "worker_nodes" {
-  cluster_name = aws_eks_cluster.control_plane.name
+  cluster_name    = aws_eks_cluster.control_plane.name
   node_group_name = "${aws_eks_cluster.control_plane.name}-group"
 
   scaling_config {

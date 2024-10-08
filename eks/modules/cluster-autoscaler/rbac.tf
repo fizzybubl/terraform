@@ -1,4 +1,4 @@
-resource "kubernetes_service_account" "autoscaler_sa" {
+resource "kubernetes_service_account_v1" "autoscaler_sa" {
   metadata {
     labels = local.labels
 
@@ -12,7 +12,7 @@ resource "kubernetes_service_account" "autoscaler_sa" {
 }
 
 
-resource "kubernetes_cluster_role" "autoscaler_c_role" {
+resource "kubernetes_cluster_role_v1" "autoscaler_c_role" {
   metadata {
     labels = local.labels
     name   = local.name
@@ -100,7 +100,7 @@ resource "kubernetes_cluster_role" "autoscaler_c_role" {
 }
 
 
-resource "kubernetes_role" "autoscaler_role" {
+resource "kubernetes_role_v1" "autoscaler_role" {
   metadata {
     labels = local.labels
     name   = local.name
@@ -121,7 +121,7 @@ resource "kubernetes_role" "autoscaler_role" {
 }
 
 
-resource "kubernetes_cluster_role_binding" "autoscaler_c_role_bind" {
+resource "kubernetes_cluster_role_binding_v1" "autoscaler_c_role_bind" {
   metadata {
     labels = local.labels
     name   = local.name
@@ -140,7 +140,7 @@ resource "kubernetes_cluster_role_binding" "autoscaler_c_role_bind" {
 }
 
 
-resource "kubernetes_role_binding" "autoscaler_role_bind" {
+resource "kubernetes_role_binding_v1" "autoscaler_role_bind" {
   metadata {
     labels    = local.labels
     name      = local.name
