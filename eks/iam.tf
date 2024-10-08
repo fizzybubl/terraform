@@ -62,3 +62,34 @@ resource "aws_iam_role_policy_attachment" "AmazonEC2ContainerRegistryReadOnly" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
   role       = aws_iam_role.worker.name
 }
+
+
+# EBS CSI policies
+resource "aws_iam_role" "ebs_csi_driver" {
+  name = "EKS_CSI_DriverRole"
+
+  assume_role_policy = jsonencode({
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Principal": {
+            "Federated": "${aws_iam_openid_connect_provider.control_plane.arn}"
+          },
+          "Action": "sts:AssumeRoleWithWebIdentity",
+          "Condition": {
+            "StringEquals": {
+              "${replace(aws_eks_cluster.control_plane.identity[0].oidc[0].issuer, "https://", "")}:aud": "sts.amazonaws.com",
+              "${replace(aws_eks_cluster.control_plane.identity[0].oidc[0].issuer, "https://", "")}:sub": "system:serviceaccount:kube-system:ebs-csi-controller-sa"
+            }
+          }
+        }
+      ]
+    })
+}
+
+
+resource "aws_iam_role_policy_attachment" "AmazonEBSCSIDriverPolicy" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+  role       = aws_iam_role.ebs_csi_driver.name
+}

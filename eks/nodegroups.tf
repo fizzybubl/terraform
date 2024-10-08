@@ -1,9 +1,10 @@
 resource "aws_eks_node_group" "worker_nodes" {
   cluster_name = aws_eks_cluster.control_plane.name
+  node_group_name = "${aws_eks_cluster.control_plane.name}-group"
 
   scaling_config {
     desired_size = 1
-    max_size     = 1
+    max_size     = 3
     min_size     = 1
   }
 
@@ -22,6 +23,33 @@ resource "aws_eks_node_group" "worker_nodes" {
   ]
 }
 
+
+# resource "aws_eks_node_group" "spot_worker_nodes" {
+#   cluster_name    = aws_eks_cluster.control_plane.name
+#   node_group_name = "${aws_eks_cluster.control_plane.name}-spot-group"
+#   capacity_type   = "SPOT"
+#   instance_types  = ["t2.micro", "t3.micro"]
+
+#   scaling_config {
+#     desired_size = 1
+#     max_size     = 3
+#     min_size     = 1
+#   }
+
+#   subnet_ids    = aws_subnet.public_subnet[*].id
+#   node_role_arn = aws_iam_role.worker.arn
+
+#   launch_template {
+#     version = aws_launch_template.node.latest_version
+#     name    = aws_launch_template.node.name
+#   }
+
+#   depends_on = [
+#     aws_iam_role_policy_attachment.AmazonEKSWorkerNodePolicy,
+#     aws_iam_role_policy_attachment.AmazonEKS_CNI_Policy,
+#     aws_iam_role_policy_attachment.AmazonEC2ContainerRegistryReadOnly,
+#   ]
+# }
 
 data "aws_ssm_parameter" "eks_image" {
   name = "/aws/service/eks/optimized-ami/${aws_eks_cluster.control_plane.version}/amazon-linux-2/recommended/image_id"
@@ -43,6 +71,28 @@ resource "aws_launch_template" "node" {
   name_prefix            = "eks_worker_template"
   image_id               = data.aws_ssm_parameter.eks_image.value
   instance_type          = var.instance_type
+  vpc_security_group_ids = [aws_security_group.eks.id]
+
+  depends_on = [aws_security_group.eks]
+
+  user_data = data.cloudinit_config.user_data.rendered
+
+
+  tag_specifications {
+    resource_type = "instance"
+    tags = {
+      "kubernetes.io/cluster/${aws_eks_cluster.control_plane.name}"     = "owned",
+      "eks:cluster-name"                                                = aws_eks_cluster.control_plane.name,
+      "k8s.io/cluster-autoscaler/enabled"                               = true,
+      "k8s.io/cluster-autoscaler/${aws_eks_cluster.control_plane.name}" = true
+    }
+  }
+}
+
+
+resource "aws_launch_template" "spot_node" {
+  name_prefix            = "spot_eks_worker_template"
+  image_id               = data.aws_ssm_parameter.eks_image.value
   vpc_security_group_ids = [aws_security_group.eks.id]
 
   depends_on = [aws_security_group.eks]
