@@ -3,9 +3,9 @@ resource "aws_eks_node_group" "worker_nodes" {
   node_group_name = "${aws_eks_cluster.control_plane.name}-group"
 
   scaling_config {
-    desired_size = 1
-    max_size     = 3
-    min_size     = 1
+    desired_size = 3
+    max_size     = 5
+    min_size     = 2
   }
 
   subnet_ids    = aws_subnet.public_subnet[*].id
@@ -18,7 +18,6 @@ resource "aws_eks_node_group" "worker_nodes" {
 
   depends_on = [
     aws_iam_role_policy_attachment.AmazonEKSWorkerNodePolicy,
-    aws_iam_role_policy_attachment.AmazonEKS_CNI_Policy,
     aws_iam_role_policy_attachment.AmazonEC2ContainerRegistryReadOnly,
   ]
 }
@@ -31,9 +30,9 @@ resource "aws_eks_node_group" "worker_nodes" {
 #   instance_types  = ["t2.micro", "t3.micro"]
 
 #   scaling_config {
-#     desired_size = 1
-#     max_size     = 3
-#     min_size     = 1
+#     desired_size = 3
+#     max_size     = 5
+#     min_size     = 2
 #   }
 
 #   subnet_ids    = aws_subnet.public_subnet[*].id
@@ -46,7 +45,6 @@ resource "aws_eks_node_group" "worker_nodes" {
 
 #   depends_on = [
 #     aws_iam_role_policy_attachment.AmazonEKSWorkerNodePolicy,
-#     aws_iam_role_policy_attachment.AmazonEKS_CNI_Policy,
 #     aws_iam_role_policy_attachment.AmazonEC2ContainerRegistryReadOnly,
 #   ]
 # }
