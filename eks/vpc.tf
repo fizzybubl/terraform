@@ -7,9 +7,11 @@ locals {
 
 
 resource "aws_vpc" "custom_vpc" {
-  cidr_block       = var.vpc_data.cidr_block
-  instance_tenancy = var.vpc_data.instance_tenancy
-  tags             = local.tags
+  cidr_block           = var.vpc_data.cidr_block
+  instance_tenancy     = var.vpc_data.instance_tenancy
+  enable_dns_support   = true
+  enable_dns_hostnames = true
+  tags                 = local.tags
 }
 
 
@@ -24,6 +26,11 @@ resource "aws_route_table" "private_route_table" {
   tags = {
     Name = "Private Subnets route table"
   }
+
+  route {
+    gateway_id = "local"
+    cidr_block = aws_vpc.custom_vpc.cidr_block
+  }
 }
 
 
@@ -31,12 +38,18 @@ resource "aws_route_table" "public_route_table" {
   vpc_id = aws_vpc.custom_vpc.id
 
   tags = {
+    Type = "Public Subnet"
     Name = "Public Subnets route table"
   }
 
   route {
     gateway_id = aws_internet_gateway.internet_gateway.id
     cidr_block = local.public_internet
+  }
+
+  route {
+    gateway_id = "local"
+    cidr_block = aws_vpc.custom_vpc.cidr_block
   }
 }
 
@@ -48,8 +61,8 @@ resource "aws_subnet" "private_subnet" {
   availability_zone = var.private_subnets_input[count.index].availability_zone
 
   tags = {
-    Type = "Private Subnets"
-    Name = "Private Subnet ${count.index}"
+    Type = "Private Subnet"
+    Name = "Private Subnet ${var.private_subnets_input[count.index].availability_zone}"
   }
 
   depends_on = [aws_vpc.custom_vpc]
@@ -65,7 +78,7 @@ resource "aws_subnet" "public_subnet" {
 
   tags = {
     Type = "Public Subnets"
-    Name = "Public Subnet ${count.index}"
+    Name = "Public Subnet ${var.public_subnets_input[count.index].availability_zone}"
   }
 
   depends_on = [aws_vpc.custom_vpc]

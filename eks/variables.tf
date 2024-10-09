@@ -1,11 +1,13 @@
 variable "authorised_ips" {
   type        = set(string)
   description = "IPs from which to allow traffic"
+  default     = ["0.0.0.0/0"]
 }
 
 
 variable "profile" {
-  type = string
+  type    = string
+  default = "default"
 }
 
 
@@ -66,13 +68,13 @@ variable "instance_type" {
   }
 }
 
-
-variable "instance_image" {
-  type    = string
-  default = "ami-01dad638e8f31ab9a"
-}
-
 variable "region" {
   type    = string
   default = "eu-central-1"
+}
+
+
+variable "cluster_name" {
+  type    = string
+  default = "oidc-cluster"
 }
