@@ -245,6 +245,8 @@ resource "kubernetes_deployment_v1" "metrics_server" {
       }
     }
   }
+
+  depends_on = [ aws_eks_node_group.worker_nodes ]
 }
 
 
@@ -262,7 +264,9 @@ resource "kubernetes_api_service_v1" "metrics_server" {
       name      = "metrics-server"
       namespace = local.namespace
     }
-    version          = "v1beta"
+    version          = "v1beta1"
     version_priority = 100
   }
+
+  depends_on = [ aws_eks_node_group.worker_nodes ]
 }
