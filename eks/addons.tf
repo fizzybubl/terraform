@@ -21,23 +21,23 @@ resource "aws_eks_addon" "ebs_csi_driver" {
     }
   })
 
-  depends_on = [ aws_eks_addon.vpc_cni ]
+  depends_on = [aws_eks_addon.vpc_cni]
 }
 
 
 resource "aws_eks_addon" "kube_proxy" {
-  cluster_name             = aws_eks_cluster.control_plane.name
-  addon_version            = "v1.30.3-eksbuild.5"
-  addon_name               = "kube-proxy"
+  cluster_name  = aws_eks_cluster.control_plane.name
+  addon_version = "v1.30.3-eksbuild.5"
+  addon_name    = "kube-proxy"
 
-  depends_on = [ aws_eks_cluster.control_plane ]
+  depends_on = [aws_eks_cluster.control_plane]
 }
 
 
 resource "aws_eks_addon" "coredns" {
-  cluster_name             = aws_eks_cluster.control_plane.name
-  addon_version            = "v1.11.3-eksbuild.1"
-  addon_name               = "coredns"
+  cluster_name  = aws_eks_cluster.control_plane.name
+  addon_version = "v1.11.3-eksbuild.1"
+  addon_name    = "coredns"
 
-  depends_on = [ aws_eks_cluster.control_plane ]
+  depends_on = [aws_eks_cluster.control_plane]
 }

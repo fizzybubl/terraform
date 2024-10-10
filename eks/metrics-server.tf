@@ -246,7 +246,7 @@ resource "kubernetes_deployment_v1" "metrics_server" {
     }
   }
 
-  depends_on = [ aws_eks_node_group.worker_nodes ]
+  depends_on = [aws_eks_node_group.worker_nodes]
 }
 
 
@@ -268,5 +268,5 @@ resource "kubernetes_api_service_v1" "metrics_server" {
     version_priority = 100
   }
 
-  depends_on = [ aws_eks_node_group.worker_nodes ]
+  depends_on = [aws_eks_node_group.worker_nodes]
 }

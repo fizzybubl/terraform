@@ -1,10 +1,11 @@
 resource "aws_eks_node_group" "worker_nodes" {
   cluster_name    = aws_eks_cluster.control_plane.name
   node_group_name = "${aws_eks_cluster.control_plane.name}-group"
+  instance_types  = [var.instance_type]
 
   scaling_config {
-    desired_size = 3
-    max_size     = 5
+    desired_size = 6
+    max_size     = 10
     min_size     = 2
   }
 
@@ -30,8 +31,8 @@ resource "aws_eks_node_group" "worker_nodes" {
 #   instance_types  = ["t2.micro", "t3.micro"]
 
 #   scaling_config {
-#     desired_size = 3
-#     max_size     = 5
+#     desired_size = 6
+#     max_size     = 10
 #     min_size     = 2
 #   }
 
@@ -68,13 +69,16 @@ data "cloudinit_config" "user_data" {
 resource "aws_launch_template" "node" {
   name_prefix            = "eks_worker_template"
   image_id               = data.aws_ssm_parameter.eks_image.value
-  instance_type          = var.instance_type
   vpc_security_group_ids = [aws_security_group.eks.id]
 
-  depends_on = [aws_security_group.eks]
+  block_device_mappings {
+    device_name = "/dev/xvda"
+    ebs {
+      volume_size = 10
+    }
+  }
 
   user_data = data.cloudinit_config.user_data.rendered
-
 
   tag_specifications {
     resource_type = "instance"
@@ -85,28 +89,8 @@ resource "aws_launch_template" "node" {
       "k8s.io/cluster-autoscaler/${aws_eks_cluster.control_plane.name}" = true
     }
   }
-}
-
-
-resource "aws_launch_template" "spot_node" {
-  name_prefix            = "spot_eks_worker_template"
-  image_id               = data.aws_ssm_parameter.eks_image.value
-  vpc_security_group_ids = [aws_security_group.eks.id]
 
   depends_on = [aws_security_group.eks]
-
-  user_data = data.cloudinit_config.user_data.rendered
-
-
-  tag_specifications {
-    resource_type = "instance"
-    tags = {
-      "kubernetes.io/cluster/${aws_eks_cluster.control_plane.name}"     = "owned",
-      "eks:cluster-name"                                                = aws_eks_cluster.control_plane.name,
-      "k8s.io/cluster-autoscaler/enabled"                               = true,
-      "k8s.io/cluster-autoscaler/${aws_eks_cluster.control_plane.name}" = true
-    }
-  }
 }
 
 
