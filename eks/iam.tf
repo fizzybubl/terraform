@@ -93,7 +93,7 @@ resource "aws_iam_role_policy_attachment" "AmazonEBSCSIDriverPolicy" {
 # VPC CNI policies
 
 resource "aws_iam_role" "vpc_cni" {
-  name = "EKS_CPV_CNIRole"
+  name = "EKS_VPC_CNIRole"
 
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
