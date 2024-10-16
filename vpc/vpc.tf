@@ -26,16 +26,6 @@ resource "aws_route_table" "private_route_table" {
   tags = {
     Name = "Private Subnets route table"
   }
-
-  route {
-    gateway_id = "local"
-    cidr_block = aws_vpc.custom_vpc.cidr_block
-  }
-
-  route {
-    vpc_endpoint_id            = aws_vpc_endpoint.s3.id
-    destination_prefix_list_id = data.aws_ec2_managed_prefix_list.s3.id
-  }
 }
 
 
