@@ -19,7 +19,7 @@ resource "aws_eks_node_group" "worker_nodes" {
 
   depends_on = [
     aws_iam_role_policy_attachment.AmazonEKSWorkerNodePolicy,
-    aws_iam_role_policy_attachment.AmazonEC2ContainerRegistryReadOnly,
+    aws_iam_role_policy_attachment.AmazonEC2ContainerRegistryReadOnly
   ]
 }
 
