@@ -32,3 +32,12 @@ variable "cluster_name" {
   type    = string
   default = "oidc-cluster"
 }
+
+
+variable "vpc_data" {
+  type = object({
+    cidr_block       = string
+    instance_tenancy = string
+  })
+  default = { cidr_block = "10.0.0.0/16", instance_tenancy = "default" }
+}

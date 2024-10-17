@@ -3,7 +3,7 @@ resource "aws_eks_cluster" "control_plane" {
   role_arn = aws_iam_role.eks_cluster_role.arn
 
   vpc_config {
-    subnet_ids              = [for subnet in aws_subnet.private_subnet : subnet.id]
+    subnet_ids              = data.aws_subnets.private_subnets.ids
     security_group_ids      = [aws_security_group.eks.id]
     endpoint_private_access = true
     endpoint_public_access  = true

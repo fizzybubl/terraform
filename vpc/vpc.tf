@@ -11,7 +11,9 @@ resource "aws_vpc" "custom_vpc" {
   instance_tenancy     = var.vpc_data.instance_tenancy
   enable_dns_support   = true
   enable_dns_hostnames = true
-  tags                 = local.tags
+  tags                 = merge(local.tags, {
+    "Name" = "Custom VPC"
+  })
 }
 
 

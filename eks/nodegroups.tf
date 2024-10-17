@@ -9,7 +9,7 @@ resource "aws_eks_node_group" "worker_nodes" {
     min_size     = 2
   }
 
-  subnet_ids    = aws_subnet.private_subnet[*].id
+  subnet_ids    = data.aws_subnets.private_subnets.ids
   node_role_arn = aws_iam_role.worker.arn
 
   launch_template {
