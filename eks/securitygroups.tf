@@ -18,6 +18,7 @@ resource "aws_vpc_security_group_ingress_rule" "vpc_inbound_access" {
   cidr_ipv4         = data.aws_vpc.custom_vpc.cidr_block
 }
 
+
 resource "aws_vpc_security_group_ingress_rule" "internet_inbound_access" {
   for_each          = var.authorised_ips
   security_group_id = aws_security_group.eks.id

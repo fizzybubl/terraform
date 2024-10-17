@@ -21,7 +21,7 @@ resource "aws_eks_addon" "ebs_csi_driver" {
     }
   })
 
-  depends_on = [aws_eks_addon.vpc_cni]
+  depends_on = [aws_eks_addon.vpc_cni, aws_eks_node_group.worker_nodes]
 }
 
 
