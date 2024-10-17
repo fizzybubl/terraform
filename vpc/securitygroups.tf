@@ -28,11 +28,11 @@ resource "aws_vpc_security_group_egress_rule" "vpc_outbound_access" {
 
 # VPC Interface EP security group
 resource "aws_security_group" "internet" {
-  name   = "EC2_Instance_Connect"
+  name   = "EC2_Instance_Connect_SecurityGroup"
   vpc_id = aws_vpc.custom_vpc.id
 
   tags = {
-    "Name" = "EC2_Instance_Connect"
+    "Name" = "EC2_Instance_Connect_SecurityGroup"
   }
 }
 
