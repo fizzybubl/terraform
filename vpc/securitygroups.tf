@@ -60,18 +60,18 @@ resource "aws_vpc_security_group_egress_rule" "vpc_outbound_access_" {
 }
 
 
-resource "aws_vpc_security_group_ingress_rule" "ec_connect_inbound" {
+resource "aws_vpc_security_group_ingress_rule" "ec2_connect_inbound" {
   security_group_id = aws_security_group.internet.id
   ip_protocol       = -1
   from_port         = -1
   to_port           = -1
-  prefix_list_id = data.aws_ec2_managed_prefix_list.ec2_instance_connect.id
+  prefix_list_id    = data.aws_ec2_managed_prefix_list.ec2_instance_connect.id
 }
 
-resource "aws_vpc_security_group_egress_rule" "ec_connect_outbound" {
+resource "aws_vpc_security_group_egress_rule" "ec2_connect_outbound" {
   security_group_id = aws_security_group.internet.id
   ip_protocol       = -1
   from_port         = -1
   to_port           = -1
-  prefix_list_id = data.aws_ec2_managed_prefix_list.ec2_instance_connect.id
+  prefix_list_id    = data.aws_ec2_managed_prefix_list.ec2_instance_connect.id
 }
