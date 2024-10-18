@@ -7,5 +7,5 @@ data "template_file" "user_data" {
 }
 
 output "rendered" {
-  value = data.template_file.example.rendered
+  value = data.template_file.user_data.rendered
 }

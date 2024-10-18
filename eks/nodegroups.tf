@@ -4,7 +4,7 @@ resource "aws_eks_node_group" "worker_nodes" {
   instance_types  = [var.instance_type]
 
   scaling_config {
-    desired_size = 8
+    desired_size = 7
     max_size     = 10
     min_size     = 2
   }
@@ -56,6 +56,7 @@ data "aws_ssm_parameter" "eks_image" {
 
 
 data "cloudinit_config" "user_data" {
+  gzip = false
   part {
     filename     = "userdata.sh"
     content_type = "text/x-shellscript"
@@ -94,29 +95,29 @@ resource "aws_launch_template" "node" {
     }
   }
 
-  depends_on = [aws_security_group.eks]
+  depends_on = [aws_security_group.eks, aws_eks_cluster.control_plane]
 }
 
 
-resource "aws_autoscaling_group_tag" "enabled" {
-  autoscaling_group_name = aws_eks_node_group.worker_nodes.resources[0].autoscaling_groups[0].name
-  tag {
-    key                 = "k8s.io/cluster-autoscaler/enabled"
-    value               = true
-    propagate_at_launch = true
-  }
+# resource "aws_autoscaling_group_tag" "enabled" {
+#   autoscaling_group_name = aws_eks_node_group.worker_nodes.resources[0].autoscaling_groups[0].name
+#   tag {
+#     key                 = "k8s.io/cluster-autoscaler/enabled"
+#     value               = true
+#     propagate_at_launch = true
+#   }
 
-  depends_on = [aws_eks_cluster.control_plane]
-}
+#   depends_on = [aws_eks_cluster.control_plane]
+# }
 
 
-resource "aws_autoscaling_group_tag" "cluster_name" {
-  autoscaling_group_name = aws_eks_node_group.worker_nodes.resources[0].autoscaling_groups[0].name
-  tag {
-    key                 = "k8s.io/cluster-autoscaler/${aws_eks_cluster.control_plane.name}"
-    value               = true
-    propagate_at_launch = true
-  }
+# resource "aws_autoscaling_group_tag" "cluster_name" {
+#   autoscaling_group_name = aws_eks_node_group.worker_nodes.resources[0].autoscaling_groups[0].name
+#   tag {
+#     key                 = "k8s.io/cluster-autoscaler/${aws_eks_cluster.control_plane.name}"
+#     value               = true
+#     propagate_at_launch = true
+#   }
 
-  depends_on = [aws_eks_cluster.control_plane]
-}
+#   depends_on = [aws_eks_cluster.control_plane]
+# }
