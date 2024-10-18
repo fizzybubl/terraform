@@ -108,6 +108,6 @@ resource "aws_vpc_endpoint" "sts" {
 }
 
 
-resource "aws_ec2_instance_connect_endpoint" "example" {
-  subnet_id = aws_subnet.private_subnet[0].id
-}
+# resource "aws_ec2_instance_connect_endpoint" "example" {
+#   subnet_id = aws_subnet.private_subnet[0].id
+# }
