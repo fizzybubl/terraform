@@ -25,7 +25,13 @@ resource "aws_internet_gateway" "internet_gateway" {
 resource "aws_route_table" "private_route_table" {
   vpc_id = aws_vpc.custom_vpc.id
 
+  route {
+    gateway_id = "local"
+    cidr_block = aws_vpc.custom_vpc.cidr_block
+  }
+
   tags = {
+    Type = "Private Subnet"
     Name = "Private Subnets route table"
   }
 }
@@ -74,7 +80,7 @@ resource "aws_subnet" "public_subnet" {
   availability_zone       = var.public_subnets_input[count.index].availability_zone
 
   tags = {
-    Type = "Public Subnets"
+    Type = "Public Subnet"
     Name = "Public Subnet ${var.public_subnets_input[count.index].availability_zone}"
   }
 
