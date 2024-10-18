@@ -5,15 +5,15 @@ data "aws_vpc" "custom_vpc" {
 
 data "aws_subnets" "public_subnets" {
   filter {
-    name = "tag:Type"
-    values = [ "Public Subnet" ]
+    name   = "tag:Type"
+    values = ["Public Subnet"]
   }
 }
 
 
 data "aws_subnets" "private_subnets" {
   filter {
-    name = "tag:Type"
-    values = [ "Private Subnet" ]
+    name   = "tag:Type"
+    values = ["Private Subnet"]
   }
 }

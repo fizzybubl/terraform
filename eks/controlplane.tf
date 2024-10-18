@@ -1,6 +1,7 @@
 resource "aws_eks_cluster" "control_plane" {
   name     = var.cluster_name
   role_arn = aws_iam_role.eks_cluster_role.arn
+  version  = "1.30"
 
   vpc_config {
     subnet_ids              = data.aws_subnets.private_subnets.ids

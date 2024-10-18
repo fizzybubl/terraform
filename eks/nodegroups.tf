@@ -60,9 +60,13 @@ data "cloudinit_config" "user_data" {
     filename     = "userdata.sh"
     content_type = "text/x-shellscript"
     content = templatefile("${path.module}/files/userdata.tpl.sh", {
-      cluster_name = aws_eks_cluster.control_plane.name
+      cluster_name = aws_eks_cluster.control_plane.name,
+      eks_endpoint = aws_eks_cluster.control_plane.endpoint,
+      eks_ca       = aws_eks_cluster.control_plane.certificate_authority[0].data
     })
   }
+
+  depends_on = [aws_eks_cluster.control_plane]
 }
 
 
