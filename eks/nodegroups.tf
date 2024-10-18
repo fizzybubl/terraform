@@ -4,7 +4,7 @@ resource "aws_eks_node_group" "worker_nodes" {
   instance_types  = [var.instance_type]
 
   scaling_config {
-    desired_size = 6
+    desired_size = 8
     max_size     = 10
     min_size     = 2
   }
@@ -31,7 +31,7 @@ resource "aws_eks_node_group" "worker_nodes" {
 #   instance_types  = ["t2.micro", "t3.micro"]
 
 #   scaling_config {
-#     desired_size = 6
+#     desired_size = 2
 #     max_size     = 10
 #     min_size     = 2
 #   }
@@ -74,7 +74,7 @@ resource "aws_launch_template" "node" {
   block_device_mappings {
     device_name = "/dev/xvda"
     ebs {
-      volume_size = 10
+      volume_size = 8
     }
   }
 

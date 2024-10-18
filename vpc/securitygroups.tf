@@ -10,18 +10,18 @@ resource "aws_security_group" "vpc_ep" {
 
 resource "aws_vpc_security_group_ingress_rule" "vpc_inbound_access" {
   security_group_id = aws_security_group.vpc_ep.id
-  ip_protocol       = -1
-  from_port         = -1
-  to_port           = -1
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
   cidr_ipv4         = aws_vpc.custom_vpc.cidr_block
 }
 
 
 resource "aws_vpc_security_group_egress_rule" "vpc_outbound_access" {
   security_group_id = aws_security_group.vpc_ep.id
-  ip_protocol       = -1
-  from_port         = -1
-  to_port           = -1
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
   cidr_ipv4         = aws_vpc.custom_vpc.cidr_block
 }
 
