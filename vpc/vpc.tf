@@ -22,12 +22,29 @@ resource "aws_internet_gateway" "internet_gateway" {
 }
 
 
+resource "aws_eip" "nat_gw_eip" {
+  domain = "vpc"
+  network_border_group = var.region
+}
+
+
+resource "aws_nat_gateway" "public_gw" {
+  subnet_id     = aws_subnet.public_subnet[0].id
+  allocation_id = aws_eip.nat_gw_eip.id
+}
+
+
 resource "aws_route_table" "private_route_table" {
   vpc_id = aws_vpc.custom_vpc.id
 
   route {
     gateway_id = "local"
     cidr_block = aws_vpc.custom_vpc.cidr_block
+  }
+
+  route {
+    nat_gateway_id = aws_nat_gateway.public_gw.id
+    cidr_block = "0.0.0.0/0"
   }
 
   tags = {
