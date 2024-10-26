@@ -11,7 +11,7 @@ resource "aws_vpc_endpoint" "client" {
   private_dns_enabled = true
 
   security_group_ids = [
-    aws_security_group.vpc_ep.id,
+    aws_security_group.vpc_ep.id
   ]
 }
 
