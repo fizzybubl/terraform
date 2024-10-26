@@ -23,7 +23,7 @@ resource "aws_internet_gateway" "internet_gateway" {
 
 
 resource "aws_eip" "nat_gw_eip" {
-  domain = "vpc"
+  domain               = "vpc"
   network_border_group = var.region
 }
 
@@ -44,7 +44,7 @@ resource "aws_route_table" "private_route_table" {
 
   route {
     nat_gateway_id = aws_nat_gateway.public_gw.id
-    cidr_block = "0.0.0.0/0"
+    cidr_block     = "0.0.0.0/0"
   }
 
   tags = {

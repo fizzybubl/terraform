@@ -1,8 +1,8 @@
 resource "aws_lb" "ep_service" {
   name               = "NLB-Endpoint-Service"
-  internal           = false
+  internal           = true
   load_balancer_type = "network"
-  subnets            = [for subnet in module.vpc["service"].public_subnets : subnet.id]
+  subnets            = [for subnet in module.vpc["service"].private_subnets : subnet.id]
 
   tags = {
     Name = "NLB Endpoint Service"
@@ -10,24 +10,57 @@ resource "aws_lb" "ep_service" {
 }
 
 
-resource "aws_vpc_endpoint_service" "ep_service" {
-  acceptance_required        = true
-  network_load_balancer_arns = [aws_lb.ep_service.arn]
+resource "aws_lb_target_group" "nlb_tg" {
+  target_type = "alb"
+  protocol = "TCP"
+  port = 80
+  vpc_id = module.vpc["service"].vpc.id
 }
 
 
-resource "aws_vpc_endpoint" "client" {
-  vpc_id              = module.vpc["client"].vpc.id
-  service_name        = aws_vpc_endpoint_service.ep_service.service_name
-  vpc_endpoint_type   = "Interface"
-  private_dns_enabled = false
-
-  security_group_ids = [
-    aws_security_group.vpc_ep.id,
-  ]
+resource "aws_lb_target_group_attachment" "to_alb" {
+  target_group_arn = aws_lb_target_group.nlb_tg.arn
+  target_id        = aws_lb.internal_alb.arn
+  depends_on       = [aws_lb.internal_alb, aws_lb_listener.alb_default]
 }
 
-resource "aws_vpc_endpoint_connection_accepter" "example" {
-  vpc_endpoint_service_id = aws_vpc_endpoint_service.ep_service.id
-  vpc_endpoint_id         = aws_vpc_endpoint.client.id
+
+resource "aws_lb_listener" "nlb_default" {
+  load_balancer_arn = aws_lb.ep_service.arn
+  port              = "80"
+  protocol          = "TCP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.nlb_tg.arn
+  }
+}
+
+
+# ALB SETUP
+resource "aws_lb" "internal_alb" {
+  name               = "ALB-Endpoint-Service"
+  internal           = true
+  subnets            = [for subnet in module.vpc["service"].private_subnets : subnet.id]
+
+  tags = {
+    Name = "ALB Endpoint Service"
+  }
+}
+
+
+resource "aws_lb_listener" "alb_default" {
+  load_balancer_arn = aws_lb.internal_alb.arn
+  port              = "80"
+  protocol          = "HTTP"
+
+  default_action {
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Fixed response content"
+      status_code  = "200"
+    }
+  }
 }
