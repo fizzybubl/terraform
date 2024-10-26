@@ -12,9 +12,9 @@ resource "aws_lb" "ep_service" {
 
 resource "aws_lb_target_group" "nlb_tg" {
   target_type = "alb"
-  protocol = "TCP"
-  port = 80
-  vpc_id = module.vpc["service"].vpc.id
+  protocol    = "TCP"
+  port        = 80
+  vpc_id      = module.vpc["service"].vpc.id
 }
 
 
@@ -39,9 +39,10 @@ resource "aws_lb_listener" "nlb_default" {
 
 # ALB SETUP
 resource "aws_lb" "internal_alb" {
-  name               = "ALB-Endpoint-Service"
-  internal           = true
-  subnets            = [for subnet in module.vpc["service"].private_subnets : subnet.id]
+  name            = "ALB-Endpoint-Service"
+  internal        = true
+  subnets         = [for subnet in module.vpc["service"].private_subnets : subnet.id]
+  security_groups = [module.security_group["alb"].security_group.id]
 
   tags = {
     Name = "ALB Endpoint Service"
