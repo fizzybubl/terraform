@@ -8,8 +8,8 @@ resource "aws_vpc_endpoint" "client" {
   vpc_id              = module.vpc["client"].vpc.id
   service_name        = aws_vpc_endpoint_service.ep_service.service_name
   vpc_endpoint_type   = "Interface"
-  private_dns_enabled = true
 
+  subnet_ids = [ for subnet in module.vpc["client"].private_subnets: subnet.id ]
   security_group_ids = [
     aws_security_group.vpc_ep.id
   ]
@@ -19,3 +19,10 @@ resource "aws_vpc_endpoint_connection_accepter" "example" {
   vpc_endpoint_service_id = aws_vpc_endpoint_service.ep_service.id
   vpc_endpoint_id         = aws_vpc_endpoint.client.id
 }
+
+
+# resource "aws_vpc_endpoint_private_dns" "client" {
+#   vpc_endpoint_id     = aws_vpc_endpoint.client.id
+#   private_dns_enabled = true
+#   depends_on = [ aws_vpc_endpoint_connection_accepter.example ]
+# }
