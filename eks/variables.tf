@@ -41,3 +41,9 @@ variable "vpc_data" {
   })
   default = { cidr_block = "10.0.0.0/16", instance_tenancy = "default" }
 }
+
+
+variable "eks_version" {
+  type = string
+  default = "1.30" 
+}
