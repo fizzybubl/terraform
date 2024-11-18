@@ -5,3 +5,8 @@ output "user" {
     id         = data.aws_caller_identity.current_user.id
   }
 }
+
+
+output "url" {
+  value = aws_api_gateway_stage.name.invoke_url
+}

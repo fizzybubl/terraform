@@ -45,7 +45,7 @@ resource "aws_lambda_function" "apigw_lambda" {
     }
   }
 }
- 
+
 
 # resource "aws_cloudwatch_log_group" "apigw_lambda" {
 #   name = "/aws/lambda/${aws_lambda_function.apigw_lambda.function_name}"
