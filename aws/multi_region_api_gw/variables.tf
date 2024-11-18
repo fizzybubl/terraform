@@ -1,8 +1,10 @@
 variable "region" {
-  type = string
+  type    = string
+  default = "eu-central-1"
 }
 
 
 variable "profile" {
-  type = string
+  type    = string
+  default = "root-admin"
 }
