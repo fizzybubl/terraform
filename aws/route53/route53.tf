@@ -17,70 +17,53 @@ resource "aws_route53_record" "record" {
   ttl      = each.value.ttl
   records  = each.value.records
 
-  # cidr_routing_policy {
-  #   for_each = each.value.cidr_routing_policy
-    
-  # }
-
   dynamic "failover_routing_policy" {
-    for_each = each.value.failover_routing_policy
-    iterator = "routing_policy"
+    for_each = each.value.failover_routing_policy ? ["failover_routing_policy"] : []
     content {
-      type = routing_policy.value.type
+      type = each.value.failover_routing_policy.type
     }
   }
 
   dynamic "geolocation_routing_policy" {
-    for_each = each.value.geolocation_routing_policy
-    iterator = "routing_policy"
+    for_each = each.value.geolocation_routing_policy ? ["geolocation_routing_policy"] : []
     content {
-      continent = routing_policy.value.continent
-      country = routing_policy.value.country
-      subdivision = routing_policy.value.subdivision
+      continent = each.value.geolocation_routing_policy.continent
+      country = each.value.geolocation_routing_policy.country
+      subdivision = each.value.geolocation_routing_policy.subdivision
     }
   }
 
   dynamic "geoproximity_routing_policy" {
-    for_each = each.value.geoproximity_routing_policy
-    iterator = "routing_policy"
+    for_each = each.value.geoproximity_routing_policy ? ["geoproximity_routing_policy"] : []
     content {
-      aws_region = routing_policy.value.aws_region
-      bias = routing_policy.value.bias
+      aws_region = each.value.geoproximity_routing_policy.aws_region
+      bias = each.value.geoproximity_routing_policy.bias
       coordinates = {
-        latitude = routing_policy.value.coordinates.latitude
-        longitude = routing_policy.value.coordinates.longitude
+        latitude = each.value.geoproximity_routing_policy.coordinates.latitude
+        longitude = each.value.geoproximity_routing_policy.coordinates.longitude
       }
-      local_zone_group = routing_policy.value.local_zone_group
+      local_zone_group = each.value.geoproximity_routing_policy.local_zone_group
     }
   }
 
   dynamic "latency_routing_policy" {
-    for_each = each.value.latency_routing_policy
-    iterator = "routing_policy"
+    for_each = each.value.latency_routing_policy ? ["latency_routing_policy"] : []
     content {
-      region = routing_policy.value.region
+      region = each.value.latency_routing_policy.region
     }
   }
 
-  dynamic "multivalue_answer_routing_policy"{
-    for_each = each.value.multivalue_answer_routing_policy
-    iterator = "routing_policy"
+  dynamic "weighted_routing_policy"{
+    for_each = each.value.weighted_routing_policy ? ["weighted_routing_policy"] : []
     content {
-      weight = routing_policy.value.weight
+      weight = each.value.weighted_routing_policy.weight
     }
   }
 
-  weighted_routing_policy = each.value.weighted_routing_policy
-}
+  multivalue_answer_routing_policy = each.value.multivalue_answer_routing_policy
 
-
-resource "aws_route53_record" "alias_record" {
-  for_each = var.record_data
-  zone_id  = local.zone_id
-  name     = each.key
-  type     = each.value.type
-
-  alias {
+  dynamic "alias" {
+    for_each = each.value.alias ? ["alias"] : []
     name                   = each.value.alias.name
     zone_id                = each.value.alias.zone_id
     evaluate_target_health = each.value.alias.evaluate_target_health
