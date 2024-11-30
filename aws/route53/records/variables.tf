@@ -3,7 +3,7 @@ variable "record_data" {
     zone_id = string
     ttl                              = optional(string, null)
     type                             = optional(string, null)
-    records                          = optional(list(string), [])
+    records                          = optional(list(string), null)
     failover_routing_policy          = optional(object({ type = string }), null)
     geolocation_routing_policy       = optional(object({ continent = string, country = string, subdivision = string }), null)
     geoproximity_routing_policy      = optional(object({ aws_region = string, bias = number, coordinates = object({ latitude = string, longitude = string }), local_zone_group = string }), null)

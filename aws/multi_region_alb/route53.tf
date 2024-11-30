@@ -11,7 +11,7 @@ module "latency_routing_record" {
   source = "../route53/records"
 
   record_data = {
-    "frankfurt_record" = {
+    "fra.mtlsexample.online" = {
       zone_id = module.route53_hosted_zone.hosted_zone.zone_id
       type = "A"
       set_identifier = "fra"
