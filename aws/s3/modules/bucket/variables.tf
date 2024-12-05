@@ -26,11 +26,6 @@ variable "tags" {
   default = {}
 }
 
-variable "bucket_policy" {
-  type = any
-  default = null
-}
-
 
 variable "versioning" {
   type = string

@@ -12,7 +12,6 @@ variable "profile" {
 
 variable "bucket_id" {
   type = string
-  default = null
 }
 
 
@@ -20,4 +19,6 @@ variable "rules" {
   type = map(object({
     
   }))
+  default = {
+  }
 }
