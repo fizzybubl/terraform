@@ -6,6 +6,10 @@ data "aws_iam_role" "admin" {
 module "s3_bucket" {
   source = "./modules/bucket"
   bucket = "test-bucket-module-tf"
+  block_public_acls = true
+  block_public_policy = true
+  restrict_public_buckets = true
+  ignore_public_acls = true
 }
 
 
@@ -27,4 +31,11 @@ module "s3_bucket_policy" {
       }
     ]
   }
+}
+
+
+module "s3_lifecycle_policy" {
+  source = "./modules/lifecycle"
+  bucket_id = var.bucket_id
+  rules = {}
 }
