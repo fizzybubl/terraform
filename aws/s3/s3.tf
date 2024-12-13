@@ -34,8 +34,33 @@ module "s3_bucket_policy" {
 }
 
 
-module "s3_lifecycle_policy" {
-  source = "./modules/lifecycle"
-  bucket_id = var.bucket_id
-  rules = {}
+resource "aws_s3_bucket_lifecycle_configuration" "example" {
+  bucket = aws_s3_bucket.bucket.id
+
+  rule {
+    id = "logs_rule"
+
+    filter {
+      prefix = "logs/"
+    }
+
+    transition {
+      days = 365
+      storage_class = "GLACIER_IR"
+    }
+
+    status = "Enabled"
+  }
+
+  rule {
+    id = "rule-2"
+
+    filter {
+      prefix = "tmp/"
+    }
+
+    # ... other transition/expiration actions ...
+
+    status = "Enabled"
+  }
 }

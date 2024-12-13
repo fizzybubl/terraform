@@ -22,8 +22,11 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
         }
       }
 
-      expiration {
-        date = rule.value.expiration.date
+      dynamic "expiration" {
+        for_each = rule.value.expiration
+       content {
+          date = expiration.value.date
+       }
       }
     }
   }
