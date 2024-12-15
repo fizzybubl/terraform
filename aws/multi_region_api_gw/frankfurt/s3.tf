@@ -6,7 +6,7 @@ data "aws_caller_identity" "current_user" {
 
 
 resource "aws_s3_bucket" "source" {
-  bucket = "lambda-s3-source-bucket"
+  bucket_prefix = "lambda-s3-source-bucket"
   force_destroy = true
 }
 
@@ -35,7 +35,7 @@ resource "aws_s3_object" "name" {
 
 resource "aws_s3_bucket" "destination" {
   provider = aws.second_region
-  bucket = "lambda-s3-destination-bucket"
+  bucket_prefix = "lambda-s3-destination-bucket"
   force_destroy = true
 }
 
