@@ -11,7 +11,7 @@ resource "aws_s3_bucket" "source" {
 }
 
 
-resource "aws_s3_bucket_versioning" "versioning" {
+resource "aws_s3_bucket_versioning" "source_versioning" {
   bucket = aws_s3_bucket.source.id
   versioning_configuration {
     status = "Enabled"
@@ -30,4 +30,20 @@ resource "aws_s3_object" "name" {
   bucket = aws_s3_bucket.source.id
   key = "lambda-code/dev/lambda.py"
   source = "${path.module}/lambda_function_payload.zip"
+}
+
+
+resource "aws_s3_bucket" "destination" {
+  provider = aws.second_region
+  bucket = "lambda-s3-destination-bucket"
+  force_destroy = true
+}
+
+
+resource "aws_s3_bucket_versioning" "destination_versioning" {
+  provider = aws.second_region
+  bucket = aws_s3_bucket.destination.id
+  versioning_configuration {
+    status = "Enabled"
+  }
 }

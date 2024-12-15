@@ -8,3 +8,9 @@ variable "profile" {
   type    = string
   default = "root-admin"
 }
+
+
+variable "second_region" {
+  type = string
+  default = "eu-west-1"
+}
