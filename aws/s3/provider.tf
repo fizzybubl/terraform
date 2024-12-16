@@ -7,7 +7,7 @@ provider "aws" {
 
 
 provider "aws" {
-  alias = "second_region"
+  alias                    = "second_region"
   profile                  = var.profile
   shared_credentials_files = ["C:\\Users\\danii\\.aws\\credentials"]
   region                   = var.second_region

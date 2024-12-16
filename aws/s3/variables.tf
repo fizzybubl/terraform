@@ -11,6 +11,6 @@ variable "profile" {
 
 
 variable "second_region" {
-  type = string
+  type    = string
   default = "eu-west-1"
 }

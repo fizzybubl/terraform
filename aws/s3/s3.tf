@@ -28,13 +28,13 @@ data "archive_file" "lambda" {
 
 resource "aws_s3_object" "name" {
   bucket = aws_s3_bucket.source.id
-  key = "lambda-code/dev/lambda.py"
+  key    = "lambda-code/dev/lambda.py"
   source = "${path.module}/lambda_function_payload.zip"
 }
 
 
 resource "aws_s3_bucket" "destination" {
-  provider = aws.second_region
+  provider      = aws.second_region
   bucket_prefix = "lambda-s3-destination-bucket"
   force_destroy = true
 }
@@ -42,7 +42,7 @@ resource "aws_s3_bucket" "destination" {
 
 resource "aws_s3_bucket_versioning" "destination_versioning" {
   provider = aws.second_region
-  bucket = aws_s3_bucket.destination.id
+  bucket   = aws_s3_bucket.destination.id
   versioning_configuration {
     status = "Enabled"
   }
