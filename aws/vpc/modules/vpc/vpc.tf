@@ -11,32 +11,32 @@ resource "aws_vpc" "custom_vpc" {
   instance_tenancy     = var.vpc_data.instance_tenancy
   enable_dns_support   = true
   enable_dns_hostnames = true
-  tags = merge(local.tags, var.vpc_data.tags)
+  tags                 = merge(local.tags, var.vpc_data.tags)
 }
 
 
 resource "aws_internet_gateway" "internet_gateway" {
-  count = length(var.public_subnets_input) > 0 ? 1 : 0
+  count  = length(var.public_subnets_input) > 0 ? 1 : 0
   vpc_id = aws_vpc.custom_vpc.id
 }
 
 
 resource "aws_eip" "nat_gw_eip" {
-  count = var.natgw ? 1 : 0
+  count                = var.natgw ? 1 : 0
   domain               = "vpc"
   network_border_group = var.region
 }
 
 
 resource "aws_nat_gateway" "public_gw" {
-  count = var.natgw ? 1 : 0
+  count         = var.natgw ? 1 : 0
   subnet_id     = aws_subnet.public_subnet[0].id
   allocation_id = aws_eip.nat_gw_eip[0].id
 }
 
 
 resource "aws_route_table" "private_route_table" {
-  count = length(var.private_subnets_input) > 0 ? 1 : 0
+  count  = length(var.private_subnets_input) > 0 ? 1 : 0
   vpc_id = aws_vpc.custom_vpc.id
 
   route {
@@ -60,7 +60,7 @@ resource "aws_route_table" "private_route_table" {
 
 
 resource "aws_route_table" "public_route_table" {
-  count = length(var.public_subnets_input) > 0 ? 1 : 0
+  count  = length(var.public_subnets_input) > 0 ? 1 : 0
   vpc_id = aws_vpc.custom_vpc.id
 
   tags = {

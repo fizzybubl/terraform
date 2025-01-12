@@ -15,7 +15,7 @@ output "vpc" {
 
 output "route_tables" {
   value = {
-    public_route_table = aws_route_table.public_route_table
+    public_route_table  = aws_route_table.public_route_table
     private_route_table = aws_route_table.private_route_table
   }
 }

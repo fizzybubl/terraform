@@ -32,8 +32,8 @@ resource "aws_ec2_transit_gateway_route_table" "dmz" {
 
 
 resource "aws_ec2_transit_gateway_vpc_attachment" "prod" {
-  vpc_id                                          = module.prod.vpc.id
-  subnet_ids                                      = module.prod.private_subnets[*].id
+  vpc_id                                          = aws_vpc.prod.id
+  subnet_ids                                      = [for s in aws_subnet.private_subnets_tgw_prod : s.id]
   transit_gateway_id                              = aws_ec2_transit_gateway.example.id
   transit_gateway_default_route_table_association = false
   transit_gateway_default_route_table_propagation = false
@@ -41,8 +41,8 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "prod" {
 
 
 resource "aws_ec2_transit_gateway_vpc_attachment" "pre_prod" {
-  vpc_id                                          = module.pre_prod.vpc.id
-  subnet_ids                                      = module.pre_prod.private_subnets[*].id
+  vpc_id                                          = aws_vpc.pre_prod.id
+  subnet_ids                                      = [for s in aws_subnet.private_subnets_tgw_pre_prod : s.id]
   transit_gateway_id                              = aws_ec2_transit_gateway.example.id
   transit_gateway_default_route_table_association = false
   transit_gateway_default_route_table_propagation = false
@@ -50,8 +50,8 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "pre_prod" {
 
 
 resource "aws_ec2_transit_gateway_vpc_attachment" "stg" {
-  vpc_id                                          = module.stg.vpc.id
-  subnet_ids                                      = module.stg.private_subnets[*].id
+  vpc_id                                          = aws_vpc.stg.id
+  subnet_ids                                      = [for s in aws_subnet.private_subnets_tgw_stg : s.id]
   transit_gateway_id                              = aws_ec2_transit_gateway.example.id
   transit_gateway_default_route_table_association = false
   transit_gateway_default_route_table_propagation = false
@@ -59,8 +59,8 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "stg" {
 
 
 resource "aws_ec2_transit_gateway_vpc_attachment" "dev" {
-  vpc_id                                          = module.dev.vpc.id
-  subnet_ids                                      = module.dev.private_subnets[*].id
+  vpc_id                                          = aws_vpc.dev.id
+  subnet_ids                                      = [for s in aws_subnet.private_subnets_tgw_dev : s.id]
   transit_gateway_id                              = aws_ec2_transit_gateway.example.id
   transit_gateway_default_route_table_association = false
   transit_gateway_default_route_table_propagation = false
@@ -68,8 +68,8 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "dev" {
 
 
 resource "aws_ec2_transit_gateway_vpc_attachment" "dmz" {
-  vpc_id                                          = module.dmz.vpc.id
-  subnet_ids                                      = module.dmz.public_subnets[*].id
+  vpc_id                                          = aws_vpc.dmz.id
+  subnet_ids                                      = [for s in aws_subnet.private_subnets_tgw_dmz : s.id]
   transit_gateway_id                              = aws_ec2_transit_gateway.example.id
   transit_gateway_default_route_table_association = false
   transit_gateway_default_route_table_propagation = false

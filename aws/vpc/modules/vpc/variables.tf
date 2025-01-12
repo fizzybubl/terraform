@@ -1,16 +1,11 @@
-variable "profile" {
-  type    = string
-  default = "default"
-}
-
-
 variable "vpc_data" {
   type = object({
-    cidr_block       = string
-    instance_tenancy = string
-    tags             = map(string)
+    cidr_block                   = string
+    instance_tenancy             = string
+    default_route_table_creation = bool
+    tags                         = map(string)
   })
-  default = { cidr_block = "10.0.0.0/16", instance_tenancy = "default", tags = null }
+  default = { cidr_block = "10.0.0.0/16", instance_tenancy = "default", tags = null, default_route_table_creation = true }
 }
 
 
@@ -56,6 +51,7 @@ variable "public_subnets_input" {
       availability_zone = "eu-central-1b",
       cidr_block        = "10.0.201.0/24"
       tags              = null
+
     },
     {
       availability_zone = "eu-central-1c",
