@@ -134,3 +134,25 @@ resource "aws_ec2_transit_gateway_route_table_propagation" "dmz" {
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.dmz.id
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.dmz.id
 }
+
+
+# PRE_PROD needs access to STG
+resource "aws_ec2_transit_gateway_route_table_propagation" "pre_prod_to_stg" {
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.stg.id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.prod.id
+}
+
+
+# DMZ needs access to prod for public LBs to contact prod apps
+resource "aws_ec2_transit_gateway_route_table_propagation" "dmz_to_prod" {
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.prod.id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.dmz.id
+}
+
+
+# PROD needs access to DMZ for outbound access through public NATGW
+resource "aws_ec2_transit_gateway_route" "prod_to_dmz" {
+  destination_cidr_block         = "0.0.0.0/0"
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.dmz.id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.prod.id
+}

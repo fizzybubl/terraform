@@ -2,14 +2,14 @@ locals {
   private_subnets_tgw_prod = [
     {
       availability_zone = "eu-central-1b"
-      cidr_block        = "10.0.1.0/24"
+      cidr_block        = "10.0.1.0/28"
       tags = {
         "Name" : "Private Subnet PROD TGW 1b"
       }
     },
     {
       availability_zone = "eu-central-1c"
-      cidr_block        = "10.0.2.0/24"
+      cidr_block        = "10.0.2.0/28"
       tags = {
         "Name" : "Private Subnet PROD TGW 1c"
       }
@@ -19,14 +19,14 @@ locals {
   private_subnets_tgw_pre_prod = [
     {
       availability_zone = "eu-central-1b"
-      cidr_block        = "10.1.1.0/24"
+      cidr_block        = "10.1.1.0/28"
       tags = {
         "Name" : "Private Subnet PREPROD TGW 1b"
       }
     },
     {
       availability_zone = "eu-central-1c"
-      cidr_block        = "10.1.2.0/24"
+      cidr_block        = "10.1.2.0/28"
       tags = {
         "Name" : "Private Subnet PREPROD TGW 1c"
       }
@@ -36,14 +36,14 @@ locals {
   private_subnets_tgw_stg = [
     {
       availability_zone = "eu-central-1b"
-      cidr_block        = "10.2.1.0/24"
+      cidr_block        = "10.2.1.0/28"
       tags = {
         "Name" : "Private Subnet STG TGW 1b"
       }
     },
     {
       availability_zone = "eu-central-1c"
-      cidr_block        = "10.2.2.0/24"
+      cidr_block        = "10.2.2.0/28"
       tags = {
         "Name" : "Private Subnet STG TGW 1c"
       }
@@ -53,14 +53,14 @@ locals {
   private_subnets_tgw_dev = [
     {
       availability_zone = "eu-central-1b"
-      cidr_block        = "10.3.1.0/24"
+      cidr_block        = "10.3.1.0/28"
       tags = {
         "Name" : "Private Subnet DEV TGW 1b"
       }
     },
     {
       availability_zone = "eu-central-1c"
-      cidr_block        = "10.3.2.0/24"
+      cidr_block        = "10.3.2.0/28"
       tags = {
         "Name" : "Private Subnet DEV TGW 1c"
       }
@@ -70,14 +70,14 @@ locals {
   private_subnets_tgw_dmz = [
     {
       availability_zone = "eu-central-1b"
-      cidr_block        = "10.100.201.0/24"
+      cidr_block        = "10.100.201.0/28"
       tags = {
         "Name" : "Public Subnet DMZ TGW 1b"
       }
     },
     {
       availability_zone = "eu-central-1c"
-      cidr_block        = "10.100.202.0/24"
+      cidr_block        = "10.100.202.0/28"
       tags = {
         "Name" : "Public Subnet DMZ TGW 1c"
       }
@@ -280,12 +280,12 @@ resource "aws_vpc" "dmz" {
 }
 
 
-resource "aws_subnet" "private_instance_dmz" {
+resource "aws_subnet" "public_outbound" {
   vpc_id            = aws_vpc.dev.id
   availability_zone = "eu-central-1a"
   cidr_block        = "10.100.0.0/24"
   tags = {
-    "Name" : "Private Subnet Instance DMZ"
+    "Name" : "Public Outbound"
   }
 }
 
@@ -308,8 +308,8 @@ resource "aws_route_table" "dmz_private" {
   }
 
   route {
-    transit_gateway_id = aws_ec2_transit_gateway.example.id
-    cidr_block         = "10.0.0.0/8"
+    nat_gateway_id = aws_nat_gateway.public_gw.id
+    cidr_block         = "0.0.0.0/0"
   }
 
   tags = {
@@ -319,7 +319,55 @@ resource "aws_route_table" "dmz_private" {
 }
 
 
-resource "aws_route_table_association" "dmz" {
+resource "aws_route_table" "dmz_public" {
+  vpc_id = aws_vpc.dmz.id
+
+  route {
+    gateway_id = "local"
+    cidr_block = aws_vpc.dmz.cidr_block
+  }
+
+  route {
+    transit_gateway_id = aws_ec2_transit_gateway.example.id
+    cidr_block         = "10.0.0.0/8"
+  }
+
+  tags = {
+    Type = "Private"
+    Name = "DMZ Public Route Table"
+  }
+}
+
+
+resource "aws_route_table_association" "dmz_private" {
   route_table_id = aws_route_table.dmz_private.id
-  subnet_id      = aws_subnet.private_instance_dmz.id
+  subnet_id      = aws_subnet.private_tgw_dmz.id
+}
+
+
+resource "aws_route_table_association" "dmz_public" {
+  route_table_id = aws_route_table.dmz_public.id
+  subnet_id      = aws_subnet.public_outbound.id
+}
+
+
+resource "aws_eip" "nat_gw_eip" {
+  domain               = "vpc"
+  network_border_group = var.region
+}
+
+
+resource "aws_nat_gateway" "public_gw" {
+  count         = var.natgw ? 1 : 0
+  subnet_id     = aws_subnet.dmz_public.id
+  allocation_id = aws_eip.nat_gw_eip.id
+}
+
+
+resource "aws_internet_gateway" "gw" {
+  vpc_id = aws_vpc.dmz.id
+
+  tags = {
+    Name = "DMZ"
+  }
 }
