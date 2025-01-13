@@ -309,7 +309,7 @@ resource "aws_route_table" "dmz_private" {
 
   route {
     nat_gateway_id = aws_nat_gateway.public_gw.id
-    cidr_block         = "0.0.0.0/0"
+    cidr_block     = "0.0.0.0/0"
   }
 
   tags = {
@@ -330,6 +330,11 @@ resource "aws_route_table" "dmz_public" {
   route {
     transit_gateway_id = aws_ec2_transit_gateway.example.id
     cidr_block         = "10.0.0.0/8"
+  }
+
+  route {
+    gateway_id = aws_internet_gateway.gw.id
+    cidr_block = "0.0.0.0/0"
   }
 
   tags = {
@@ -358,7 +363,6 @@ resource "aws_eip" "nat_gw_eip" {
 
 
 resource "aws_nat_gateway" "public_gw" {
-  count         = var.natgw ? 1 : 0
   subnet_id     = aws_subnet.dmz_public.id
   allocation_id = aws_eip.nat_gw_eip.id
 }
