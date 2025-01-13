@@ -70,5 +70,5 @@ variable "region" {
 
 variable "natgw" {
   type    = bool
-  default = false
+  default = true
 }
