@@ -60,5 +60,16 @@ variable "restrict_public_buckets" {
 variable "transfer_acceleration" {
   type = string
   default = "Suspended"
-  va
 } 
+
+
+variable "sse_alg" {
+  type = string
+  default = "AES256"
+}
+
+
+variable "key_arn" {
+  type = string
+  default = null
+}

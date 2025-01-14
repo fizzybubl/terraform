@@ -76,6 +76,8 @@ module "upload_bucket" {
   restrict_public_buckets = true
   ignore_public_acls = true
   versioning = "Enabled"
+  sse_alg = "aws:kms"
+  key_arn = "TO CREATE KMS"
 }
 
 
