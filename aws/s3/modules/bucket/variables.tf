@@ -29,7 +29,7 @@ variable "tags" {
 
 variable "versioning" {
   type = string
-  default = "Enabled"
+  default = "Disabled"
 }
 
 
@@ -55,3 +55,10 @@ variable "restrict_public_buckets" {
   type = bool
   default = false
 }
+
+
+variable "transfer_acceleration" {
+  type = string
+  default = "Suspended"
+  va
+} 

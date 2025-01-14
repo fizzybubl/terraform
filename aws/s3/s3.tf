@@ -5,16 +5,16 @@ data "aws_iam_role" "admin" {
 
 module "s3_bucket" {
   source = "./modules/bucket"
-  bucket = "test-bucket-module-tf"
+  bucket = "custom-logs-for-analysis"
   block_public_acls = true
   block_public_policy = true
   restrict_public_buckets = true
   ignore_public_acls = true
+  versioning = "Disabled"
 }
 
 
-module "s3_bucket_policy" {
-  source    = "./modules/bucket_policy"
+resource "aws_s3_bucket_policy" "policy" {
   bucket_id = module.s3_bucket.bucket.id
   bucket_policy = {
     "Version" : "2012-10-17",
@@ -34,7 +34,7 @@ module "s3_bucket_policy" {
 }
 
 
-resource "aws_s3_bucket_lifecycle_configuration" "example" {
+resource "aws_s3_bucket_lifecycle_configuration" "logs" {
   bucket = aws_s3_bucket.bucket.id
 
   rule {
@@ -45,21 +45,113 @@ resource "aws_s3_bucket_lifecycle_configuration" "example" {
     }
 
     transition {
+      days = 30
+      storage_class = "STANDARD_IA"
+    }
+
+    transition {
+      days = 90
+      storage_class = "GLACIER"
+    }
+
+    transition {
       days = 365
-      storage_class = "GLACIER_IR"
+      storage_class = "DEEP_ARCHIVE"
+    }
+
+    expiration {
+      days = 730
+    }
+
+    status = "Enabled"
+  }
+}
+
+
+module "upload_bucket" {
+  source = "./modules/bucket"
+  bucket = "upload_bucket"
+  block_public_acls = true
+  block_public_policy = true
+  restrict_public_buckets = true
+  ignore_public_acls = true
+  versioning = "Enabled"
+}
+
+
+resource "aws_s3_bucket_policy" "policy_upload" {
+  bucket_id = module.upload_bucket.bucket.id
+  bucket_policy = {
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Principal" : {
+          "AWS" : "${data.aws_iam_role.admin.arn}"
+        },
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:*"
+        ],
+        "Resource" : "${module.upload_bucket.bucket.arn}",
+      }
+    ]
+  }
+}
+
+
+resource "aws_s3_bucket_lifecycle_configuration" "upload" {
+  bucket = aws_s3_bucket.bucket.id
+
+  rule {
+    id = "archive"
+
+    filter {}
+
+    transition {
+      days = 30
+      storage_class = "STANDARD_IA"
+    }
+
+    transition {
+      days = 90
+      storage_class = "GLACIER"
+    }
+
+    transition {
+      days = 365
+      storage_class = "DEEP_ARCHIVE"
+    }
+
+    expiration {
+      days = 730
     }
 
     status = "Enabled"
   }
 
   rule {
-    id = "rule-2"
+    id = "archive"
 
-    filter {
-      prefix = "tmp/"
+    filter {}
+
+    transition {
+      days = 30
+      storage_class = "STANDARD_IA"
     }
 
-    # ... other transition/expiration actions ...
+    transition {
+      days = 90
+      storage_class = "GLACIER"
+    }
+
+    transition {
+      days = 365
+      storage_class = "DEEP_ARCHIVE"
+    }
+
+    expiration {
+      days = 730
+    }
 
     status = "Enabled"
   }
