@@ -22,3 +22,21 @@ resource "aws_s3_bucket_public_access_block" "example" {
   ignore_public_acls      = var.ignore_public_acls
   restrict_public_buckets = var.restrict_public_buckets
 }
+
+
+resource "aws_s3_bucket_accelerate_configuration" "this" {
+  bucket = aws_s3_bucket.this.id
+  status = var.transfer_acceleration
+}
+
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
+  bucket = aws_s3_bucket.this.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = var.key_arn
+      sse_algorithm     = var.sse_alg
+    }
+  }
+}

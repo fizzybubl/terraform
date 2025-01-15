@@ -26,15 +26,10 @@ variable "tags" {
   default = {}
 }
 
-variable "bucket_policy" {
-  type = any
-  default = null
-}
-
 
 variable "versioning" {
   type = string
-  default = "Enabled"
+  default = "Disabled"
 }
 
 
@@ -59,4 +54,22 @@ variable "ignore_public_acls" {
 variable "restrict_public_buckets" {
   type = bool
   default = false
+}
+
+
+variable "transfer_acceleration" {
+  type = string
+  default = "Suspended"
+} 
+
+
+variable "sse_alg" {
+  type = string
+  default = "AES256"
+}
+
+
+variable "key_arn" {
+  type = string
+  default = null
 }
