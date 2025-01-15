@@ -24,14 +24,14 @@ module "s3_west" {
   versioning = "Disabled"
 
   providers = {
-    aws= aws.west
+    aws = aws.west
   }
 }
 
 
 resource "aws_s3_bucket_policy" "policy" {
-  bucket_id = module.s3_central.bucket.id
-  bucket_policy = {
+  bucket = module.s3_central.bucket.id
+  policy = {
     "Version" : "2012-10-17",
     "Statement" : [
       {

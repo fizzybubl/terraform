@@ -8,7 +8,7 @@ provider "aws" {
 
 # Configure the AWS Provider
 provider "aws" {
-  alias                    = west
+  alias                    = "west"
   profile                  = var.profile
   shared_credentials_files = ["C:\\Users\\danii\\.aws\\credentials"]
   region                   = var.second_region
