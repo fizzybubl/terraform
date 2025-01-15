@@ -3,20 +3,20 @@ data "aws_iam_role" "admin" {
 }
 
 
-module "s3_bucket" {
-  source = "./modules/bucket"
-  bucket = "custom-logs-for-analysis"
-  block_public_acls = true
-  block_public_policy = true
+module "logs_bucket" {
+  source                  = "./modules/bucket"
+  bucket                  = "custom-logs-for-analysis"
+  block_public_acls       = true
+  block_public_policy     = true
   restrict_public_buckets = true
-  ignore_public_acls = true
-  versioning = "Disabled"
+  ignore_public_acls      = true
+  versioning              = "Disabled"
 }
 
 
 resource "aws_s3_bucket_policy" "policy" {
-  bucket_id = module.s3_bucket.bucket.id
-  bucket_policy = {
+  bucket = module.logs_bucket.bucket.id
+  policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
       {
@@ -27,15 +27,15 @@ resource "aws_s3_bucket_policy" "policy" {
         "Action" : [
           "s3:*"
         ],
-        "Resource" : "${module.s3_bucket.bucket.arn}",
+        "Resource" : "${module.logs_bucket.bucket.arn}",
       }
     ]
-  }
+  })
 }
 
 
 resource "aws_s3_bucket_lifecycle_configuration" "logs" {
-  bucket = aws_s3_bucket.bucket.id
+  bucket = module.logs_bucket.bucket.id
 
   rule {
     id = "logs_rule"
@@ -45,22 +45,22 @@ resource "aws_s3_bucket_lifecycle_configuration" "logs" {
     }
 
     transition {
-      days = 30
+      days          = 30
       storage_class = "STANDARD_IA"
     }
 
     transition {
-      days = 90
+      days          = 90
       storage_class = "GLACIER"
     }
 
     transition {
-      days = 365
+      days          = 180
       storage_class = "DEEP_ARCHIVE"
     }
 
     expiration {
-      days = 730
+      days = 365
     }
 
     status = "Enabled"
@@ -68,22 +68,28 @@ resource "aws_s3_bucket_lifecycle_configuration" "logs" {
 }
 
 
+# resource "aws_kms_key" "upload" {
+#   enable_key_rotation = true
+#   deletion_window_in_days = 14
+# }
+
+
 module "upload_bucket" {
-  source = "./modules/bucket"
-  bucket = "upload_bucket"
-  block_public_acls = true
-  block_public_policy = true
+  source                  = "./modules/bucket"
+  bucket                  = "upload-bucket-test-something-dada-asdasdxzvgsd"
+  block_public_acls       = true
+  block_public_policy     = true
   restrict_public_buckets = true
-  ignore_public_acls = true
-  versioning = "Enabled"
-  sse_alg = "aws:kms"
-  key_arn = "TO CREATE KMS"
+  ignore_public_acls      = true
+  versioning              = "Enabled"
+  sse_alg                 = "AES256"
+  # key_arn                 = "TO CREATE KMS"
 }
 
 
 resource "aws_s3_bucket_policy" "policy_upload" {
-  bucket_id = module.upload_bucket.bucket.id
-  bucket_policy = {
+  bucket = module.upload_bucket.bucket.id
+  policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
       {
@@ -97,12 +103,12 @@ resource "aws_s3_bucket_policy" "policy_upload" {
         "Resource" : "${module.upload_bucket.bucket.arn}",
       }
     ]
-  }
+  })
 }
 
 
 resource "aws_s3_bucket_lifecycle_configuration" "upload" {
-  bucket = aws_s3_bucket.bucket.id
+  bucket = module.upload_bucket.bucket.id
 
   rule {
     id = "archive"
@@ -110,17 +116,17 @@ resource "aws_s3_bucket_lifecycle_configuration" "upload" {
     filter {}
 
     transition {
-      days = 30
+      days          = 30
       storage_class = "STANDARD_IA"
     }
 
     transition {
-      days = 90
+      days          = 90
       storage_class = "GLACIER"
     }
 
     transition {
-      days = 365
+      days          = 365
       storage_class = "DEEP_ARCHIVE"
     }
 
@@ -137,17 +143,17 @@ resource "aws_s3_bucket_lifecycle_configuration" "upload" {
     filter {}
 
     transition {
-      days = 30
+      days          = 30
       storage_class = "STANDARD_IA"
     }
 
     transition {
-      days = 90
+      days          = 90
       storage_class = "GLACIER"
     }
 
     transition {
-      days = 365
+      days          = 365
       storage_class = "DEEP_ARCHIVE"
     }
 
