@@ -1,21 +1,9 @@
 data "aws_caller_identity" "current" {}
 
-resource "aws_kms_key" "symmetric" {
-  description             = "An example symmetric encryption KMS key"
-  enable_key_rotation     = true
-  deletion_window_in_days = 7
-}
-
-
-resource "aws_kms_alias" "a" {
-  name          = "alias/symmetric-test"
-  target_key_id = aws_kms_key.symmetric.key_id
-}
-
-
-resource "aws_kms_key_policy" "symmetric" {
-  key_id = aws_kms_key.symmetric.id
-  policy = jsonencode({
+module "kms" {
+  alias  = "multi-region"
+  source = "./modules/kms"
+  key_policy = jsonencode({
     Version = "2012-10-17"
     Id      = "key-default-1"
     Statement = [
