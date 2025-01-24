@@ -62,6 +62,9 @@ module "primary" {
 
 
 module "replica" {
+  providers = {
+    aws = aws.dublin
+  }
   alias  = "multi-region-replica"
   primary_key_arn = module.primary.key.arn
   replica = true
