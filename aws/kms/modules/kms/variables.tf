@@ -49,3 +49,15 @@ variable "alias" {
   type    = string
   default = "some_alias"
 }
+
+
+variable "replica" {
+  type    = bool
+  default = false
+}
+
+
+variable "primary_key_arn" {
+  type = string
+  default = null
+}
