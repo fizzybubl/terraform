@@ -67,13 +67,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "logs" {
   }
 }
 
-
-# resource "aws_kms_key" "upload" {
-#   enable_key_rotation = true
-#   deletion_window_in_days = 14
-# }
-
-
 module "upload_bucket" {
   source                  = "./modules/bucket"
   bucket                  = "upload-bucket-test-something-dada-asdasdxzvgsd"
@@ -83,7 +76,6 @@ module "upload_bucket" {
   ignore_public_acls      = true
   versioning              = "Enabled"
   sse_alg                 = "AES256"
-  # key_arn                 = "TO CREATE KMS"
 }
 
 

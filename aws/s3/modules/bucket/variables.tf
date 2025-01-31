@@ -12,6 +12,13 @@ variable "profile" {
 
 variable "bucket" {
   type = string
+  default = null
+}
+
+
+variable "bucket_prefix" {
+  type = string
+  default = null
 }
 
 
