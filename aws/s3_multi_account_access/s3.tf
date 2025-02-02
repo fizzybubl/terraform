@@ -57,7 +57,8 @@ resource "aws_s3_bucket_policy" "petpics1" {
           "s3:ListBucket",
           "s3:GetObjectTagging",
           "s3:DeleteObject",
-          "s3:PutObjectTagging"
+          "s3:PutObjectTagging",
+          "s3:GetBucketOwnershipControls"
         ],
         "Resource" : [
           "${module.multi_account_access["petpics1"].bucket.arn}",
@@ -76,7 +77,7 @@ resource "aws_s3_bucket_policy" "petpics2" {
     "Statement" : [
       {
         "Principal" : {
-          "AWS" : "${data.aws_caller_identity.management.arn}"
+          "AWS" : "${aws_iam_role.mock_user_role.arn}"
         },
         "Effect" : "Allow",
         "Action" : [
@@ -152,22 +153,22 @@ resource "aws_s3_bucket_policy" "petpics3" {
 }
 
 
-resource "aws_s3_object" "object" {
-  provider = aws.management
+# resource "aws_s3_object" "object" {
+#   provider = aws.management
 
-  count  = length(local.buckets_to_upload)
-  bucket = module.multi_account_access[local.buckets_to_upload[count.index]].bucket.id
-  key    = local.buckets_objects[local.buckets_to_upload[count.index]].obj
-  source = "${path.module}/files/${local.buckets_to_upload[count.index]}/${local.buckets_objects[local.buckets_to_upload[count.index]].obj}"
+#   count  = length(local.buckets_to_upload)
+#   bucket = module.multi_account_access[local.buckets_to_upload[count.index]].bucket.id
+#   key    = local.buckets_objects[local.buckets_to_upload[count.index]].obj
+#   source = "${path.module}/files/${local.buckets_to_upload[count.index]}/${local.buckets_objects[local.buckets_to_upload[count.index]].obj}"
 
-  # The filemd5() function is available in Terraform 0.11.12 and later
-  # For Terraform 0.11.11 and earlier, use the md5() function and the file() function:
-  etag = filemd5("${path.module}/files/${local.buckets_to_upload[count.index]}/${local.buckets_objects[local.buckets_to_upload[count.index]].obj}")
+#   # The filemd5() function is available in Terraform 0.11.12 and later
+#   # For Terraform 0.11.11 and earlier, use the md5() function and the file() function:
+#   etag = filemd5("${path.module}/files/${local.buckets_to_upload[count.index]}/${local.buckets_objects[local.buckets_to_upload[count.index]].obj}")
 
-  depends_on = [aws_s3_bucket_policy.petpics1, aws_s3_bucket_policy.petpics2, aws_s3_bucket_policy.petpics3]
+#   depends_on = [aws_s3_bucket_policy.petpics1, aws_s3_bucket_policy.petpics2, aws_s3_bucket_policy.petpics3]
 
-  tags = {
-    "Created by account_id" : "${data.aws_caller_identity.management.account_id}",
-    "Created by canonical_id" : "${data.aws_canonical_user_id.management.id}"
-  }
-}
+#   tags = {
+#     "Created by account_id" : "${data.aws_caller_identity.management.account_id}",
+#     "Created by canonical_id" : "${data.aws_canonical_user_id.management.id}"
+#   }
+# }
