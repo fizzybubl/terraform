@@ -3,10 +3,10 @@ resource "aws_organizations_organizational_unit" "dev" {
   parent_id = data.aws_organizations_organization.root_org.roots[0].id
 
   tags = {
-    "Created by"="AcousticBear"
+    "Created by" = "AcousticBear"
   }
   tags_all = {
-    "Created by"="AcousticBear"
+    "Created by" = "AcousticBear"
   }
 }
 
