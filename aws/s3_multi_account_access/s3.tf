@@ -47,16 +47,16 @@ resource "aws_s3_bucket_policy" "petpics1" {
     "Statement" : [
       {
         "Principal" : {
-          "AWS" : "${data.aws_caller_identity.management.arn}"
+          "AWS" : "${aws_iam_role.s3_access.arn}"
         },
         "Effect" : "Allow",
         "Action" : [
+          "s3:ListBucket",
           "s3:GetObject",
           "s3:PutObject",
           "s3:PutObjectAcl",
-          "s3:ListBucket",
-          "s3:GetObjectTagging",
           "s3:DeleteObject",
+          "s3:GetObjectTagging",
           "s3:PutObjectTagging",
           "s3:GetBucketOwnershipControls"
         ],
@@ -77,17 +77,17 @@ resource "aws_s3_bucket_policy" "petpics2" {
     "Statement" : [
       {
         "Principal" : {
-          "AWS" : "${aws_iam_role.mock_user_role.arn}"
+          "AWS" : "${aws_iam_role.s3_access.arn}"
         },
         "Effect" : "Allow",
         "Action" : [
           "s3:GetObject",
           "s3:PutObject",
-          "s3:PutObjectAcl",
-          "s3:ListBucket",
-          "s3:GetObjectTagging",
           "s3:DeleteObject",
-          "s3:PutObjectTagging"
+          "s3:PutObjectAcl",
+          "s3:GetObjectTagging",
+          "s3:PutObjectTagging",
+          "s3:GetBucketOwnershipControls"
         ],
         "Resource" : [
           "${module.multi_account_access["petpics2"].bucket.arn}",
@@ -119,35 +119,17 @@ resource "aws_s3_bucket_policy" "petpics3" {
       },
       {
         "Principal" : {
-          "AWS" : "${aws_iam_role.mock_user_role.arn}"
+          "AWS" : "${aws_iam_role.s3_access.arn}"
         },
         "Effect" : "Allow",
         "Action" : [
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:PutObjectAcl",
-          "s3:ListBucket",
-          "s3:GetObjectTagging",
-          "s3:DeleteObject"
+          "s3:ListBucket"
         ],
         "Resource" : [
           "${module.multi_account_access["petpics3"].bucket.arn}",
           "${module.multi_account_access["petpics3"].bucket.arn}/*"
         ]
       },
-      {
-        "Effect" : "Deny",
-        "Principal" : {
-          "AWS" : "${aws_iam_role.mock_user_role.arn}"
-        },
-        "Action" : [
-          "s3:DeleteObject"
-        ],
-        "Resource" : [
-          "${module.multi_account_access["petpics3"].bucket.arn}",
-          "${module.multi_account_access["petpics3"].bucket.arn}/*"
-        ]
-      }
     ]
   })
 }

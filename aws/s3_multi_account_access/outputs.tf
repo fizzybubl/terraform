@@ -8,7 +8,7 @@ output "management" {
 
 
 output "s3_role" {
-  value = aws_iam_role.mock_user_role.arn
+  value = aws_iam_role.s3_access.arn
 }
 
 
