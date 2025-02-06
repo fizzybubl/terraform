@@ -37,3 +37,27 @@ module "cloudfront" {
   versioning              = "Disabled"
   force_destroy           = true
 }
+
+
+resource "aws_s3_bucket_cors_configuration" "cloudfront" {
+  bucket = module.cloudfront.bucket.id
+
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["PUT", "POST"]
+    allowed_origins = ["*"]
+  }
+}
+
+
+resource "aws_s3_object" "js" {
+  bucket = module.cloudfront.bucket.id
+  key = "scripts.js"
+  source = "${path.module}/files/app/scripts.js"
+}
+
+resource "aws_s3_object" "html" {
+  bucket = module.cloudfront.bucket.id
+  key = "index.html"
+  source = "${path.module}/files/app/index.html"
+}

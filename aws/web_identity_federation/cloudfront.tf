@@ -27,10 +27,18 @@ resource "aws_cloudfront_distribution" "s3" {
 
   default_cache_behavior {
     allowed_methods        = ["GET", "HEAD"]
-    cached_methods         = []
+    cached_methods         = ["GET", "HEAD"]
     target_origin_id       = local.origin_id
     viewer_protocol_policy = "redirect-to-https"
     compress               = true
+
+    forwarded_values {
+      query_string = false
+
+      cookies {
+        forward = "none"
+      }
+    }
   }
 
   ordered_cache_behavior {
@@ -39,6 +47,7 @@ resource "aws_cloudfront_distribution" "s3" {
     cached_methods         = ["GET", "HEAD"]
     target_origin_id       = local.origin_id
     viewer_protocol_policy = "redirect-to-https"
+
     forwarded_values {
       query_string = false
 
