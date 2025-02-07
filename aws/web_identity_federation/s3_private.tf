@@ -11,8 +11,8 @@ module "privatepatches" {
 
 
 resource "aws_s3_object" "patches" {
-  count = 3
-  bucket = module.cloudfront.bucket.id
-  key = "patches${count.index + 1}.jpg"
+  count  = 3
+  bucket = module.privatepatches.bucket.id
+  key    = "patches${count.index + 1}.jpg"
   source = "${path.module}/files/photos/patches${count.index + 1}.jpg"
 }

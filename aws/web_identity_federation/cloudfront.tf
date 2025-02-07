@@ -33,7 +33,7 @@ resource "aws_cloudfront_distribution" "s3" {
     compress               = true
 
     forwarded_values {
-      query_string = false
+      query_string = true
 
       cookies {
         forward = "none"
@@ -42,14 +42,14 @@ resource "aws_cloudfront_distribution" "s3" {
   }
 
   ordered_cache_behavior {
-    path_pattern           = "/bucket/*"
+    path_pattern           = "*"
     allowed_methods        = ["GET", "HEAD", "OPTIONS"]
     cached_methods         = ["GET", "HEAD"]
     target_origin_id       = local.origin_id
     viewer_protocol_policy = "redirect-to-https"
 
     forwarded_values {
-      query_string = false
+      query_string = true
 
       cookies {
         forward = "none"
