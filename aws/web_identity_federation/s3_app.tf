@@ -22,17 +22,22 @@ resource "aws_s3_bucket_cors_configuration" "cloudfront" {
 
 
 resource "aws_s3_object" "js" {
-  bucket = module.cloudfront.bucket.id
-  key    = "scripts.js"
-  source = "${path.module}/files/app/scripts.js"
+  bucket       = module.cloudfront.bucket.id
+  key          = "scripts.js"
   content_type = "text/javascript"
+  content = templatefile("${path.module}/files/app/scripts.tpl.js", {
+    PRIVATE_PATCHES_BUCKET   = module.privatepatches.bucket.id,
+    COGNITO_IDENTITY_POOL_ID = aws_cognito_identity_pool.cloudfront.id
+  })
 }
 
 resource "aws_s3_object" "html" {
-  bucket = module.cloudfront.bucket.id
-  key    = "index.html"
-  source = "${path.module}/files/app/index.html"
+  bucket       = module.cloudfront.bucket.id
+  key          = "index.html"
   content_type = "text/html"
+  content = templatefile("${path.module}/files/app/index.tpl.html", {
+    CLIENT_ID = var.google_client_id
+  })
 }
 
 
@@ -64,16 +69,3 @@ resource "aws_s3_bucket_policy" "cloudfront" {
     ]
   })
 }
-
-
-# resource "aws_s3_bucket_website_configuration" "cloudfront" {
-#   bucket = module.cloudfront.bucket.id
-
-#   index_document {
-#     suffix = "index.html"
-#   }
-
-#   error_document {
-#     key = "error.html"
-#   }
-# }

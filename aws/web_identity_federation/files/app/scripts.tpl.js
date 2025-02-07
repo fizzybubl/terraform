@@ -22,7 +22,7 @@ function credentialExchange(googleToken) {
     console.log("Exchanging Google Token for AWS credentials...");
     AWS.config.region = 'us-east-1'; 
     AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-      IdentityPoolId: 'REPLACE_ME_COGNITO_IDENTITY_POOL_ID', // MAKE SURE YOU REPLACE THIS
+      IdentityPoolId: '${COGNITO_IDENTITY_POOL_ID}', // MAKE SURE YOU REPLACE THIS
       Logins: {
         'accounts.google.com': googleToken.credential
       }
@@ -53,7 +53,7 @@ function accessImages() {
   console.log("Creating Session to S3...");
   var s3 = new AWS.S3();
   var params = {
-    Bucket: "REPLACE_ME_NAME_OF_PATCHES_PRIVATE_BUCKET" // MAKE SURE YOU REPLACE THIS
+    Bucket: '${PRIVATE_PATCHES_BUCKET}' // MAKE SURE YOU REPLACE THIS
   }; 
 
   // If we are here, things are going well, lets list all of the objects in the bucket
