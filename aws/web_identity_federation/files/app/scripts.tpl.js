@@ -20,7 +20,7 @@ function credentialExchange(googleToken) {
     // We can't access anything in AWS with a google token...
     // ... so we need to exchange it using Cognito for AWS credentials
     console.log("Exchanging Google Token for AWS credentials...");
-    AWS.config.region = 'us-east-1'; 
+    AWS.config.region = '${region}'; 
     AWS.config.credentials = new AWS.CognitoIdentityCredentials({
       IdentityPoolId: '${COGNITO_IDENTITY_POOL_ID}', // MAKE SURE YOU REPLACE THIS
       Logins: {

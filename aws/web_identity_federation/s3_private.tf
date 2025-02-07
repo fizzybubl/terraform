@@ -16,3 +16,15 @@ resource "aws_s3_object" "patches" {
   key    = "patches${count.index + 1}.jpg"
   source = "${path.module}/files/photos/patches${count.index + 1}.jpg"
 }
+
+
+
+resource "aws_s3_bucket_cors_configuration" "patches" {
+  bucket = module.privatepatches.bucket.id
+
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["GET", "HEAD"]
+    allowed_origins = ["*"]
+  }
+}

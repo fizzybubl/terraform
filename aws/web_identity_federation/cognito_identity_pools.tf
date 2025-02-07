@@ -7,53 +7,23 @@ resource "aws_cognito_identity_pool" "cloudfront" {
 }
 
 
-resource "aws_iam_role" "federated_s3_access" {
-  name = "FederatedS3Access"
-  assume_role_policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Effect" : "Allow",
-        "Principal" : {
-          "Federated" : "cognito-identity.amazonaws.com"
-        },
-        "Action" : "sts:AssumeRoleWithWebIdentity",
-        "Condition" : {
-          "StringEquals" : {
-            "cognito-identity.amazonaws.com:aud" : "${aws_cognito_identity_pool.cloudfront.id}"
-          },
-          "ForAnyValue:StringLike" : {
-            "cognito-identity.amazonaws.com:amr" : "authenticated"
-          }
-        }
-      }
-    ]
-  })
-}
+resource "aws_cognito_identity_pool_roles_attachment" "federated_s3_access" {
+  identity_pool_id = aws_cognito_identity_pool.cloudfront.id
 
+  role_mapping {
+    identity_provider         = "accounts.google.com"
+    ambiguous_role_resolution = "AuthenticatedRole"
+    type                      = "Rules"
 
-resource "aws_iam_policy" "federated_s3_access" {
-  name = "FederatedS3Access"
-  policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Effect" : "Allow",
-        "Action" : [
-          "s3:ListBucket",
-          "s3:GetObject"
-        ]
-        "Resource" : [
-          "${module.privatepatches.bucket.arn}",
-          "${module.privatepatches.bucket.arn}/*"
-        ]
-      }
-    ]
-  })
-}
+    mapping_rule {
+      claim = "email_verified"
+      match_type = "Equals"
+      value = "true"
+      role_arn = aws_iam_role.federated_s3_access.arn
+    }
+  }
 
-
-resource "aws_iam_role_policy_attachment" "federated_s3_access" {
-  role       = aws_iam_role.federated_s3_access.name
-  policy_arn = aws_iam_policy.federated_s3_access.arn
+  roles = {
+    "authenticated" = aws_iam_role.federated_s3_access.arn
+  }
 }

@@ -28,6 +28,7 @@ resource "aws_s3_object" "js" {
   content = templatefile("${path.module}/files/app/scripts.tpl.js", {
     PRIVATE_PATCHES_BUCKET   = module.privatepatches.bucket.id,
     COGNITO_IDENTITY_POOL_ID = aws_cognito_identity_pool.cloudfront.id
+    region = var.region
   })
 }
 
