@@ -8,6 +8,6 @@ output "public_subnets" {
 }
 
 
-output "rendered" {
-  value = data.template_file.user_data.rendered
-}
+# output "rendered" {
+#   value = data.template_file.user_data.rendered
+# }

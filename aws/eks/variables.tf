@@ -7,7 +7,7 @@ variable "authorised_ips" {
 
 variable "profile" {
   type    = string
-  default = "default"
+  default = "admin-dev"
 }
 
 
