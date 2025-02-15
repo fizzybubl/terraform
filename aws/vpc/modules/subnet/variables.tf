@@ -73,5 +73,51 @@ variable "natgw" {
 
 variable "region" {
   type    = string
-  default = "eu-central-q"
+  default = "eu-central-1"
+}
+
+
+variable "network_acl_id" {
+  type    = string
+  default = null
+}
+
+
+variable "create_network_acl" {
+  type    = bool
+  default = false
+}
+
+
+variable "ingress_acl" {
+  type = map(object({
+    rule_number     = optional(string)
+    protocol        = optional(string)
+    rule_action     = optional(string)
+    cidr_block      = optional(string)
+    from_port       = optional(string)
+    to_port         = optional(string)
+    ipv6_cidr_block = optional(string)
+    icmp_type       = optional(number)
+    icmp_code       = optional(number)
+  }))
+
+  default = {}
+}
+
+
+variable "egress_acl" {
+  type = map(object({
+    rule_number     = optional(string)
+    protocol        = optional(string)
+    rule_action     = optional(string)
+    cidr_block      = optional(string)
+    from_port       = optional(string)
+    to_port         = optional(string)
+    ipv6_cidr_block = optional(string)
+    icmp_type       = optional(number)
+    icmp_code       = optional(number)
+  }))
+
+  default = {}
 }
