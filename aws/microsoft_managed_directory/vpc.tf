@@ -204,7 +204,11 @@ module "on_prem_web_rtb" {
   routes = {
     "igw" : {
       destination_cidr_block = "0.0.0.0/0"
-      internet_gateway_id    = module.on_prem_vpc.igw_id
+      gateway_id             = module.on_prem_vpc.igw_id
+    },
+    "cloud" : {
+      destination_cidr_block    = module.cloud_vpc.cidr_block
+      vpc_peering_connection_id = aws_vpc_peering_connection.on_prem_to_cloud.id
     }
   }
 }
@@ -223,6 +227,8 @@ module "on_prem_web" {
   subnet_tags    = each.value.tags
 }
 
+
+#### CLOUD INFRA ####
 
 module "cloud_vpc" {
   source   = "../vpc/modules/vpc_v3"
@@ -277,7 +283,11 @@ module "cloud_web_rtb" {
   routes = {
     "igw" : {
       destination_cidr_block = "0.0.0.0/0"
-      internet_gateway_id    = module.cloud_vpc.igw_id
+      gateway_id             = module.cloud_vpc.igw_id
+    },
+    "onprem" : {
+      destination_cidr_block    = module.on_prem_vpc.cidr_block
+      vpc_peering_connection_id = aws_vpc_peering_connection.on_prem_to_cloud.id
     }
   }
 }
@@ -293,4 +303,31 @@ module "cloud_web" {
   create_rtb     = false
   route_table_id = module.cloud_web_rtb.route_table_id
   subnet_tags    = each.value.tags
+}
+
+
+#### VPC PEERING ####
+
+data "aws_caller_identity" "target_vpc_owner" {}
+
+
+resource "aws_vpc_peering_connection" "on_prem_to_cloud" {
+  peer_owner_id = data.aws_caller_identity.target_vpc_owner.account_id
+  peer_vpc_id   = module.cloud_vpc.vpc_id
+  vpc_id        = module.on_prem_vpc.vpc_id # connection requester
+  peer_region   = var.region
+
+  tags = {
+    Side = "Requester"
+  }
+}
+
+
+resource "aws_vpc_peering_connection_accepter" "on_prem_to_cloud" {
+  vpc_peering_connection_id = aws_vpc_peering_connection.on_prem_to_cloud.id
+  auto_accept               = true
+
+  tags = {
+    Side = "Accepter"
+  }
 }

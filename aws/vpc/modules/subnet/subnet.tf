@@ -26,7 +26,7 @@ resource "aws_route" "this" {
   destination_ipv6_cidr_block = lookup(each.value, "destination_ipv6_cidr_block", null)
   destination_prefix_list_id  = lookup(each.value, "destination_prefix_list_id", null)
 
-  gateway_id                = coalesce(lookup(each.value, "internet_gateway_id", null), lookup(each.value, "virtual_private_gateway_id", null))
+  gateway_id                = lookup(each.value, "gateway_id", null)
   nat_gateway_id            = lookup(each.value, "nat_gateway_id", null)
   transit_gateway_id        = lookup(each.value, "transit_gateway_id", null)
   vpc_peering_connection_id = lookup(each.value, "vpc_peering_connection_id", null)
