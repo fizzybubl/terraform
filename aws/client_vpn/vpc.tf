@@ -121,11 +121,12 @@ module "cloud_app" {
 
 
 module "cloud_web_rtb" {
-  source      = "../vpc/modules/subnet"
-  vpc_id      = module.cloud_vpc.vpc_id
-  cidr_block  = local.cloud_web_subnets[local.az_ids[0]].cidr_block
-  az_id       = local.cloud_web_subnets[local.az_ids[0]].availability_zone_id
-  subnet_tags = local.cloud_web_subnets[local.az_ids[0]].tags
+  source              = "../vpc/modules/subnet"
+  vpc_id              = module.cloud_vpc.vpc_id
+  cidr_block          = local.cloud_web_subnets[local.az_ids[0]].cidr_block
+  az_id               = local.cloud_web_subnets[local.az_ids[0]].availability_zone_id
+  subnet_tags         = local.cloud_web_subnets[local.az_ids[0]].tags
+  public_ip_on_launch = true
 
   routes = {
     "igw" : {
@@ -140,12 +141,13 @@ module "cloud_web" {
   source   = "../vpc/modules/subnet"
   for_each = { for key, value in local.cloud_web_subnets : key => value if key != local.az_ids[0] }
 
-  vpc_id         = module.cloud_vpc.vpc_id
-  cidr_block     = each.value.cidr_block
-  az_id          = each.value.availability_zone_id
-  create_rtb     = false
-  route_table_id = module.cloud_web_rtb.route_table_id
-  subnet_tags    = each.value.tags
+  vpc_id              = module.cloud_vpc.vpc_id
+  cidr_block          = each.value.cidr_block
+  az_id               = each.value.availability_zone_id
+  create_rtb          = false
+  route_table_id      = module.cloud_web_rtb.route_table_id
+  subnet_tags         = each.value.tags
+  public_ip_on_launch = true
 }
 
 
