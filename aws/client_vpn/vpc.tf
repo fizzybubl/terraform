@@ -150,13 +150,28 @@ module "cloud_web" {
 
 
 module "ssm" {
-  source = "../vpc/modules/vpc_endpoint"
-  vpc_id = module.cloud_vpc.vpc_id
+  source              = "../vpc/modules/vpc_endpoint"
+  vpc_id              = module.cloud_vpc.vpc_id
   service_name        = "com.amazonaws.${var.region}.ssm"
   private_dns_enabled = true
-  subnet_ids          = [for az_id in [local.az_ids[1], local.az_ids[2]]: module.cloud_db[az_id].subnet_id]
+  subnet_ids          = [for az_id in [local.az_ids[1], local.az_ids[2]] : module.cloud_db[az_id].subnet_id]
 
   tags = {
     "Name" = "SSM EP"
+  }
+}
+
+module "ssm_messages" {
+  source       = "../vpc/modules/vpc_endpoint"
+  vpc_id       = module.cloud_vpc.vpc_id
+  service_name = "com.amazonaws.${var.region}.ssmmessages"
+
+  private_dns_enabled = true
+  subnet_ids          = [for az_id in [local.az_ids[1], local.az_ids[2]] : module.cloud_db[az_id].subnet_id]
+
+  security_group_ids = [module.ssm.sg_id]
+
+  tags = {
+    "Name" = "SSM MESSAGES EP"
   }
 }
