@@ -1,23 +1,23 @@
 locals {
-  az_ids = ["euc1-az1", "euc1-az2", "euc1-az3"]
+  az_ids = ["euw1-az1", "euw1-az2", "euw1-az3"]
 
   cloud_db_subnets = {
-    "euc1-az1" = {
-      availability_zone_id = "euc1-az1"
+    "euw1-az1" = {
+      availability_zone_id = "euw1-az1"
       cidr_block           = "10.0.1.0/24"
       tags = {
         "Name" : "Private Subnet DB AZ1"
       }
     },
-    "euc1-az2" = {
-      availability_zone_id = "euc1-az2"
+    "euw1-az2" = {
+      availability_zone_id = "euw1-az2"
       cidr_block           = "10.0.2.0/24"
       tags = {
         "Name" : "Private Subnet DB AZ2"
       }
     },
-    "euc1-az3" = {
-      availability_zone_id = "euc1-az3"
+    "euw1-az3" = {
+      availability_zone_id = "euw1-az3"
       cidr_block           = "10.0.3.0/24"
       tags = {
         "Name" : "Private Subnet DB AZ3"
@@ -26,22 +26,22 @@ locals {
   }
 
   cloud_app_subnets = {
-    "euc1-az1" = {
-      availability_zone_id = "euc1-az1"
+    "euw1-az1" = {
+      availability_zone_id = "euw1-az1"
       cidr_block           = "10.0.10.0/24"
       tags = {
         "Name" : "Private Subnet APP AZ1"
       }
     },
-    "euc1-az2" = {
-      availability_zone_id = "euc1-az2"
+    "euw1-az2" = {
+      availability_zone_id = "euw1-az2"
       cidr_block           = "10.0.11.0/24"
       tags = {
         "Name" : "Private Subnet APP AZ2"
       }
     },
-    "euc1-az3" = {
-      availability_zone_id = "euc1-az3"
+    "euw1-az3" = {
+      availability_zone_id = "euw1-az3"
       cidr_block           = "10.0.12.0/24"
       tags = {
         "Name" : "Private Subnet APP AZ3"
@@ -51,22 +51,22 @@ locals {
   }
 
   cloud_web_subnets = {
-    "euc1-az1" = {
-      availability_zone_id = "euc1-az1"
+    "euw1-az1" = {
+      availability_zone_id = "euw1-az1"
       cidr_block           = "10.0.100.0/24"
       tags = {
         "Name" : "Public Subnet Web AZ1"
       }
     },
-    "euc1-az2" = {
-      availability_zone_id = "euc1-az2"
+    "euw1-az2" = {
+      availability_zone_id = "euw1-az2"
       cidr_block           = "10.0.101.0/24"
       tags = {
         "Name" : "Public Subnet Web AZ2"
       }
     },
-    "euc1-az3" = {
-      availability_zone_id = "euc1-az3"
+    "euw1-az3" = {
+      availability_zone_id = "euw1-az3"
       cidr_block           = "10.0.102.0/24"
       tags = {
         "Name" : "Public Subnet Web AZ3"
@@ -170,7 +170,7 @@ module "ssm_messages" {
 
   private_dns_enabled = true
   subnet_ids          = [for az_id in [local.az_ids[1], local.az_ids[2]] : module.cloud_db[az_id].subnet_id]
-
+  default_sg = false
   security_group_ids = [module.ssm.sg_id]
 
   tags = {
