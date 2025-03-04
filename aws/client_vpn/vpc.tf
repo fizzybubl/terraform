@@ -170,8 +170,8 @@ module "ssm_messages" {
 
   private_dns_enabled = true
   subnet_ids          = [for az_id in [local.az_ids[1], local.az_ids[2]] : module.cloud_db[az_id].subnet_id]
-  default_sg = false
-  security_group_ids = [module.ssm.sg_id]
+  default_sg          = false
+  security_group_ids  = [module.ssm.sg_id]
 
   tags = {
     "Name" = "SSM MESSAGES EP"

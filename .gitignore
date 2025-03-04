@@ -5,3 +5,5 @@
 **/terraform.tfstate.d
 **/*.tfvars
 **/*.tfstate.lock.info
+
+**/certificates/*
