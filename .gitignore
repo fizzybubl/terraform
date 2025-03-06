@@ -7,3 +7,6 @@
 **/*.tfstate.lock.info
 
 **/certificates/*
+
+**/.venv
+**/.idea
