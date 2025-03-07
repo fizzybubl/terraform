@@ -21,7 +21,7 @@ data "cloudinit_config" "user_data" {
 
 # Cluster security group
 resource "aws_security_group" "ec2" {
-  name   = "ClusterSecurityGroup"
+  name   = "GeneralSG"
   vpc_id = module.cloud_vpc.vpc_id
 
   tags = {
