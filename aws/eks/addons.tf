@@ -25,6 +25,16 @@ resource "aws_eks_addon" "ebs_csi_driver" {
 }
 
 
+resource "aws_eks_addon" "csi_snapshot_controller" {
+  cluster_name             = aws_eks_cluster.control_plane.name
+  addon_version            = "v8.2.0-eksbuild.1"
+  addon_name               = "snapshot-controller"
+  service_account_role_arn = aws_iam_role.ebs_csi_driver.arn
+
+  depends_on = [aws_eks_addon.vpc_cni, aws_eks_node_group.worker_nodes]
+}
+
+
 resource "aws_eks_addon" "kube_proxy" {
   cluster_name  = aws_eks_cluster.control_plane.name
   addon_version = "v1.30.3-eksbuild.5"
