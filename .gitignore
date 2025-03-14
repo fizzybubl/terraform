@@ -5,3 +5,8 @@
 **/terraform.tfstate.d
 **/*.tfvars
 **/*.tfstate.lock.info
+
+**/certificates/*
+
+**/.venv
+**/.idea
