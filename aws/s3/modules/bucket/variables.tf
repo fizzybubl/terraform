@@ -4,12 +4,6 @@ variable "region" {
 }
 
 
-variable "profile" {
-  type    = string
-  default = "root-admin"
-}
-
-
 variable "bucket" {
   type = string
   default = null

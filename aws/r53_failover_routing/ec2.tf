@@ -38,13 +38,13 @@ resource "aws_vpc_security_group_ingress_rule" "vpc_inbound_access" {
 }
 
 
-resource "aws_vpc_security_group_ingress_rule" "internet_inbound_access" {
-  security_group_id = aws_security_group.ec2.id
-  ip_protocol       = -1
-  from_port         = -1
-  to_port           = -1
-  cidr_ipv4         = "0.0.0.0/0"
-}
+# resource "aws_vpc_security_group_ingress_rule" "internet_inbound_access" {
+#   security_group_id = aws_security_group.ec2.id
+#   ip_protocol       = -1
+#   from_port         = -1
+#   to_port           = -1
+#   cidr_ipv4         = "0.0.0.0/0"
+# }
 
 
 resource "aws_vpc_security_group_egress_rule" "vpc_outbound_access" {
@@ -72,7 +72,8 @@ resource "aws_eip" "public_ip" {
 
 
 resource "aws_network_interface" "public_ip" {
-  subnet_id = data.aws_subnets.default.ids[0]
+  subnet_id = data.aws_subnet.default.id
+  security_groups =  [aws_security_group.ec2.id]
 }
 
 
@@ -85,8 +86,6 @@ resource "aws_eip_association" "public_ip" {
 resource "aws_launch_template" "ec2" {
   name_prefix = "eks_worker_template"
   image_id    = data.aws_ami.ami.id
-
-  vpc_security_group_ids = [aws_security_group.ec2.id]
 
   instance_type = "t2.micro"
 
@@ -126,7 +125,7 @@ resource "aws_autoscaling_group" "ec2_asg" {
   health_check_grace_period = 300
   health_check_type         = "EC2"
   placement_group           = aws_placement_group.test.id
-  vpc_zone_identifier       = data.aws_subnets.default.ids
+  availability_zones = ["eu-central-1b"]
 
   launch_template {
     id      = aws_launch_template.ec2.id

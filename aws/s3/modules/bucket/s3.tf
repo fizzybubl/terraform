@@ -26,6 +26,7 @@ resource "aws_s3_bucket_public_access_block" "example" {
 
 
 resource "aws_s3_bucket_accelerate_configuration" "this" {
+  count = var.transfer_acceleration == "Suspended" ? 0 : 1
   bucket = aws_s3_bucket.this.id
   status = var.transfer_acceleration
 }

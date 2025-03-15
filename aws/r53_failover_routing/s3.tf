@@ -1,6 +1,6 @@
 module "failover" {
   source                  = "../s3/modules/bucket"
-  bucket_prefix           = "example-bucket-failover"
+  bucket           = "www.mtlsexample.online"
   block_public_acls       = true
   block_public_policy     = false
   restrict_public_buckets = false
@@ -8,7 +8,7 @@ module "failover" {
   versioning              = "Disabled"
 }
 
-resource "aws_s3_bucket_policy" "name" {
+resource "aws_s3_bucket_policy" "failover" {
   bucket = module.failover.bucket.id
   policy = jsonencode({
     "Version" : "2012-10-17",

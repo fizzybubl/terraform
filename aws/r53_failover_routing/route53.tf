@@ -6,8 +6,9 @@ resource "aws_route53_zone" "public" {
 resource "aws_route53_health_check" "active" {
   type              = "HTTP"
   port              = "80"
-  resource_path     = "index.html"
+  resource_path     = "/index.html"
   failure_threshold = "3"
+  request_interval = 30
   ip_address        = aws_eip.public_ip.public_ip
 }
 
@@ -34,7 +35,7 @@ resource "aws_route53_record" "passive" {
   type           = "A"
 
   alias {
-    name                   = aws_s3_bucket_website_configuration.failover.website_domain
+    name                   = aws_s3_bucket_website_configuration.failover.website_endpoint
     zone_id                = module.failover.bucket.hosted_zone_id
     evaluate_target_health = false
   }
