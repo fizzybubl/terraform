@@ -1,6 +1,6 @@
 module "failover" {
   source                  = "../s3/modules/bucket"
-  bucket           = "www.mtlsexample.online"
+  bucket                  = "www.mtlsexample.online"
   block_public_acls       = true
   block_public_policy     = false
   restrict_public_buckets = false
