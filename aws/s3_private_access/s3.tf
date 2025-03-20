@@ -1,6 +1,11 @@
+data "aws_caller_identity" "current" {
+
+}
+
+
 module "private" {
   source                  = "../s3/modules/bucket"
-  bucket_prefix            = "privatecats"
+  bucket_prefix           = "privatecats"
   block_public_acls       = true
   block_public_policy     = true
   restrict_public_buckets = true
@@ -15,15 +20,24 @@ resource "aws_s3_bucket_policy" "private" {
     "Statement" : [
       {
         "Sid" : "OnlyThroughVpcEndpointGateway",
-        "Effect" : "Deny",
+        "Effect" : "Allow",
         "Principal" : "*",
         "Action" : ["s3:*"],
         "Resource" : ["${module.private.bucket.arn}/*", "${module.private.bucket.arn}"],
-        "Condition": {
-            "StringNotEquals": {
-                "aws:sourceVpce": "${aws_vpc_endpoint.private_s3.id}"
-            }
+        "Condition" : {
+          "StringEquals" : {
+            "aws:sourceVpce" : "${aws_vpc_endpoint.private_s3.id}"
+          }
         }
+      },
+      {
+        "Sid" : "AllowAdmin",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        },
+        "Action" : ["s3:*"],
+        "Resource" : ["${module.private.bucket.arn}/*", "${module.private.bucket.arn}"],
       }
     ]
   })
@@ -32,10 +46,10 @@ resource "aws_s3_bucket_policy" "private" {
 
 module "public" {
   source                  = "../s3/modules/bucket"
-  bucket_prefix            = "publiccats"
+  bucket_prefix           = "publiccats"
   block_public_acls       = true
-  block_public_policy     = true
-  restrict_public_buckets = true
+  block_public_policy     = false
+  restrict_public_buckets = false
   ignore_public_acls      = true
   versioning              = "Disabled"
 }
@@ -51,8 +65,7 @@ resource "aws_s3_bucket_policy" "public" {
         "Principal" : "*",
         "Action" : [
           "s3:Get*",
-          "s3:List*",
-          "s3:Describe*"
+          "s3:List*"
         ],
         "Resource" : ["${module.public.bucket.arn}/*"]
       },
@@ -62,6 +75,15 @@ resource "aws_s3_bucket_policy" "public" {
         "Principal" : "*",
         "Action" : ["s3:ListBucket"],
         "Resource" : [module.public.bucket.arn]
+      },
+      {
+        "Sid" : "AllowAdmin",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        },
+        "Action" : ["s3:*"],
+        "Resource" : ["${module.public.bucket.arn}/*", "${module.public.bucket.arn}"],
       }
     ]
   })
@@ -71,10 +93,10 @@ resource "aws_s3_bucket_policy" "public" {
 
 module "public_no_vpce" {
   source                  = "../s3/modules/bucket"
-  bucket_prefix            = "publicdog"
+  bucket_prefix           = "publicdog"
   block_public_acls       = true
-  block_public_policy     = true
-  restrict_public_buckets = true
+  block_public_policy     = false
+  restrict_public_buckets = false
   ignore_public_acls      = true
   versioning              = "Disabled"
 }
@@ -88,8 +110,17 @@ resource "aws_s3_bucket_policy" "public_no_vpce" {
         "Sid" : "PublicRead",
         "Effect" : "Allow",
         "Principal" : "*",
-        "Action" : ["s3:GetObject"],
-        "Resource" : ["${module.public_no_vpce.bucket.arn}/*"]
+        "Action" : ["s3:Get*", "s3:List*"],
+        "Resource" : ["${module.public_no_vpce.bucket.arn}/*", "${module.public_no_vpce.bucket.arn}"]
+      },
+      {
+        "Sid" : "AllowAdmin",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        },
+        "Action" : ["s3:*"],
+        "Resource" : ["${module.public_no_vpce.bucket.arn}/*", "${module.public_no_vpce.bucket.arn}"],
       }
     ]
   })

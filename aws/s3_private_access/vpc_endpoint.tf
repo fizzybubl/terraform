@@ -5,7 +5,7 @@ resource "aws_vpc_endpoint" "private_s3" {
 
 
 resource "aws_vpc_endpoint_route_table_association" "private_s3" {
-  route_table_id = module.subnet_1.route_table_id
+  route_table_id  = module.subnet_1.route_table_id
   vpc_endpoint_id = aws_vpc_endpoint.private_s3.id
 }
 
