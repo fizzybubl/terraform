@@ -9,5 +9,5 @@ output "cidr_block" {
 
 
 output "igw_id" {
-  value = aws_internet_gateway.this[0].id
+  value = var.igw ? aws_internet_gateway.this[0].id : null
 }
