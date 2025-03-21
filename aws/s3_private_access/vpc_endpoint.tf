@@ -43,3 +43,35 @@ resource "aws_vpc_endpoint_policy" "private_s3" {
     ]
   })
 }
+
+
+resource "aws_security_group" "instance_connect" {
+  name = "InstanceConnectSG"
+  tags = {
+    "Name": "InstanceConnectSG"
+  }
+}
+
+
+resource "aws_vpc_security_group_ingress_rule" "internet_inbound" {
+  security_group_id = aws_security_group.instance_connect.id
+  ip_protocol       = -1
+  from_port         = -1
+  to_port           = -1
+  cidr_ipv4         = "0.0.0.0/0"
+}
+
+
+resource "aws_vpc_security_group_ingress_rule" "vpc_outbound" {
+  security_group_id = aws_security_group.instance_connect.id
+  ip_protocol       = -1
+  from_port         = -1
+  to_port           = -1
+  cidr_ipv4         = module.private_vpc.cidr_block
+}
+
+
+resource "aws_ec2_instance_connect_endpoint" "ep" {
+  subnet_id = module.subnet_2.subnet_id
+  security_group_ids = [aws_security_group.instance_connect.id]
+}
