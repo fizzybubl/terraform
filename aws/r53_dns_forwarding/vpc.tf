@@ -17,6 +17,11 @@ module "aws_subnet_1" {
   cidr_block = "10.0.1.0/24"
   az_id      = "euc1-az1"
 
+  "peer": {
+      destination_cidr_block = module.on_prem_vpc.cidr_block
+      vpc_peering_connection_id = aws_vpc_peering_connection.peer.id
+  } 
+
   subnet_tags = {
     "Name" : "AWS Subnet 1"
   }
@@ -55,6 +60,13 @@ module "on_prem_subnet_1" {
   cidr_block = "10.10.1.0/24"
   az_id      = "euc1-az1"
 
+  routes = {
+    "peer": {
+      destination_cidr_block = module.aws_vpc.cidr_block
+      vpc_peering_connection_id = aws_vpc_peering_connection.peer.id
+    } 
+  }
+
   subnet_tags = {
     "Name" : "AWS Subnet 1"
   }
@@ -71,5 +83,40 @@ module "on_prem_subnet_2" {
 
   subnet_tags = {
     "Name" : "ON PREM Subnet 2"
+  }
+}
+
+
+## VPC PEERING
+
+resource "aws_vpc_peering_connection" "peer" {
+  peer_vpc_id   = module.aws_vpc.vpc_id
+  vpc_id        = module.on_prem_vpc.vpc_id
+
+  tags = {
+    Side = "Requester"
+  }
+}
+
+
+resource "aws_vpc_peering_connection_accepter" "peer" {
+  vpc_peering_connection_id = aws_vpc_peering_connection.peer.id
+  auto_accept               = true
+
+  tags = {
+    Side = "Accepter"
+  }
+}
+
+
+resource "aws_vpc_peering_connection_options" "peer" {
+  vpc_peering_connection_id = aws_vpc_peering_connection.peer.id
+
+  accepter {
+    allow_remote_vpc_dns_resolution = false
+  }
+
+  requester {
+    allow_remote_vpc_dns_resolution = false
   }
 }
