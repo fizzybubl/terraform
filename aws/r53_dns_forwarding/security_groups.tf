@@ -2,11 +2,11 @@
 # ON PREM
 
 resource "aws_security_group" "on_prem_ec2" {
-  name   = "GeneralSG"
+  name   = "ON_PREM"
   vpc_id = module.on_prem_vpc.vpc_id
 
   tags = {
-    "Name" = "AllowAll"
+    "Name" = "AllowALL_ON_PREM"
   }
 }
 
@@ -41,11 +41,11 @@ resource "aws_vpc_security_group_egress_rule" "on_prem_vpc_outbound_access" {
 # AWS
 
 resource "aws_security_group" "aws_ec2" {
-  name   = "GeneralSG"
+  name   = "AWS_EC2"
   vpc_id = module.aws_vpc.vpc_id
 
   tags = {
-    "Name" = "AllowAll"
+    "Name" = "AllowALL_AWS"
   }
 }
 
@@ -74,3 +74,43 @@ resource "aws_vpc_security_group_egress_rule" "aws_vpc_outbound_access" {
   to_port           = -1
   cidr_ipv4         =  module.aws_vpc.cidr_block
 }
+
+
+# VPC INBOUND
+resource "aws_security_group" "vpc_inbound" {
+  name   = "GeneralSG"
+  vpc_id = module.aws_vpc.vpc_id
+
+  tags = {
+    "Name" = "AllowVPCPeering"
+  }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "inbound_peer" {
+  security_group_id = aws_security_group.vpc_inbound.id
+  ip_protocol       = -1
+  from_port         = -1
+  to_port           = -1
+  cidr_ipv4         =  module.on_prem_vpc.cidr_block
+}
+
+
+resource "aws_vpc_security_group_ingress_rule" "inbound_peer_tcp_53" {
+  security_group_id = aws_security_group.vpc_inbound.id
+  ip_protocol       = "TCP"
+  from_port         = 53
+  to_port           = 53
+  cidr_ipv4         =  module.on_prem_vpc.cidr_block
+}
+
+
+resource "aws_vpc_security_group_ingress_rule" "inbound_peer_udp_53" {
+  security_group_id = aws_security_group.vpc_inbound.id
+  ip_protocol       = "UDP"
+  from_port         = 53
+  to_port           = 53
+  cidr_ipv4         =  module.on_prem_vpc.cidr_block
+}
+
+
+# VPC OUTBOUND
