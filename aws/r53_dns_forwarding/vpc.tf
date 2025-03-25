@@ -1,10 +1,10 @@
 # AWS VPC
 
 module "aws_vpc" {
-  source = "../vpc/modules/vpc_v3"
-  igw    = false
+  source               = "../vpc/modules/vpc_v3"
+  igw                  = false
   enable_dns_hostnames = true
-  enable_dns_support = true
+  enable_dns_support   = true
   vpc_tags = {
     Name = "AWS VPC"
   }
@@ -17,10 +17,12 @@ module "aws_subnet_1" {
   cidr_block = "10.0.1.0/24"
   az_id      = "euc1-az1"
 
-  "peer": {
-      destination_cidr_block = module.on_prem_vpc.cidr_block
+  routes = {
+    "peer" : {
+      destination_cidr_block    = module.on_prem_vpc.cidr_block
       vpc_peering_connection_id = aws_vpc_peering_connection.peer.id
-  } 
+    }
+  }
 
   subnet_tags = {
     "Name" : "AWS Subnet 1"
@@ -61,10 +63,10 @@ module "on_prem_subnet_1" {
   az_id      = "euc1-az1"
 
   routes = {
-    "peer": {
-      destination_cidr_block = module.aws_vpc.cidr_block
+    "peer" : {
+      destination_cidr_block    = module.aws_vpc.cidr_block
       vpc_peering_connection_id = aws_vpc_peering_connection.peer.id
-    } 
+    }
   }
 
   subnet_tags = {
@@ -90,8 +92,8 @@ module "on_prem_subnet_2" {
 ## VPC PEERING
 
 resource "aws_vpc_peering_connection" "peer" {
-  peer_vpc_id   = module.aws_vpc.vpc_id
-  vpc_id        = module.on_prem_vpc.vpc_id
+  peer_vpc_id = module.aws_vpc.vpc_id
+  vpc_id      = module.on_prem_vpc.vpc_id
 
   tags = {
     Side = "Requester"

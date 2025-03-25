@@ -13,9 +13,9 @@ data "cloudinit_config" "user_data" {
   part {
     filename     = "user_data.sh"
     content_type = "text/x-shellscript"
-    content      = templatefile("${path.module}/files/user_data.tpl.sh", {
-      APP_PRIVATE_IP="10.10.0.10 ",
-      FORWARDED_IP="10.10.0.2"
+    content = templatefile("${path.module}/files/user_data.tpl.sh", {
+      APP_PRIVATE_IP = "10.10.0.10 ",
+      FORWARDED_IP   = "10.10.0.2"
     })
   }
 }
@@ -59,7 +59,7 @@ resource "aws_autoscaling_group" "ec2_asg" {
   health_check_grace_period = 300
   health_check_type         = "EC2"
   placement_group           = aws_placement_group.test.id
-  vpc_zone_identifier = [ module.on_prem_subnet_1.subnet_id, module.on_prem_subnet_2.subnet_id ]
+  vpc_zone_identifier       = [module.on_prem_subnet_1.subnet_id, module.on_prem_subnet_2.subnet_id]
 
   launch_template {
     id      = aws_launch_template.on_prem_dns.id

@@ -1,6 +1,6 @@
 resource "aws_network_interface" "on_prem_ec2" {
-  subnet_id = module.on_prem_subnet_1.subnet_id
-  private_ip = "10.10.0.10"
+  subnet_id       = module.on_prem_subnet_1.subnet_id
+  private_ip      = "10.10.0.10"
   security_groups = [aws_security_group.on_prem_ec2.id]
 }
 
@@ -8,7 +8,7 @@ resource "aws_network_interface" "on_prem_ec2" {
 resource "aws_launch_template" "on_prem_ec2" {
   name_prefix = "eks_worker_template"
   image_id    = data.aws_ami.ami.id
-  
+
   instance_type = "t2.micro"
 
   metadata_options {
@@ -26,14 +26,14 @@ resource "aws_launch_template" "on_prem_ec2" {
   }
 
   network_interfaces {
-    network_card_index = 0
+    network_card_index   = 0
     network_interface_id = aws_network_interface.on_prem_ec2.id
   }
 }
 
 resource "aws_instance" "on_prem_ec2" {
   launch_template {
-    id = aws_launch_template.on_prem_ec2.id
+    id      = aws_launch_template.on_prem_ec2.id
     version = "$Latest"
   }
 }
