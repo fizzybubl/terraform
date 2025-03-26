@@ -1,6 +1,6 @@
 resource "aws_network_interface" "aws_ec2" {
   subnet_id       = module.aws_subnet_1.subnet_id
-  security_groups = [aws_security_group.on_prem_ec2.id]
+  security_groups = [aws_security_group.aws_ec2.id]
 }
 
 
@@ -34,5 +34,9 @@ resource "aws_instance" "aws_ec2" {
   launch_template {
     id      = aws_launch_template.aws_ec2.id
     version = "$Latest"
+  }
+
+  tags = {
+    Name = "AWS APP"
   }
 }

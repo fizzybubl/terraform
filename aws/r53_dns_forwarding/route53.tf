@@ -1,6 +1,6 @@
 locals {
-  inbound_ip1 = "10.0.0.100"
-  inbound_ip2 = "10.0.0.101"
+  inbound_ip1 = "10.0.1.100"
+  inbound_ip2 = "10.0.2.101"
 }
 
 
@@ -70,25 +70,25 @@ resource "aws_route53_resolver_endpoint" "outbound" {
 }
 
 
-resource "aws_route53_resolver_rule" "outbound" {
-  domain_name          = "onprem.privatezone.org"
-  name                 = "outbound"
-  rule_type            = "FORWARD"
-  resolver_endpoint_id = aws_route53_resolver_endpoint.outbound.id
+# resource "aws_route53_resolver_rule" "outbound" {
+#   domain_name          = "onprem.privatezone.org"
+#   name                 = "outbound"
+#   rule_type            = "FORWARD"
+#   resolver_endpoint_id = aws_route53_resolver_endpoint.outbound.id
 
-  target_ip {
-    ip = aws_network_interface.on_prem_dns1.private_ip
-    port = 53
-  }
+#   target_ip {
+#     ip   = aws_network_interface.on_prem_dns1.private_ip
+#     port = 53
+#   }
 
-  target_ip {
-    ip = aws_network_interface.on_prem_dns2.private_ip
-    port = 53
-  }
-}
+#   target_ip {
+#     ip   = aws_network_interface.on_prem_dns2.private_ip
+#     port = 53
+#   }
+# }
 
 
-resource "aws_route53_resolver_rule_association" "outbound" {
-  resolver_rule_id = aws_route53_resolver_rule.outbound.id
-  vpc_id           = module.aws_vpc.vpc_id
-}
+# resource "aws_route53_resolver_rule_association" "outbound" {
+#   resolver_rule_id = aws_route53_resolver_rule.outbound.id
+#   vpc_id           = module.aws_vpc.vpc_id
+# }

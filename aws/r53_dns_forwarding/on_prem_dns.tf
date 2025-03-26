@@ -60,6 +60,12 @@ resource "aws_instance" "on_prem_dns1" {
     device_index         = 0
     network_interface_id = aws_network_interface.on_prem_dns1.id
   }
+
+  tags = {
+    Name = "On Prem DNS1"
+  }
+
+  depends_on = [ aws_network_interface.on_prem_dns1 ]
 }
 
 
@@ -84,4 +90,10 @@ resource "aws_instance" "on_prem_dns2" {
     device_index         = 0
     network_interface_id = aws_network_interface.on_prem_dns2.id
   }
+
+  tags = {
+    Name = "On Prem DNS2"
+  }
+
+  depends_on = [ aws_network_interface.on_prem_dns2 ]
 }

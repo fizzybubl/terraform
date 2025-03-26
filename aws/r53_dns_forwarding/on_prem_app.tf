@@ -47,11 +47,17 @@ resource "aws_launch_template" "on_prem_ec2" {
     network_card_index   = 0
     network_interface_id = aws_network_interface.on_prem_ec2.id
   }
+
+  
 }
 
 resource "aws_instance" "on_prem_ec2" {
   launch_template {
     id      = aws_launch_template.on_prem_ec2.id
     version = "$Latest"
+  }
+
+  tags = {
+    "Name" = "OnPremApp"
   }
 }

@@ -78,7 +78,7 @@ resource "aws_vpc_security_group_egress_rule" "aws_vpc_outbound_access" {
 
 # VPC INBOUND
 resource "aws_security_group" "vpc_inbound" {
-  name   = "GeneralSG"
+  name   = "inbound-aws"
   vpc_id = module.aws_vpc.vpc_id
 
   tags = {
@@ -115,7 +115,7 @@ resource "aws_vpc_security_group_ingress_rule" "inbound_peer_udp_53" {
 
 # VPC OUTBOUND
 resource "aws_security_group" "vpc_outbound" {
-  name   = "GeneralSG"
+  name   = "outbound-aws"
   vpc_id = module.aws_vpc.vpc_id
 
   tags = {

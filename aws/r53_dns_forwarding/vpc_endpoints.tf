@@ -45,11 +45,11 @@ resource "aws_vpc_security_group_ingress_rule" "vpc_outbound" {
 }
 
 
-resource "aws_ec2_instance_connect_endpoint" "ep" {
-  for_each           = local.vpcs
-  subnet_id          = each.value.subnet_ids[0]
-  security_group_ids = [aws_security_group.ssm_endpoint[each.key].id]
-}
+# resource "aws_ec2_instance_connect_endpoint" "ep" {
+#   for_each           = local.vpcs
+#   subnet_id          = each.value.subnet_ids[0]
+#   security_group_ids = [aws_security_group.ssm_endpoint[each.key].id]
+# }
 
 
 resource "aws_vpc_endpoint" "ssm" {
@@ -59,7 +59,7 @@ resource "aws_vpc_endpoint" "ssm" {
   vpc_endpoint_type   = "Interface"
   private_dns_enabled = true
   security_group_ids  = [aws_security_group.ssm_endpoint[each.key].id]
-  subnet_ids          = [module.on_prem_subnet_1.subnet_id, module.on_prem_subnet_2.subnet_id]
+  subnet_ids          = each.value.subnet_ids
 }
 
 
@@ -70,7 +70,7 @@ resource "aws_vpc_endpoint" "ec2messages" {
   vpc_endpoint_type   = "Interface"
   private_dns_enabled = true
   security_group_ids  = [aws_security_group.ssm_endpoint[each.key].id]
-  subnet_ids          = [module.on_prem_subnet_1.subnet_id, module.on_prem_subnet_2.subnet_id]
+  subnet_ids          = each.value.subnet_ids
 }
 
 
@@ -81,5 +81,5 @@ resource "aws_vpc_endpoint" "ssm_messages" {
   vpc_endpoint_type   = "Interface"
   private_dns_enabled = true
   security_group_ids  = [aws_security_group.ssm_endpoint[each.key].id]
-  subnet_ids          = [module.on_prem_subnet_1.subnet_id, module.on_prem_subnet_2.subnet_id]
+  subnet_ids          = each.value.subnet_ids
 }
