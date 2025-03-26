@@ -10,7 +10,7 @@ options {
     recursion yes;
     forward first;
     forwarders {
-        ${FORWARDED_IP};
+        ${FORWARDER_IP};
     };
     dnssec-enable yes;
     dnssec-validation yes;
@@ -23,6 +23,11 @@ zone "corp.animals4life.org" IN {
     type master;
     file "corp.animals4life.org.zone";
     allow-update { none; };
+};
+zone "aws.privatezone.org" { 
+  type forward; 
+  forward only;
+  forwarders { ${INBOUND_IP1}; ${INBOUND_IP2}; }; 
 };
 EOF
 

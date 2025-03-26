@@ -5,6 +5,22 @@ resource "aws_network_interface" "on_prem_ec2" {
 }
 
 
+
+data "cloudinit_config" "user_data_app" {
+  gzip = false
+  part {
+    filename     = "user_data.sh"
+    content_type = "text/x-shellscript"
+    content = templatefile("${path.module}/files/user_data_on_prem_app.tpl.sh", {
+      DNS_IP_1 = aws_network_interface.on_prem_dns1.private_ip,
+      DNS_IP_2 = aws_network_interface.on_prem_dns2.private_ip
+    })
+  }
+
+  depends_on = [aws_route53_resolver_endpoint.inbound]
+}
+
+
 resource "aws_launch_template" "on_prem_ec2" {
   name_prefix = "eks_worker_template"
   image_id    = data.aws_ami.ami.id
@@ -17,6 +33,8 @@ resource "aws_launch_template" "on_prem_ec2" {
     http_put_response_hop_limit = 1
     instance_metadata_tags      = "enabled"
   }
+
+  user_data = data.cloudinit_config.user_data_app.rendered
 
   block_device_mappings {
     device_name = "/dev/xvda"

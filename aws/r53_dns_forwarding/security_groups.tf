@@ -82,7 +82,7 @@ resource "aws_security_group" "vpc_inbound" {
   vpc_id = module.aws_vpc.vpc_id
 
   tags = {
-    "Name" = "AllowVPCPeering"
+    "Name" = "Inbound-Resolver-SG"
   }
 }
 
@@ -114,3 +114,37 @@ resource "aws_vpc_security_group_ingress_rule" "inbound_peer_udp_53" {
 
 
 # VPC OUTBOUND
+resource "aws_security_group" "vpc_outbound" {
+  name   = "GeneralSG"
+  vpc_id = module.aws_vpc.vpc_id
+
+  tags = {
+    "Name" = "Outboundd-Resolver-SG"
+  }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "outbound_peer" {
+  security_group_id = aws_security_group.vpc_outbound.id
+  ip_protocol       = -1
+  from_port         = -1
+  to_port           = -1
+  cidr_ipv4         = module.on_prem_vpc.cidr_block
+}
+
+
+resource "aws_vpc_security_group_ingress_rule" "outbound_peer_tcp_53" {
+  security_group_id = aws_security_group.vpc_outbound.id
+  ip_protocol       = "TCP"
+  from_port         = 53
+  to_port           = 53
+  cidr_ipv4         = module.on_prem_vpc.cidr_block
+}
+
+
+resource "aws_vpc_security_group_ingress_rule" "outbound_peer_udp_53" {
+  security_group_id = aws_security_group.vpc_outbound.id
+  ip_protocol       = "UDP"
+  from_port         = 53
+  to_port           = 53
+  cidr_ipv4         = module.on_prem_vpc.cidr_block
+}
