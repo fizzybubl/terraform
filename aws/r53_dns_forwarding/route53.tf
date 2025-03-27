@@ -15,7 +15,7 @@ resource "aws_route53_zone" "private" {
 
 resource "aws_route53_record" "aws_app" {
   zone_id = aws_route53_zone.private.id
-  name    = "web.aws.privaztezone.org"
+  name    = "test"
   type    = "A"
   records = [aws_network_interface.aws_ec2.private_ip]
   ttl     = "60"
