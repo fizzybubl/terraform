@@ -27,14 +27,14 @@ data "cloudinit_config" "user_data" {
 
 resource "aws_network_interface" "on_prem_dns1" {
   subnet_id       = module.on_prem_subnet_1.subnet_id
-  private_ips      = ["10.10.0.100"]
+  private_ips      = ["10.10.1.100"]
   security_groups = [aws_security_group.on_prem_ec2.id]
 }
 
 
 resource "aws_network_interface" "on_prem_dns2" {
-  subnet_id       = module.on_prem_subnet_1.subnet_id
-  private_ips      = ["10.10.0.101"]
+  subnet_id       = module.on_prem_subnet_2.subnet_id
+  private_ips      = ["10.10.2.101"]
   security_groups = [aws_security_group.on_prem_ec2.id]
 }
 
