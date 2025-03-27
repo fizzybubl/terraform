@@ -1,6 +1,6 @@
 resource "aws_network_interface" "on_prem_ec2" {
   subnet_id       = module.on_prem_subnet_1.subnet_id
-  private_ip      = "10.10.0.10"
+  private_ips      = ["10.10.0.10"]
   security_groups = [aws_security_group.on_prem_ec2.id]
 }
 
