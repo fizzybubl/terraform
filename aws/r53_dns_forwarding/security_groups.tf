@@ -37,6 +37,24 @@ resource "aws_vpc_security_group_egress_rule" "on_prem_vpc_outbound_access" {
 }
 
 
+resource "aws_vpc_security_group_egress_rule" "on_prem_https_outbound_access" {
+  security_group_id = aws_security_group.on_prem_ec2.id
+  ip_protocol       = "TCP"
+  from_port         = 443
+  to_port           = 443
+  cidr_ipv4         = "0.0.0.0/0"
+}
+
+
+
+resource "aws_vpc_security_group_egress_rule" "on_prem_http_outbound_access" {
+  security_group_id = aws_security_group.on_prem_ec2.id
+  ip_protocol       = "TCP"
+  from_port         = 80
+  to_port           = 80
+  cidr_ipv4         = "0.0.0.0/0"
+}
+
 
 # AWS
 
@@ -119,7 +137,7 @@ resource "aws_security_group" "vpc_outbound" {
   vpc_id = module.aws_vpc.vpc_id
 
   tags = {
-    "Name" = "Outboundd-Resolver-SG"
+    "Name" = "Outbound-Resolver-SG"
   }
 }
 

@@ -46,12 +46,44 @@ module "aws_subnet_2" {
 
 # ON PREM VPC
 
+
+resource "aws_eip" "natgw" {
+  domain               = "vpc"
+  network_border_group = var.region
+}
+
+
+resource "aws_nat_gateway" "this" {
+  subnet_id     = module.public_on_prem_subnet.subnet_id
+  allocation_id = aws_eip.natgw.id
+}
+
+
 module "on_prem_vpc" {
   source   = "../vpc/modules/vpc_v3"
-  igw      = false
+  igw      = true
   vpc_cidr = "10.10.0.0/16"
   vpc_tags = {
     Name = "ON PREM VPC"
+  }
+}
+
+
+module "public_on_prem_subnet" {
+  source     = "../vpc/modules/subnet"
+  vpc_id     = module.on_prem_vpc.vpc_id
+  cidr_block = "10.10.100.0/24"
+  az_id      = "euc1-az1"
+
+  routes = {
+    "igw" : {
+      gateway_id             = module.on_prem_vpc.igw_id
+      destination_cidr_block = "0.0.0.0/0"
+    }
+  }
+
+  subnet_tags = {
+    "Name" = "ON PREM Public Subnet"
   }
 }
 
@@ -66,11 +98,15 @@ module "on_prem_subnet_1" {
     "peer" : {
       destination_cidr_block    = module.aws_vpc.cidr_block
       vpc_peering_connection_id = aws_vpc_peering_connection.peer.id
+    },
+    "natgw" : {
+      destination_cidr_block = "0.0.0.0/0"
+      nat_gateway_id         = aws_nat_gateway.this.id
     }
   }
 
   subnet_tags = {
-    "Name" : "AWS Subnet 1"
+    "Name" : "ON PREM Subnet 1"
   }
 }
 
@@ -121,4 +157,6 @@ resource "aws_vpc_peering_connection_options" "peer" {
   requester {
     allow_remote_vpc_dns_resolution = false
   }
+
+  depends_on = [aws_vpc_peering_connection_accepter.peer]
 }

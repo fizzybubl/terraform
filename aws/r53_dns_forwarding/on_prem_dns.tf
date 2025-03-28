@@ -17,24 +17,24 @@ data "cloudinit_config" "user_data" {
       APP_PRIVATE_IP = "10.10.0.10",
       FORWARDER_IP   = "10.10.0.2",
       INBOUND_IP1    = local.inbound_ip1,
-      INBOUND_IP2    = local.inbound_ip2
+      INBOUND_IP2    = local.inbound_ip2,
+      DNS_IP_1       = aws_network_interface.on_prem_dns1.private_ip,
+      DNS_IP_2       = aws_network_interface.on_prem_dns2.private_ip
     })
   }
-
-  depends_on = [aws_route53_resolver_endpoint.inbound]
 }
 
 
 resource "aws_network_interface" "on_prem_dns1" {
   subnet_id       = module.on_prem_subnet_1.subnet_id
-  private_ips      = ["10.10.1.100"]
+  private_ips     = ["10.10.1.100"]
   security_groups = [aws_security_group.on_prem_ec2.id]
 }
 
 
 resource "aws_network_interface" "on_prem_dns2" {
   subnet_id       = module.on_prem_subnet_2.subnet_id
-  private_ips      = ["10.10.2.101"]
+  private_ips     = ["10.10.2.101"]
   security_groups = [aws_security_group.on_prem_ec2.id]
 }
 
@@ -65,7 +65,7 @@ resource "aws_instance" "on_prem_dns1" {
     Name = "On Prem DNS1"
   }
 
-  depends_on = [ aws_network_interface.on_prem_dns1 ]
+  depends_on = [ aws_nat_gateway.this ]
 }
 
 
@@ -95,5 +95,5 @@ resource "aws_instance" "on_prem_dns2" {
     Name = "On Prem DNS2"
   }
 
-  depends_on = [ aws_network_interface.on_prem_dns2 ]
+  depends_on = [ aws_nat_gateway.this ]
 }

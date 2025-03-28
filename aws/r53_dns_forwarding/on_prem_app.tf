@@ -1,6 +1,6 @@
 resource "aws_network_interface" "on_prem_ec2" {
   subnet_id       = module.on_prem_subnet_1.subnet_id
-  private_ips      = ["10.10.1.10"]
+  private_ips     = ["10.10.1.10"]
   security_groups = [aws_security_group.on_prem_ec2.id]
 }
 
@@ -16,8 +16,6 @@ data "cloudinit_config" "user_data_app" {
       DNS_IP_2 = aws_network_interface.on_prem_dns2.private_ip
     })
   }
-
-  depends_on = [aws_route53_resolver_endpoint.inbound]
 }
 
 
@@ -48,7 +46,7 @@ resource "aws_launch_template" "on_prem_ec2" {
     network_interface_id = aws_network_interface.on_prem_ec2.id
   }
 
-  
+
 }
 
 resource "aws_instance" "on_prem_ec2" {
@@ -60,4 +58,6 @@ resource "aws_instance" "on_prem_ec2" {
   tags = {
     "Name" = "OnPremApp"
   }
+
+  depends_on = [ aws_nat_gateway.this ]
 }

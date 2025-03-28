@@ -58,6 +58,7 @@ variable "routes" {
     network_interface_id        = optional(string)
     vpc_endpoint_id             = optional(string)
     egress_only_gateway_id      = optional(string)
+    nat_gateway_id              = optional(string)
   }))
 
   default = {}

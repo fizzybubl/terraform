@@ -35,7 +35,7 @@ resource "aws_vpc_security_group_ingress_rule" "internet_inbound" {
 }
 
 
-resource "aws_vpc_security_group_ingress_rule" "vpc_outbound" {
+resource "aws_vpc_security_group_egress_rule" "vpc_outbound" {
   for_each          = local.vpcs
   security_group_id = aws_security_group.ssm_endpoint[each.key].id
   ip_protocol       = -1

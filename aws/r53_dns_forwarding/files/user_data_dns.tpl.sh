@@ -1,5 +1,5 @@
 #!/bin/bash -xe
-dnf install bind bind-utils -y
+yum install bind bind-utils -y
 cat <<EOF > /etc/named.conf
 options {
     directory	"/var/named";
@@ -19,9 +19,9 @@ options {
     bindkeys-file "/etc/named.iscdlv.key";
     managed-keys-directory "/var/named/dynamic";
 };
-zone "corp.animals4life.org" IN {
+zone "onprem.privatezone.org" IN {
     type master;
-    file "corp.animals4life.org.zone";
+    file "onprem.privatezone.org.zone";
     allow-update { none; };
 };
 zone "aws.privatezone.org" { 
@@ -31,7 +31,7 @@ zone "aws.privatezone.org" {
 };
 EOF
 
-cat <<EOF > /var/named/corp.animals4life.org.zone
+cat <<EOF > /var/named/onprem.privatezone.org.zone
 \$TTL 86400
 @   IN  SOA     ns1.mydomain.com. root.mydomain.com. (
         2013042201  ;Serial
@@ -41,15 +41,18 @@ cat <<EOF > /var/named/corp.animals4life.org.zone
         86400       ;Minimum TTL
 )
 ; Specify our two nameservers
-    IN	NS		dnsA.corp.animals4life.org.
-    IN	NS		dnsB.corp.animals4life.org.
+    IN	NS		dnsA.onprem.privatezone.org.
+    IN	NS		dnsB.onprem.privatezone.org.
 ; Resolve nameserver hostnames to IP, replace with your two droplet IP addresses.
-dnsA		IN	A		1.1.1.1
-dnsB	  IN	A		8.8.8.8
+dnsA	  IN	A		${DNS_IP_1}
+dnsB	  IN	A		${DNS_IP_2}
 
 ; Define hostname -> IP pairs which you wish to resolve
-@		  IN	A		${APP_PRIVATE_IP}
+@		IN	A	  ${APP_PRIVATE_IP}
 app		IN	A	  ${APP_PRIVATE_IP}
 EOF
+
+named-checkzone /var/named/onprem.privatezone.org.zone
+
 service named restart
 chkconfig named on
