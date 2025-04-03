@@ -44,6 +44,8 @@ resource "aws_instance" "on_prem_dns1" {
 
   ami = data.aws_ami.ami.id
 
+  user_data = data.cloudinit_config.user_data.rendered
+
   metadata_options {
     http_endpoint               = "enabled"
     http_tokens                 = "required"
@@ -73,6 +75,8 @@ resource "aws_instance" "on_prem_dns2" {
   instance_type = "t2.micro"
 
   ami = data.aws_ami.ami.id
+
+  user_data = data.cloudinit_config.user_data.rendered
 
   metadata_options {
     http_endpoint               = "enabled"

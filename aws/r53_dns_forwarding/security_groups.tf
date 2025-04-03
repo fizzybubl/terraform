@@ -10,7 +10,16 @@ resource "aws_security_group" "on_prem_ec2" {
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "on_prem_vpc_inbound_access" {
+resource "aws_vpc_security_group_ingress_rule" "peer_aws_vpc_access" {
+  security_group_id = aws_security_group.on_prem_ec2.id
+  ip_protocol       = -1
+  from_port         = -1
+  to_port           = -1
+  cidr_ipv4         = module.aws_vpc.cidr_block
+}
+
+
+resource "aws_vpc_security_group_ingress_rule" "on_prem_vpc_access" {
   security_group_id = aws_security_group.on_prem_ec2.id
   ip_protocol       = -1
   from_port         = -1
@@ -19,7 +28,7 @@ resource "aws_vpc_security_group_ingress_rule" "on_prem_vpc_inbound_access" {
 }
 
 
-resource "aws_vpc_security_group_ingress_rule" "ec2_instance_connect_inbound_access" {
+resource "aws_vpc_security_group_ingress_rule" "ec2_instance_connect_access" {
   security_group_id            = aws_security_group.on_prem_ec2.id
   ip_protocol                  = -1
   from_port                    = -1
@@ -34,6 +43,15 @@ resource "aws_vpc_security_group_egress_rule" "on_prem_vpc_outbound_access" {
   from_port         = -1
   to_port           = -1
   cidr_ipv4         = module.on_prem_vpc.cidr_block
+}
+
+
+resource "aws_vpc_security_group_egress_rule" "peer_aws_vpc_outbound_access" {
+  security_group_id = aws_security_group.on_prem_ec2.id
+  ip_protocol       = -1
+  from_port         = -1
+  to_port           = -1
+  cidr_ipv4         = module.aws_vpc.cidr_block
 }
 
 
@@ -67,7 +85,7 @@ resource "aws_security_group" "aws_ec2" {
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "aws_vpc_inbound_access" {
+resource "aws_vpc_security_group_ingress_rule" "aws_vpc_access" {
   security_group_id = aws_security_group.aws_ec2.id
   ip_protocol       = -1
   from_port         = -1
@@ -76,7 +94,16 @@ resource "aws_vpc_security_group_ingress_rule" "aws_vpc_inbound_access" {
 }
 
 
-resource "aws_vpc_security_group_ingress_rule" "aws_ec2_instance_connect_inbound_access" {
+resource "aws_vpc_security_group_ingress_rule" "peer_on_prem_vpc_access" {
+  security_group_id = aws_security_group.aws_ec2.id
+  ip_protocol       = -1
+  from_port         = -1
+  to_port           = -1
+  cidr_ipv4         = module.on_prem_vpc.cidr_block
+}
+
+
+resource "aws_vpc_security_group_ingress_rule" "aws_ec2_instance_connect_access" {
   security_group_id            = aws_security_group.aws_ec2.id
   ip_protocol                  = -1
   from_port                    = -1
@@ -94,8 +121,17 @@ resource "aws_vpc_security_group_egress_rule" "aws_vpc_outbound_access" {
 }
 
 
+resource "aws_vpc_security_group_egress_rule" "peer_on_prem_vpc_access" {
+  security_group_id = aws_security_group.aws_ec2.id
+  ip_protocol       = -1
+  from_port         = -1
+  to_port           = -1
+  cidr_ipv4         = module.on_prem_vpc.cidr_block
+}
+
+
 # VPC INBOUND
-resource "aws_security_group" "vpc_inbound" {
+resource "aws_security_group" "inbound_endpoint" {
   name   = "inbound-aws"
   vpc_id = module.aws_vpc.vpc_id
 
@@ -105,7 +141,7 @@ resource "aws_security_group" "vpc_inbound" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "inbound_peer" {
-  security_group_id = aws_security_group.vpc_inbound.id
+  security_group_id = aws_security_group.inbound_endpoint.id
   ip_protocol       = -1
   from_port         = -1
   to_port           = -1
@@ -114,7 +150,7 @@ resource "aws_vpc_security_group_ingress_rule" "inbound_peer" {
 
 
 resource "aws_vpc_security_group_ingress_rule" "inbound_peer_tcp_53" {
-  security_group_id = aws_security_group.vpc_inbound.id
+  security_group_id = aws_security_group.inbound_endpoint.id
   ip_protocol       = "TCP"
   from_port         = 53
   to_port           = 53
@@ -123,7 +159,7 @@ resource "aws_vpc_security_group_ingress_rule" "inbound_peer_tcp_53" {
 
 
 resource "aws_vpc_security_group_ingress_rule" "inbound_peer_udp_53" {
-  security_group_id = aws_security_group.vpc_inbound.id
+  security_group_id = aws_security_group.inbound_endpoint.id
   ip_protocol       = "UDP"
   from_port         = 53
   to_port           = 53
@@ -132,7 +168,7 @@ resource "aws_vpc_security_group_ingress_rule" "inbound_peer_udp_53" {
 
 
 # VPC OUTBOUND
-resource "aws_security_group" "vpc_outbound" {
+resource "aws_security_group" "outbound_endpoint" {
   name   = "outbound-aws"
   vpc_id = module.aws_vpc.vpc_id
 
@@ -142,7 +178,7 @@ resource "aws_security_group" "vpc_outbound" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "outbound_peer" {
-  security_group_id = aws_security_group.vpc_outbound.id
+  security_group_id = aws_security_group.outbound_endpoint.id
   ip_protocol       = -1
   from_port         = -1
   to_port           = -1
@@ -151,7 +187,7 @@ resource "aws_vpc_security_group_ingress_rule" "outbound_peer" {
 
 
 resource "aws_vpc_security_group_ingress_rule" "outbound_peer_tcp_53" {
-  security_group_id = aws_security_group.vpc_outbound.id
+  security_group_id = aws_security_group.outbound_endpoint.id
   ip_protocol       = "TCP"
   from_port         = 53
   to_port           = 53
@@ -160,7 +196,7 @@ resource "aws_vpc_security_group_ingress_rule" "outbound_peer_tcp_53" {
 
 
 resource "aws_vpc_security_group_ingress_rule" "outbound_peer_udp_53" {
-  security_group_id = aws_security_group.vpc_outbound.id
+  security_group_id = aws_security_group.outbound_endpoint.id
   ip_protocol       = "UDP"
   from_port         = 53
   to_port           = 53

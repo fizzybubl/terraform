@@ -1,6 +1,7 @@
-#!/bin/bash -xe
+#!/bin/sh
 
-yum install -y NetworkManager
+yum upgrade -y && yum install NetworkManager -y
+
 systemctl start NetworkManager
 systemctl enable NetworkManager
 
