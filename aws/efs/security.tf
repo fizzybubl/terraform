@@ -23,3 +23,13 @@ resource "aws_vpc_security_group_egress_rule" "aws_vpc_outbound_access" {
   to_port           = -1
   cidr_ipv4         = module.aws_vpc.cidr_block
 }
+
+
+
+resource "aws_vpc_security_group_ingress_rule" "aws_ec2_instance_connect_access" {
+  security_group_id            = aws_security_group.aws_ec2.id
+  ip_protocol                  = -1
+  from_port                    = -1
+  to_port                      = -1
+  referenced_security_group_id = aws_security_group.ssm_endpoint.id
+}

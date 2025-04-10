@@ -11,8 +11,8 @@ data "cloudinit_config" "user_data" {
   part {
     filename     = "user_data.sh"
     content_type = "text/x-shellscript"
-    content = templatefile("${path.module}/files/user_data_dns.tpl.sh", {
-
+    content = templatefile("${path.module}/files/user_data.sh", {
+      MOUNT_ENDPOINT = module.efs.efs_dns
     })
   }
 }
