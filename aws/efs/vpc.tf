@@ -46,7 +46,7 @@ module "aws_subnet_2" {
 module "private_subnet_1" {
   source     = "../vpc/modules/subnet"
   vpc_id     = module.aws_vpc.vpc_id
-  cidr_block = "10.0.1.0/24"
+  cidr_block = "10.0.10.0/24"
   az_id      = "euc1-az1"
 
   subnet_tags = {
@@ -58,7 +58,7 @@ module "private_subnet_1" {
 module "private_subnet_2" {
   source         = "../vpc/modules/subnet"
   vpc_id         = module.aws_vpc.vpc_id
-  cidr_block     = "10.0.2.0/24"
+  cidr_block     = "10.0.20.0/24"
   az_id          = "euc1-az2"
   create_rtb     = false
   route_table_id = module.aws_subnet_1.route_table_id
@@ -96,7 +96,7 @@ resource "aws_vpc_security_group_egress_rule" "vpc_outbound" {
 }
 
 
-resource "aws_ec2_instance_connect_endpoint" "ep" {
-  subnet_id          = module.aws_subnet_1.subnet_id
-  security_group_ids = [aws_security_group.ssm_endpoint.id]
-}
+# resource "aws_ec2_instance_connect_endpoint" "ep" {
+#   subnet_id          = module.aws_subnet_1.subnet_id
+#   security_group_ids = [aws_security_group.ssm_endpoint.id]
+# }
