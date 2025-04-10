@@ -12,7 +12,7 @@ data "cloudinit_config" "user_data" {
     filename     = "user_data.sh"
     content_type = "text/x-shellscript"
     content = templatefile("${path.module}/files/user_data_dns.tpl.sh", {
-      
+
     })
   }
 }
@@ -23,7 +23,9 @@ resource "aws_instance" "producer" {
 
   ami = data.aws_ami.ami.id
 
-  user_data = data.cloudinit_config.user_data.rendered
+  user_data       = data.cloudinit_config.user_data.rendered
+  subnet_id       = module.aws_subnet_1.subnet_id
+  security_groups = [aws_security_group.aws_ec2.id]
 
   metadata_options {
     http_endpoint               = "enabled"
@@ -47,6 +49,9 @@ resource "aws_instance" "consumer" {
   ami = data.aws_ami.ami.id
 
   user_data = data.cloudinit_config.user_data.rendered
+
+  subnet_id       = module.aws_subnet_2.subnet_id
+  security_groups = [aws_security_group.aws_ec2.id]
 
   metadata_options {
     http_endpoint               = "enabled"

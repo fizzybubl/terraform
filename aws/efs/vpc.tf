@@ -36,8 +36,8 @@ module "aws_subnet_2" {
 
 
 resource "aws_security_group" "ssm_endpoint" {
-  name     = "InstanceConnectSG"
-  vpc_id   = module.aws_vpc.vpc_id
+  name   = "InstanceConnectSG"
+  vpc_id = module.aws_vpc.vpc_id
   tags = {
     "Name" : "InstanceConnectSG"
   }
