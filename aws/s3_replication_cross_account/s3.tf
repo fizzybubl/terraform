@@ -121,3 +121,60 @@ resource "aws_s3_bucket_replication_configuration" "prod_to_dev" {
 
   depends_on = [module.dev, module.prod]
 }
+
+
+resource "aws_s3_object" "jpg" {
+  provider = aws.prod
+  bucket       = module.prod.bucket.id
+  key          = "aotm.jpg"
+  content_type = "image/jpeg"
+  content      = file("${path.module}/files/website1/aotm.jpg")
+}
+
+
+resource "aws_s3_object" "html" {
+    provider = aws.prod
+  bucket       = module.prod.bucket.id
+  key          = "index.html"
+  content_type = "text/html"
+  content      = file("${path.module}/files/website1/index.html")
+}
+
+
+resource "aws_s3_bucket_website_configuration" "prod" {
+    provider = aws.prod
+  bucket = module.prod.bucket.id
+
+  index_document {
+    suffix = "index.html"
+  }
+
+  routing_rule {
+    condition {
+      key_prefix_equals = "home/"
+    }
+    redirect {
+      replace_key_prefix_with = "/"
+    }
+  }
+}
+
+
+resource "aws_s3_bucket_website_configuration" "dev" {
+    provider = aws.dev
+  bucket = module.dev.bucket.id
+
+  index_document {
+    suffix = "index.html"
+  }
+
+  routing_rule {
+    condition {
+      key_prefix_equals = "home/"
+    }
+    redirect {
+      replace_key_prefix_with = "/"
+    }
+  }
+}
+
