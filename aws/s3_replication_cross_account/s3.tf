@@ -96,3 +96,28 @@ resource "aws_s3_bucket_policy" "prod" {
     ]
   })
 }
+
+
+resource "aws_s3_bucket_replication_configuration" "prod_to_dev" {
+  role   = aws_iam_role.allow_prod_to_replicate_to_dev.arn
+  bucket = module.prod.bucket.id
+
+  rule {
+    id = "replicate-all"
+
+    filter {}
+
+    status = "Enabled"
+
+    destination {
+      bucket        = module.dev.bucket.arn
+      storage_class = "STANDARD"
+    }
+
+    delete_marker_replication {
+      status = "Enabled"
+    }
+  }
+
+  depends_on = [module.dev, module.prod]
+}
