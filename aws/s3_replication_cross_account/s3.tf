@@ -128,7 +128,7 @@ resource "aws_s3_object" "jpg" {
   bucket       = module.prod.bucket.id
   key          = "aotm.jpg"
   content_type = "image/jpeg"
-  content      = file("${path.module}/files/website1/aotm.jpg")
+  content      = file("${path.module}/files/${var.website_version}/aotm.jpg")
 }
 
 
@@ -137,7 +137,7 @@ resource "aws_s3_object" "html" {
   bucket       = module.prod.bucket.id
   key          = "index.html"
   content_type = "text/html"
-  content      = file("${path.module}/files/website1/index.html")
+  content      = file("${path.module}/files/${var.website_version}/index.html")
 }
 
 

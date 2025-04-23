@@ -14,3 +14,9 @@ variable "region" {
   type = string
   default = "eu-central-1"
 }
+
+
+variable "website_version" {
+    type = string
+    default = "website1"
+}
