@@ -1,6 +1,6 @@
-esource "aws_iam_role" "allow_prod_to_replicate_to_dev" {
+resource "aws_iam_role" "allow_prod_to_replicate_to_dev" {
   provider = aws.prod
-  name = "AllowProdToReplicateToDev"
+  name     = "AllowProdToReplicateToDev"
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
@@ -20,8 +20,8 @@ esource "aws_iam_role" "allow_prod_to_replicate_to_dev" {
 }
 
 resource "aws_iam_policy" "allow_prod_to_replicate_to_dev" {
-      provider = aws.prod
-  policy = {
+  provider = aws.prod
+  policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
       {
@@ -51,7 +51,7 @@ resource "aws_iam_policy" "allow_prod_to_replicate_to_dev" {
         "Resource" : "${module.dev.bucket.arn}/*"
       }
     ]
-  }
+  })
 
   tags = {
     "Name" : "AllowProdToReplicateToDev"
@@ -60,7 +60,7 @@ resource "aws_iam_policy" "allow_prod_to_replicate_to_dev" {
 
 
 resource "aws_iam_role_policy_attachment" "allow_prod_to_replicate_to_dev" {
-      provider = aws.prod
+  provider   = aws.prod
   role       = aws_iam_role.allow_prod_to_replicate_to_dev.name
   policy_arn = aws_iam_policy.allow_prod_to_replicate_to_dev.arn
 }

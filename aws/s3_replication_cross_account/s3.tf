@@ -1,49 +1,53 @@
 data "aws_iam_role" "admin_dev" {
-  name = "Administrator"
+  name     = "Administrator"
   provider = aws.dev
 }
 
 data "aws_iam_role" "admin_prod" {
-  name = "Administrator"
+  name     = "Administrator"
   provider = aws.prod
 }
 
+data "aws_caller_identity" "current" {
+  provider = aws.dev
+}
+
 module "dev" {
-    source = "../s3/modules/bucket"
-    bucket = "destination-dev"
-    block_public_acls       = true
-    block_public_policy     = true
-    restrict_public_buckets = true
-    ignore_public_acls      = true
-    versioning              = "Enabled"
-    providers = {
-        aws = aws.dev
-    }
+  source                  = "../s3/modules/bucket"
+  bucket                  = "destination-dev-test-sdd"
+  block_public_acls       = false
+  block_public_policy     = false
+  restrict_public_buckets = false
+  ignore_public_acls      = false
+  versioning              = "Enabled"
+  providers = {
+    aws = aws.dev
+  }
 }
 
 
 module "prod" {
-    source = "../s3/modules/bucket"
-    bucket = "source-prod"
-    block_public_acls       = true
-    block_public_policy     = true
-    restrict_public_buckets = true
-    ignore_public_acls      = true
-    versioning              = "Enabled"
-    providers = {
-        aws = aws.prod
-    }
+  source                  = "../s3/modules/bucket"
+  bucket                  = "source-prod-test-sdd"
+  block_public_acls       = false
+  block_public_policy     = false
+  restrict_public_buckets = false
+  ignore_public_acls      = false
+  versioning              = "Enabled"
+  providers = {
+    aws = aws.prod
+  }
 }
 
 
 resource "aws_s3_bucket_policy" "dev" {
-    provider = aws.dev
-  bucket = module.dev.bucket.id
+  provider = aws.dev
+  bucket   = module.dev.bucket.id
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
       {
-        "Sid": "Allow Admin"
+        "Sid" : "Allow Admin"
         "Principal" : {
           "AWS" : "${data.aws_iam_role.admin_dev.arn}"
         },
@@ -54,22 +58,29 @@ resource "aws_s3_bucket_policy" "dev" {
         "Resource" : ["${module.dev.bucket.arn}", "${module.dev.bucket.arn}/*"]
       },
       {
-         "Sid":"Set-permissions-for-objects",
-         "Effect":"Allow",
-         "Principal":{
-            "AWS": aws_iam_role.allow_prod_to_replicate_to_dev.arn
-         },
-         "Action":["s3:ReplicateObject", "s3:ReplicateDelete"],
-         "Resource":"${module.dev.bucket.arn}/*"
+        "Sid" : "Set-permissions-for-objects",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : aws_iam_role.allow_prod_to_replicate_to_dev.arn
+        },
+        "Action" : ["s3:ReplicateObject", "s3:ReplicateDelete"],
+        "Resource" : "${module.dev.bucket.arn}/*"
       },
       {
-         "Sid":"Set permissions on bucket",
-         "Effect":"Allow",
-         "Principal":{
-            "AWS": aws_iam_role.allow_prod_to_replicate_to_dev.arn
-         },
-         "Action":["s3:GetBucketVersioning", "s3:PutBucketVersioning"],
-         "Resource": "${module.dev.bucket.arn}"
+        "Sid" : "Set permissions on bucket",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : aws_iam_role.allow_prod_to_replicate_to_dev.arn
+        },
+        "Action" : ["s3:GetBucketVersioning", "s3:PutBucketVersioning"],
+        "Resource" : "${module.dev.bucket.arn}"
+      },
+      {
+        "Sid" : "Allow getObject public",
+        "Effect" : "Allow",
+        "Principal" : "*",
+        "Action" : ["s3:GetObject"],
+        "Resource" : "${module.dev.bucket.arn}/*"
       }
     ]
   })
@@ -77,13 +88,13 @@ resource "aws_s3_bucket_policy" "dev" {
 
 
 resource "aws_s3_bucket_policy" "prod" {
-      provider = aws.prod
-  bucket = module.prod.bucket.id
+  provider = aws.prod
+  bucket   = module.prod.bucket.id
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
       {
-        "Sid": "Allow Admin"
+        "Sid" : "Allow Admin"
         "Principal" : {
           "AWS" : "${data.aws_iam_role.admin_prod.arn}"
         },
@@ -92,6 +103,13 @@ resource "aws_s3_bucket_policy" "prod" {
           "s3:*"
         ],
         "Resource" : ["${module.prod.bucket.arn}", "${module.prod.bucket.arn}/*"],
+      },
+      {
+        "Sid" : "Allow getObject public",
+        "Effect" : "Allow",
+        "Principal" : "*",
+        "Action" : ["s3:GetObject"],
+        "Resource" : "${module.prod.bucket.arn}/*"
       }
     ]
   })
@@ -99,8 +117,9 @@ resource "aws_s3_bucket_policy" "prod" {
 
 
 resource "aws_s3_bucket_replication_configuration" "prod_to_dev" {
-  role   = aws_iam_role.allow_prod_to_replicate_to_dev.arn
-  bucket = module.prod.bucket.id
+  provider = aws.prod
+  role     = aws_iam_role.allow_prod_to_replicate_to_dev.arn
+  bucket   = module.prod.bucket.id
 
   rule {
     id = "replicate-all"
@@ -112,6 +131,11 @@ resource "aws_s3_bucket_replication_configuration" "prod_to_dev" {
     destination {
       bucket        = module.dev.bucket.arn
       storage_class = "STANDARD"
+      account       = data.aws_caller_identity.current.account_id
+
+      access_control_translation {
+        owner = "Destination"
+      }
     }
 
     delete_marker_replication {
@@ -119,31 +143,35 @@ resource "aws_s3_bucket_replication_configuration" "prod_to_dev" {
     }
   }
 
-  depends_on = [module.dev, module.prod]
+  depends_on = [aws_s3_bucket_policy.prod, aws_s3_bucket_policy.dev]
 }
 
 
 resource "aws_s3_object" "jpg" {
-  provider = aws.prod
+  provider     = aws.prod
   bucket       = module.prod.bucket.id
   key          = "aotm.jpg"
   content_type = "image/jpeg"
-  content      = file("${path.module}/files/${var.website_version}/aotm.jpg")
+  source       = "${path.module}/files/${var.website_version}/aotm.jpg"
+
+  depends_on = [aws_s3_bucket_replication_configuration.prod_to_dev]
 }
 
 
 resource "aws_s3_object" "html" {
-    provider = aws.prod
+  provider     = aws.prod
   bucket       = module.prod.bucket.id
   key          = "index.html"
   content_type = "text/html"
-  content      = file("${path.module}/files/${var.website_version}/index.html")
+  source       = "${path.module}/files/${var.website_version}/index.html"
+
+  depends_on = [aws_s3_bucket_replication_configuration.prod_to_dev]
 }
 
 
 resource "aws_s3_bucket_website_configuration" "prod" {
-    provider = aws.prod
-  bucket = module.prod.bucket.id
+  provider = aws.prod
+  bucket   = module.prod.bucket.id
 
   index_document {
     suffix = "index.html"
@@ -161,8 +189,8 @@ resource "aws_s3_bucket_website_configuration" "prod" {
 
 
 resource "aws_s3_bucket_website_configuration" "dev" {
-    provider = aws.dev
-  bucket = module.dev.bucket.id
+  provider = aws.dev
+  bucket   = module.dev.bucket.id
 
   index_document {
     suffix = "index.html"
