@@ -3,5 +3,5 @@ output "alias_arn" {
 }
 
 output "alias" {
-    value = module.s3_encryption.alias
+  value = module.s3_encryption.alias
 }

@@ -74,3 +74,9 @@ variable "key_arn" {
   type = string
   default = null
 }
+
+
+variable "bucket_key" {
+  type = bool
+  default = false
+}

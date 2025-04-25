@@ -8,6 +8,7 @@ module "encrypted" {
   versioning              = "Enabled"
   sse_alg                 = "aws:kms"
   key_arn                 = module.s3_encryption.alias.arn
+  bucket_key              = var.bucket_key
 }
 
 
