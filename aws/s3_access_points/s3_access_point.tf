@@ -44,6 +44,14 @@ resource "aws_s3control_access_point_policy" "dev" {
         AWS = data.aws_iam_role.admin_dev.arn
       }
       Resource = ["${aws_s3_access_point.dev.arn}/object/*", "${aws_s3_access_point.dev.arn}"]
+    },
+    {
+      Effect = "Allow"
+      Action = "s3:List*"
+      Principal = {
+        AWS = aws_iam_role.dev.arn
+      }
+      Resource = ["${aws_s3_access_point.dev.arn}/object/dev/*", "${aws_s3_access_point.dev.arn}"]
     }]
   })
 }
@@ -61,6 +69,14 @@ resource "aws_s3control_access_point_policy" "e2e" {
         AWS = data.aws_iam_role.admin_dev.arn
       }
       Resource = ["${aws_s3_access_point.e2e.arn}/object/*", "${aws_s3_access_point.e2e.arn}"]
+    },
+    {
+      Effect = "Allow"
+      Action = "s3:List*"
+      Principal = {
+        AWS = aws_iam_role.e2e.arn
+      }
+      Resource = ["${aws_s3_access_point.e2e.arn}/object/e2e/*", "${aws_s3_access_point.e2e.arn}"]
     }]
   })
 }

@@ -29,7 +29,7 @@ resource "aws_iam_policy" "dev" {
     Statement = [
       {
         Action = [
-          "s3:Get*",
+        #   "s3:Get*",
           "s3:List*"
         ]
         Effect   = "Allow"
@@ -72,7 +72,7 @@ resource "aws_iam_policy" "e2e" {
     Statement = [
       {
         Action = [
-          "s3:Get*",
+        #   "s3:Get*",
           "s3:List*"
         ]
         Effect   = "Allow"
