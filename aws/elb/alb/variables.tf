@@ -104,5 +104,19 @@ variable "listeners" {
       token_endpoint         = string
       user_info_endpoint     = string
     }))
+
+
+    forward_tg = optional(string)
+
+    weighted_forward = optional(object({
+      target_groups = set(object({
+        arn    = string
+        weight = number
+      }))
+      stickiness = set(object({
+        duration = optional(number, 60)
+        enabled  = bool
+      }))
+    }))
   }))
 }
