@@ -42,6 +42,7 @@ variable "mutual_authentication" {
 
 variable "cognito" {
   type = object({
+    order                               = optional(number)
     authentication_request_extra_params = optional(map(string))
     on_unauthenticated_request          = optional(string)
     scope                               = optional(string)
@@ -56,6 +57,7 @@ variable "cognito" {
 
 variable "oidc" {
   type = object({
+    order                  = optional(number)
     authorization_endpoint = string
     client_id              = string
     client_secret          = string
@@ -73,6 +75,7 @@ variable "fixed_response" {
     message_body = optional(string)
     region       = optional(string)
     status_code  = optional(string)
+    order        = optional(number)
   })
   default = null
 }
@@ -86,6 +89,7 @@ variable "redirect" {
     protocol    = optional(string, "#{protocol}")
     query       = optional(string, "#{query}")
     region      = optional(string)
+    order       = optional(number)
     status_code = string
   })
   default = null
@@ -93,13 +97,17 @@ variable "redirect" {
 
 
 variable "forward_tg" {
-  type    = string
+  type = object({
+    arn   = string
+    order = optional(number)
+  })
   default = null
 }
 
 
 variable "weighted_forward" {
   type = object({
+    order = optional(number)
     target_groups = set(object({
       arn    = string
       weight = number

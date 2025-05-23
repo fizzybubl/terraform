@@ -4,23 +4,100 @@
 
 resource "aws_lb_listener_rule" "this" {
   listener_arn = var.listener_arn
+  priority     = var.priority
 
-  action {
-    type = "forward"
-    forward {
-      target_group {
-        arn    = aws_lb_target_group.main.arn
-        weight = 80
+  dynamic "fixed_response" {
+    for_each = var.fixed_response != null ? [var.fixed_response] : []
+    content {
+      content_type = fixed_response.value.content_type
+      message_body = fixed_response.value.message_body
+      region       = fixed_response.value.region
+      status_code  = fixed_response.value.status_code
+      order        = fixed_response.value.order
+    }
+  }
+
+  dynamic "redirect" {
+    for_each = var.redirect != null ? [var.redirect] : []
+    content {
+      status_code = redirect.value.status_code
+      host        = redirect.value.host
+      path        = redirect.value.path
+      port        = redirect.value.port
+      protocol    = redirect.value.protocol
+      query       = redirect.value.query
+      region      = redirect.value.region
+      order       = redirect.value.order
+    }
+  }
+
+  dynamic "action" {
+    iterator = "cognito"
+    for_each = var.cognito != null ? [var.cognito] : []
+    content {
+      type  = "authenticate-cognito"
+      order = cognito.value.order
+      authenticate_cognito {
+        authentication_request_extra_params = cognito.value.authentication_request_extra_params
+        on_unauthenticated_request          = cognito.value.on_unauthenticated_request
+        scope                               = cognito.value.scopeabspath
+        session_cookie_name                 = cognito.value.session_cookie_name
+        session_timeout                     = cognito.value.session_timeout
+        user_pool_arn                       = cognito.value.user_pool_arn
+        user_pool_client_id                 = cognito.value.user_pool_client_id
+        user_pool_domain                    = cognito.value.user_pool_domain
+      }
+    }
+  }
+
+  dynamic "action" {
+    iterator = "oidc"
+    for_each = var.oidc != null ? [var.oidc] : []
+    content {
+      type  = "authenticate-oidc"
+      order = oidc.value.order
+      authenticate_oidc {
+        authorization_endpoint = oidc.value.authorization_endpoint
+        client_id              = oidc.value.client_id
+        client_secret          = oidc.value.client_secret
+        issuer                 = oidc.value.issuer
+        token_endpoint         = oidc.value.token_endpoint
+        user_info_endpoint     = oidc.value.user_info_endpoint
+      }
+    }
+  }
+
+  dynamic "action" {
+    for_each = var.forward_tg != null ? [var.forward_tg] : []
+    content {
+      order            = action.value.order
+      type             = "forward"
+      target_group_arn = action.value.arn
+    }
+  }
+
+  dynamic "action" {
+    for_each = var.weighted_forward != null ? [var.weighted_forward] : []
+
+    content {
+      type  = "forward"
+      order = action.value.order
+      dynamic "target_group" {
+        for_each = [action.value.target_groups]
+
+        content {
+          arn    = target_group.value.arn
+          weight = target_group.value.weight
+        }
       }
 
-      target_group {
-        arn    = aws_lb_target_group.canary.arn
-        weight = 20
-      }
+      dynamic "stickiness" {
+        for_each = [action.value.stickiness]
 
-      stickiness {
-        enabled  = true
-        duration = 600
+        content {
+          duration = stickiness.value.duration
+          enabled  = stickiness.value.enabled
+        }
       }
     }
   }

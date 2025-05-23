@@ -3,6 +3,10 @@ variable "region" {
   default = "eu-central-1"
 }
 
+variable "priority" {
+  type = number
+}
+
 variable "listener_arn" {
   type = string
 }
@@ -47,6 +51,7 @@ variable "cognito" {
     user_pool_arn                       = string
     user_pool_client_id                 = string
     user_pool_domain                    = string
+    order                               = optional(number)
   })
   default = null
 }
@@ -59,6 +64,7 @@ variable "oidc" {
     issuer                 = string
     token_endpoint         = string
     user_info_endpoint     = string
+    order                  = optional(number)
   })
   default = null
 }
@@ -70,6 +76,7 @@ variable "fixed_response" {
     message_body = optional(string)
     region       = optional(string)
     status_code  = optional(string)
+    order        = optional(number)
   })
   default = null
 }
@@ -83,6 +90,7 @@ variable "redirect" {
     protocol    = optional(string, "#{protocol}")
     query       = optional(string, "#{query}")
     region      = optional(string)
+    order       = optional(number)
     status_code = string
   })
   default = null
@@ -90,7 +98,10 @@ variable "redirect" {
 
 
 variable "forward_tg" {
-  type    = string
+  type = object({
+    arn   = string
+    order = optional(number)
+  })
   default = null
 }
 
@@ -105,6 +116,7 @@ variable "weighted_forward" {
       duration = optional(number, 60)
       enabled  = bool
     }))
+    order = optional(number)
   })
 
   default = null
