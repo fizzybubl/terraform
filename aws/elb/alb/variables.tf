@@ -70,3 +70,39 @@ variable "target_groups" {
     })
   }))
 }
+
+
+variable "listeners" {
+  type = map(object({
+    lb_arn          = optional(string)
+    port            = optional(string, "80")
+    protocol        = optional(string, "HTTP")
+    ssl_policy      = optional(string)
+    alpn_policy     = optional(string)
+    certificate_arn = optional(string)
+    mutual_authentication = optional(object({
+      mode            = string
+      trust_store_arn = string
+    }))
+
+    cognito = optional(object({
+      authentication_request_extra_params = optional(map(string))
+      on_unauthenticated_request          = optional(string)
+      scope                               = optional(string)
+      session_cookie_name                 = optional(string)
+      session_timeout                     = optional(number)
+      user_pool_arn                       = string
+      user_pool_client_id                 = string
+      user_pool_domain                    = string
+    }))
+
+    oidc = optional(object({
+      authorization_endpoint = string
+      client_id              = string
+      client_secret          = string
+      issuer                 = string
+      token_endpoint         = string
+      user_info_endpoint     = string
+    }))
+  }))
+}
