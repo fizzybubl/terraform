@@ -2,6 +2,11 @@ variable "region" {
   type    = string
   default = "eu-central-1"
 }
+
+variable "listener_arn" {
+  type = string
+}
+
 variable "lb_arn" {
   type    = string
   default = null
@@ -29,14 +34,6 @@ variable "alpn_policy" {
 
 variable "certificate_arn" {
   type    = string
-  default = null
-}
-
-variable "mutual_authentication" {
-  type = object({
-    mode            = string
-    trust_store_arn = string
-  })
   default = null
 }
 
@@ -113,9 +110,21 @@ variable "weighted_forward" {
   default = null
 }
 
-
-variable "rules" {
+variable "conditions" {
   type = set(object({
-
+    host_header = optional(list(string))
+    http_header = optional(object({
+      http_header_name = string
+      values           = optional(list(string))
+    }))
+    query_string = optional(object({
+      key   = string
+      value = string
+    }))
+    http_request_method = optional(list(string))
+    path_pattern        = optional(list(string))
+    source_ip           = optional(list(string))
   }))
+  default = null
 }
+

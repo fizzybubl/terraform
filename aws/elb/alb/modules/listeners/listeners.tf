@@ -7,6 +7,28 @@ resource "aws_lb_listener" "this" {
   certificate_arn   = var.certificate_arn
   alpn_policy       = var.alpn_policy
 
+  dynamic "fixed_response" {
+    for_each = var.fixed_response != null ? [var.fixed_response] : []
+    content {
+      content_type = fixed_response.value.content_type
+      message_body = fixed_response.value.message_body
+      region       = fixed_response.value.region
+      status_code  = fixed_response.value.status_code
+    }
+  }
+
+  dynamic "redirect" {
+    for_each = var.redirect != null ? [var.redirect] : []
+    content {
+      status_code = redirect.value.status_code
+      host        = redirect.value.host
+      path        = redirect.value.path
+      port        = redirect.value.port
+      protocol    = redirect.value.protocol
+      query       = redirect.value.query
+      region      = redirect.value.region
+    }
+  }
 
   dynamic "mutual_authentication" {
     iterator = "mtls"
@@ -82,5 +104,34 @@ resource "aws_lb_listener" "this" {
         }
       }
     }
+  }
+}
+
+
+resource "aws_lb_listener_rule" "this" {
+  listener_arn = aws_lb_listener.this.arn
+
+  action {
+    type = "forward"
+    forward {
+      target_group {
+        arn    = aws_lb_target_group.main.arn
+        weight = 80
+      }
+
+      target_group {
+        arn    = aws_lb_target_group.canary.arn
+        weight = 20
+      }
+
+      stickiness {
+        enabled  = true
+        duration = 600
+      }
+    }
+  }
+
+  condition {
+
   }
 }

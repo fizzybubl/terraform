@@ -25,3 +25,17 @@ resource "aws_lb_target_group" "this" {
     enabled         = var.stickiness.enabled
   }
 }
+
+
+resource "aws_autoscaling_attachment" "this" {
+  count = var.asg_name != null ? 1 : 0
+  lb_target_group_arn    = aws_lb_target_group.this.arn
+  autoscaling_group_name = var.asg_name
+}
+
+
+resource "aws_lb_target_group_attachment" "this" {
+  count = var.target_id != null ? 1 : 0
+  target_group_arn    = aws_lb_target_group.this.arn
+  target_id = var.target_id
+}

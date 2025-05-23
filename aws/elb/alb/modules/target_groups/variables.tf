@@ -57,3 +57,15 @@ variable "stickiness" {
   })
   default = null
 }
+
+
+variable "asg_name" {
+  type = string
+  default = null
+}
+
+
+variable "target_id" {
+  type = string
+  default = null
+}

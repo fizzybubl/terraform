@@ -41,13 +41,6 @@ module "target_groups" {
 }
 
 
-resource "aws_autoscaling_attachment" "this" {
-  for_each               = var.target_groups
-  lb_target_group_arn    = aws_lb_target_group.this[each.key].arn
-  autoscaling_group_name = each.value.asg_name
-}
-
-
 module "listeners" {
   source          = "./modules/listeners"
   for_each        = var.listeners
@@ -63,5 +56,3 @@ module "listeners" {
   forward_tg            = each.value.forward_tg
   weighted_forward      = each.value.weighted_forward
 }
-
-#  TODO: add listener_rule as optional resources, add link between created target groups and listener/rules
