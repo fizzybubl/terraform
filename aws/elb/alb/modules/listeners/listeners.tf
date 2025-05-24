@@ -110,3 +110,22 @@ resource "aws_lb_listener" "this" {
     }
   }
 }
+
+
+module "listener_rule" {
+  source = "../listener_rules"
+
+  for_each         = var.rules
+  listener_arn     = aws_lb_listener.this.arn
+  priority         = each.value.priority
+  port             = each.value.port
+  protocol         = each.value.protocol
+  cognito          = each.value.cognito
+  oidc             = each.value.oidc
+  fixed_response   = each.value.fixed_response
+  redirect         = each.value.redirect
+  forward_tg       = each.value.forward_tg
+  weighted_forward = each.value.weighted_forward
+  conditions       = each.value.conditions
+
+}

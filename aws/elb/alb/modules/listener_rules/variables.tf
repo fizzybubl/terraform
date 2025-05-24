@@ -1,19 +1,9 @@
-variable "region" {
-  type    = string
-  default = "eu-central-1"
-}
-
 variable "priority" {
   type = number
 }
 
 variable "listener_arn" {
   type = string
-}
-
-variable "lb_arn" {
-  type    = string
-  default = null
 }
 
 variable "port" {
@@ -24,21 +14,6 @@ variable "port" {
 variable "protocol" {
   type    = string
   default = "HTTP"
-}
-
-variable "ssl_policy" {
-  type    = string
-  default = null
-}
-
-variable "alpn_policy" {
-  type    = string
-  default = null
-}
-
-variable "certificate_arn" {
-  type    = string
-  default = null
 }
 
 variable "cognito" {

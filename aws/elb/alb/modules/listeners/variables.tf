@@ -1,7 +1,3 @@
-variable "region" {
-  type    = string
-  default = "eu-central-1"
-}
 variable "lb_arn" {
   type    = string
   default = null
@@ -123,7 +119,84 @@ variable "weighted_forward" {
 
 
 variable "rules" {
-  type = set(object({
+  type = object({
+    priority     = number
+    listener_arn = string
+    port         = optional(string)
+    protocol     = optional(string)
 
-  }))
+    cognito = optional(object({
+      authentication_request_extra_params = optional(map(string))
+      on_unauthenticated_request          = optional(string)
+      scope                               = optional(string)
+      session_cookie_name                 = optional(string)
+      session_timeout                     = optional(number)
+      user_pool_arn                       = string
+      user_pool_client_id                 = string
+      user_pool_domain                    = string
+      order                               = optional(number)
+    }))
+
+    oidc = optional(object({
+      authorization_endpoint = string
+      client_id              = string
+      client_secret          = string
+      issuer                 = string
+      token_endpoint         = string
+      user_info_endpoint     = string
+      order                  = optional(number)
+    }))
+
+    fixed_response = optional(object({
+      content_type = string
+      message_body = optional(string)
+      region       = optional(string)
+      status_code  = optional(string)
+      order        = optional(number)
+    }))
+
+    redirect = optional(object({
+      host        = optional(string, "#{host}")
+      path        = optional(string, "#{path}")
+      port        = optional(string, "#{port}")
+      protocol    = optional(string, "#{protocol}")
+      query       = optional(string, "#{query}")
+      region      = optional(string)
+      order       = optional(number)
+      status_code = string
+    }))
+
+    forward_tg = optional(object({
+      arn   = string
+      order = optional(number)
+    }))
+
+    weighted_forward = optional(object({
+      target_groups = set(object({
+        arn    = string
+        weight = number
+      }))
+      stickiness = set(object({
+        duration = optional(number, 60)
+        enabled  = bool
+      }))
+      order = optional(number)
+    }))
+
+    conditions = optional(set(object({
+      host_header = optional(list(string))
+      http_header = optional(object({
+        http_header_name = string
+        values           = optional(list(string))
+      }))
+      query_string = optional(object({
+        key   = string
+        value = string
+      }))
+      http_request_method = optional(list(string))
+      path_pattern        = optional(list(string))
+      source_ip           = optional(list(string))
+    })))
+  })
+  default = {}
 }
