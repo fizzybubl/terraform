@@ -1,10 +1,8 @@
 data "aws_ami" "ami" {
-
   filter {
     name   = "image-id"
     values = ["ami-0559679b06ebd7e58"]
   }
-
 }
 
 

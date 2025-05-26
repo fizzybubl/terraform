@@ -1,6 +1,18 @@
-variable "name" {
-  type        = string
-  description = "Prefix for resources"
+variable "instance" {
+  type = bool
+  default = true
+}
+
+variable "template_name" {
+  type = string
+  default = "template"
+  description = "name for launch template"
+}
+
+variable "key_name" {
+  type = string
+  default = "key_name"
+  description = "name for launch template key"
 }
 
 variable "ami_id" {
@@ -11,11 +23,6 @@ variable "ami_id" {
 variable "instance_type" {
   type        = string
   description = "EC2 instance type"
-}
-
-variable "key_name" {
-  type    = string
-  default = null
 }
 
 variable "security_group_ids" {
@@ -30,14 +37,17 @@ variable "subnet_ids" {
 
 variable "desired_capacity" {
   type = number
+  default = null
 }
 
 variable "min_size" {
   type = number
+  default = null
 }
 
 variable "max_size" {
   type = number
+  default = null
 }
 
 variable "target_group_arns" {
@@ -205,6 +215,8 @@ variable "instance_requirements" {
     spot_max_price_percentage_over_lowest_price             = optional(number)
     require_hibernate_support                               = optional(bool, false)
   })
+
+  default = null
 }
 
 variable "instance_market_options" {
@@ -218,6 +230,8 @@ variable "instance_market_options" {
       valid_until                    = string
     })
   })
+
+  default = null
 }
 
 variable "metadata_http_endpoint" {
@@ -275,4 +289,6 @@ variable "network_interfaces" {
     ipv4_addresses              = optional(set(string))
     ipv4_address_count          = optional(number)
   }))
+
+  default = null
 }

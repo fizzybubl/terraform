@@ -1,5 +1,5 @@
 resource "aws_launch_template" "this" {
-  name_prefix   = "${var.name}-lt-"
+  name_prefix   = "${var.template_name}-lt-"
   image_id      = var.ami_id
   instance_type = var.instance_type
 
@@ -129,7 +129,7 @@ resource "aws_launch_template" "this" {
     resource_type = "instance"
     tags = merge(
       var.tags,
-      { Name = "${var.name}-instance" }
+      { Name = "${var.template_name}-instance" }
     )
   }
 
@@ -144,7 +144,7 @@ resource "aws_launch_template" "this" {
 }
 
 resource "aws_autoscaling_group" "this" {
-  name_prefix             = "${var.name}-asg-"
+  name_prefix             = "asg-"
   desired_capacity        = var.desired_capacity
   min_size                = var.min_size
   max_size                = var.max_size
@@ -182,5 +182,14 @@ resource "aws_autoscaling_group" "this" {
 
   lifecycle {
     create_before_destroy = true
+  }
+}
+
+
+resource "aws_instance" "this" {
+  count = var.instance ? 1 : 0
+  launch_template {
+    version = aws_launch_template.this.latest_version
+    id = aws_launch_template.this.id
   }
 }
