@@ -4,30 +4,6 @@ locals {
   az3 = "euw1-az3"
   az_ids = [local.az1, local.az2, local.az3]
 
-  cloud_db_subnets = {
-    local.az1 = {
-      availability_zone_id = local.az1
-      cidr_block           = "10.0.1.0/24"
-      tags = {
-        "Name" : "Private Subnet DB AZ1"
-      }
-    },
-    local.az2 = {
-      availability_zone_id = local.az2
-      cidr_block           = "10.0.2.0/24"
-      tags = {
-        "Name" : "Private Subnet DB AZ2"
-      }
-    },
-    local.az3 = {
-      availability_zone_id = local.az3
-      cidr_block           = "10.0.3.0/24"
-      tags = {
-        "Name" : "Private Subnet DB AZ3"
-      }
-    }
-  }
-
   cloud_app_subnets = {
     local.az1 = {
       availability_zone_id = local.az1
@@ -88,17 +64,6 @@ module "cloud_vpc" {
   vpc_tags = {
     "Name" : "Cloud Prem VPC"
   }
-}
-
-
-module "cloud_db" {
-  source   = "../vpc/modules/subnet"
-  for_each = local.cloud_db_subnets
-
-  vpc_id         = module.cloud_vpc.vpc_id
-  cidr_block     = each.value.cidr_block
-  az_id          = each.value.availability_zone_id
-  subnet_tags         = each.value.tags
 }
 
 
