@@ -44,7 +44,14 @@ module "my_sg" {
   }
 }
 
-
+data "cloudinit_config" "user_data" {
+  gzip = false
+  part {
+    filename     = "user_data.sh"
+    content_type = "text/x-shellscript"
+    content = file("${path.module}/files/user_data.sh")
+  }
+}
 
 module "ec2" {
   source = "../ec2/modules/ec2"
@@ -52,6 +59,7 @@ module "ec2" {
   ami_id = data.aws_ami.ami.id
   subnet_ids = [for subnet in local.cloud_app_subnets: module.cloud_app[subnet].subnet_id]
   security_group_ids = [module.my_sg.sg_id]
+  user_data_base64 = data.cloudinit_config.user_data.rendered
 
   block_device_mappings = [{
     device_name = "/dev/xvda"
