@@ -221,20 +221,6 @@ resource "aws_autoscaling_group" "bar" {
     max_healthy_percentage = 120
   }
 
-  initial_lifecycle_hook {
-    name                 = "foobar"
-    default_result       = "CONTINUE"
-    heartbeat_timeout    = 2000
-    lifecycle_transition = "autoscaling:EC2_INSTANCE_LAUNCHING"
-
-    notification_metadata = jsonencode({
-      foo = "bar"
-    })
-
-    notification_target_arn = "arn:aws:sqs:us-east-1:444455556666:queue1*"
-    role_arn                = "arn:aws:iam::123456789012:role/S3Access"
-  }
-
   tag {
     key                 = "foo"
     value               = "bar"
@@ -250,4 +236,19 @@ resource "aws_autoscaling_group" "bar" {
     value               = "ipsum"
     propagate_at_launch = false
   }
+}
+
+resource "aws_autoscaling_lifecycle_hook" "foobar" {
+  name                   = "foobar"
+  autoscaling_group_name = aws_autoscaling_group.foobar.name
+  default_result         = "CONTINUE"
+  heartbeat_timeout      = 2000
+  lifecycle_transition   = "autoscaling:EC2_INSTANCE_LAUNCHING"
+
+  notification_metadata = jsonencode({
+    foo = "bar"
+  })
+
+  notification_target_arn = "arn:aws:sqs:us-east-1:444455556666:queue1*"
+  role_arn                = "arn:aws:iam::123456789012:role/S3Access"
 }
