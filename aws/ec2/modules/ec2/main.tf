@@ -193,3 +193,61 @@ resource "aws_instance" "this" {
     id = aws_launch_template.this.id
   }
 }
+
+
+resource "aws_placement_group" "this" {
+  for_each = var.partition == null ? {} : {"partition" => var.partition}
+  name     = var.name
+  strategy = var.partition.strategy
+  spread_level = var.partition.spread_level
+  partition_count = var.partition.partition_count
+  tags = var.partition.tags
+}
+
+resource "aws_autoscaling_group" "bar" {
+  name                      = var.name
+  max_size                  = var.max_size
+  min_size                  = var.min_size
+  health_check_grace_period = var.health_check_grace_period
+  health_check_type         = var.health_check_type
+  desired_capacity          = var.desired_capacity
+  force_delete              = var.force_delete
+  placement_group           = aws_placement_group.this.id
+  launch_template           = aws_launch_configuration.this.name
+  vpc_zone_identifier       = var.subnet_ids
+
+  instance_maintenance_policy {
+    min_healthy_percentage = 90
+    max_healthy_percentage = 120
+  }
+
+  initial_lifecycle_hook {
+    name                 = "foobar"
+    default_result       = "CONTINUE"
+    heartbeat_timeout    = 2000
+    lifecycle_transition = "autoscaling:EC2_INSTANCE_LAUNCHING"
+
+    notification_metadata = jsonencode({
+      foo = "bar"
+    })
+
+    notification_target_arn = "arn:aws:sqs:us-east-1:444455556666:queue1*"
+    role_arn                = "arn:aws:iam::123456789012:role/S3Access"
+  }
+
+  tag {
+    key                 = "foo"
+    value               = "bar"
+    propagate_at_launch = true
+  }
+
+  timeouts {
+    delete = "15m"
+  }
+
+  tag {
+    key                 = "lorem"
+    value               = "ipsum"
+    propagate_at_launch = false
+  }
+}

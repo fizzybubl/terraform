@@ -292,3 +292,15 @@ variable "network_interfaces" {
 
   default = null
 }
+
+variable "partition" {
+  type = object({
+    name = string
+    partition_count = optional(number)
+    spread_level = optional(string)
+    strategy = string
+    tags = optional(map(string), {})
+  })
+
+  default = null
+}
