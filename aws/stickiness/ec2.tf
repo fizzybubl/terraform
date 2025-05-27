@@ -6,7 +6,7 @@ data "aws_ami" "ami" {
 }
 
 module "ec2" {
-  source = "../ec2"
+  source = "../ec2/modules/ec2"
   instance_type = "t2.micro"
   ami_id = data.aws_ami.ami.id
   subnet_ids = []
