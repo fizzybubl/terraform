@@ -31,7 +31,7 @@ resource "aws_lb_listener" "this" {
   }
 
   dynamic "mutual_authentication" {
-    iterator = "mtls"
+    iterator = mtls
     for_each = var.mutual_authentication != null ? [var.mutual_authentication] : []
     content {
       mode            = mtls.value.mode
@@ -40,7 +40,7 @@ resource "aws_lb_listener" "this" {
   }
 
   dynamic "default_action" {
-    iterator = "cognito"
+    iterator = cognito
     for_each = var.cognito != null ? [var.cognito] : []
     content {
       type  = "authenticate-cognito"
@@ -59,7 +59,7 @@ resource "aws_lb_listener" "this" {
   }
 
   dynamic "default_action" {
-    iterator = "oidc"
+    iterator = oidc
     for_each = var.oidc != null ? [var.oidc] : []
     content {
       type  = "authenticate-oidc"

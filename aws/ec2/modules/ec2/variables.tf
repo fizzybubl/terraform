@@ -1,17 +1,22 @@
+variable "asg_name" {
+  type = string
+  default = "default-asg-name"
+}
+
 variable "instance" {
-  type = bool
-  default = true
+  type    = bool
+  default = false
 }
 
 variable "template_name" {
-  type = string
-  default = "template"
+  type        = string
+  default     = "template"
   description = "name for launch template"
 }
 
 variable "key_name" {
-  type = string
-  default = "key_name"
+  type        = string
+  default     = "key_name"
   description = "name for launch template key"
 }
 
@@ -36,28 +41,18 @@ variable "subnet_ids" {
 }
 
 variable "desired_capacity" {
-  type = number
-  default = null
+  type    = number
+  default = 2
 }
 
 variable "min_size" {
-  type = number
-  default = null
+  type    = number
+  default = 1
 }
 
 variable "max_size" {
-  type = number
-  default = null
-}
-
-variable "target_group_arns" {
-  type    = list(string)
-  default = []
-}
-
-variable "load_balancers" {
-  type    = list(string)
-  default = []
+  type    = number
+  default = 3
 }
 
 variable "health_check_type" {
@@ -72,7 +67,7 @@ variable "health_check_grace_period" {
 
 variable "termination_policies" {
   type    = list(string)
-  default = []
+  default = ["OldestLaunchTemplate"]
 }
 
 variable "enabled_metrics" {
@@ -209,7 +204,7 @@ variable "instance_requirements" {
     excluded_instance_types                                 = optional(list(string))
     instance_generations                                    = optional(list(string))
     local_storage                                           = optional(string, "included")
-    local_storage_types                                     = optional(string)
+    local_storage_types                                     = optional(list(string))
     max_spot_price_as_percentage_of_optimal_on_demand_price = optional(number, 40)
     on_demand_max_price_percentage_over_lowest_price        = optional(number, 20)
     spot_max_price_percentage_over_lowest_price             = optional(number)
@@ -295,11 +290,11 @@ variable "network_interfaces" {
 
 variable "partition" {
   type = object({
-    name = string
+    name            = string
     partition_count = optional(number)
-    spread_level = optional(string)
-    strategy = string
-    tags = optional(map(string), {})
+    spread_level    = optional(string)
+    strategy        = string
+    tags            = optional(map(string), {})
   })
 
   default = null

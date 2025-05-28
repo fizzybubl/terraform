@@ -108,7 +108,7 @@ resource "aws_launch_template" "this" {
   }
 
   dynamic "network_interfaces" {
-    iterator = "nic"
+    iterator = nic
     for_each = var.network_interfaces
     content {
       device_index                = nic.value.device_index
@@ -166,10 +166,8 @@ resource "aws_autoscaling_group" "this" {
     version = "$Latest"
   }
 
-  target_group_arns   = var.target_group_arns
-  load_balancers      = var.load_balancers
-  enabled_metrics     = var.enabled_metrics
-  metrics_granularity = var.metrics_granularity
+  # enabled_metrics     = var.enabled_metrics
+  # metrics_granularity = var.metrics_granularity
 
   dynamic "tag" {
     for_each = var.tags
@@ -190,35 +188,39 @@ resource "aws_instance" "this" {
   count = var.instance ? 1 : 0
   launch_template {
     version = aws_launch_template.this.latest_version
-    id = aws_launch_template.this.id
+    id      = aws_launch_template.this.id
   }
 }
 
 
 resource "aws_placement_group" "this" {
-  for_each = var.partition == null ? {} : {"partition" => var.partition}
-  name     = var.name
-  strategy = var.partition.strategy
-  spread_level = var.partition.spread_level
-  partition_count = var.partition.partition_count
-  tags = var.partition.tags
+  for_each        = var.partition == null ? {} : { "partition" : var.partition }
+  name            = each.value.name
+  strategy        = each.value.strategy
+  spread_level    = each.value.spread_level
+  partition_count = each.value.partition_count
+  tags            = each.value.tags
 }
 
 resource "aws_autoscaling_group" "bar" {
-  name                      = var.name
+  name                      = var.asg_name
   max_size                  = var.max_size
   min_size                  = var.min_size
   health_check_grace_period = var.health_check_grace_period
   health_check_type         = var.health_check_type
   desired_capacity          = var.desired_capacity
   force_delete              = var.force_delete
-  placement_group           = aws_placement_group.this.id
-  launch_template           = aws_launch_configuration.this.name
+  placement_group           = aws_placement_group.this["partition"].id
   vpc_zone_identifier       = var.subnet_ids
 
   instance_maintenance_policy {
     min_healthy_percentage = 90
     max_healthy_percentage = 120
+  }
+
+  launch_template {
+    id = aws_launch_template.this.id
+    version = aws_launch_template.this.latest_version
   }
 
   tag {
@@ -238,17 +240,17 @@ resource "aws_autoscaling_group" "bar" {
   }
 }
 
-resource "aws_autoscaling_lifecycle_hook" "foobar" {
-  name                   = "foobar"
-  autoscaling_group_name = aws_autoscaling_group.foobar.name
-  default_result         = "CONTINUE"
-  heartbeat_timeout      = 2000
-  lifecycle_transition   = "autoscaling:EC2_INSTANCE_LAUNCHING"
+# resource "aws_autoscaling_lifecycle_hook" "foobar" {
+#   name                   = "foobar"
+#   autoscaling_group_name = aws_autoscaling_group.foobar.name
+#   default_result         = "CONTINUE"
+#   heartbeat_timeout      = 2000
+#   lifecycle_transition   = "autoscaling:EC2_INSTANCE_LAUNCHING"
 
-  notification_metadata = jsonencode({
-    foo = "bar"
-  })
+#   notification_metadata = jsonencode({
+#     foo = "bar"
+#   })
 
-  notification_target_arn = "arn:aws:sqs:us-east-1:444455556666:queue1*"
-  role_arn                = "arn:aws:iam::123456789012:role/S3Access"
-}
+#   notification_target_arn = "arn:aws:sqs:us-east-1:444455556666:queue1*"
+#   role_arn                = "arn:aws:iam::123456789012:role/S3Access"
+# }

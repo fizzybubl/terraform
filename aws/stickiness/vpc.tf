@@ -5,21 +5,21 @@ locals {
   az_ids = [local.az1, local.az2, local.az3]
 
   cloud_app_subnets = {
-    local.az1 = {
+    (local.az1) = {
       availability_zone_id = local.az1
       cidr_block           = "10.0.10.0/24"
       tags = {
         "Name" : "Private Subnet APP AZ1"
       }
     },
-    local.az2 = {
+    (local.az2) = {
       availability_zone_id = local.az2
       cidr_block           = "10.0.11.0/24"
       tags = {
         "Name" : "Private Subnet APP AZ2"
       }
     },
-    local.az3 = {
+    (local.az3) = {
       availability_zone_id = local.az3
       cidr_block           = "10.0.12.0/24"
       tags = {
@@ -30,21 +30,21 @@ locals {
   }
 
   cloud_web_subnets = {
-    local.az1 = {
+    (local.az1) = {
       availability_zone_id = local.az1
       cidr_block           = "10.0.100.0/24"
       tags = {
         "Name" : "Public Subnet Web AZ1"
       }
     },
-    local.az2 = {
+    (local.az2) = {
       availability_zone_id = local.az2
       cidr_block           = "10.0.101.0/24"
       tags = {
         "Name" : "Public Subnet Web AZ2"
       }
     },
-    local.az3 = {
+    (local.az3) = {
       availability_zone_id = local.az3
       cidr_block           = "10.0.102.0/24"
       tags = {

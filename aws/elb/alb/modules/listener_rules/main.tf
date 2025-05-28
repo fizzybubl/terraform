@@ -28,7 +28,7 @@ resource "aws_lb_listener_rule" "this" {
   }
 
   dynamic "action" {
-    iterator = "cognito"
+    iterator = cognito
     for_each = var.cognito != null ? [var.cognito] : []
     content {
       type  = "authenticate-cognito"
@@ -47,7 +47,7 @@ resource "aws_lb_listener_rule" "this" {
   }
 
   dynamic "action" {
-    iterator = "oidc"
+    iterator = oidc
     for_each = var.oidc != null ? [var.oidc] : []
     content {
       type  = "authenticate-oidc"

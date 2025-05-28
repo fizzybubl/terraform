@@ -7,7 +7,7 @@ data "aws_ami" "ami" {
 
 
 module "my_sg" {
-  source      = "./path-to-your-module"  # adjust path
+  source      = "../ec2/modules/security_groups"  # adjust path
   name        = "example-sg"
   description = "Example security group"
   vpc_id      = module.cloud_vpc.vpc_id
@@ -57,7 +57,7 @@ module "ec2" {
   source = "../ec2/modules/ec2"
   instance_type = "t2.micro"
   ami_id = data.aws_ami.ami.id
-  subnet_ids = [for subnet in local.cloud_app_subnets: module.cloud_app[subnet].subnet_id]
+  subnet_ids = [for key, value in local.cloud_app_subnets: module.cloud_app[key].subnet_id]
   security_group_ids = [module.my_sg.sg_id]
   user_data_base64 = data.cloudinit_config.user_data.rendered
 
