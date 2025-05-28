@@ -297,5 +297,11 @@ variable "partition" {
     tags            = optional(map(string), {})
   })
 
-  default = null
+  default = {
+    name = "default_partition"
+    partition_count = null
+    strategy = "spread"
+    spread_level = "host"
+    tags = {}
+  }
 }

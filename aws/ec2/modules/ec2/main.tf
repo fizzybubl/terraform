@@ -42,57 +42,66 @@ resource "aws_launch_template" "this" {
     configured = var.enable_hibernation
   }
 
-  instance_requirements {
-    allowed_instance_types                                  = var.instance_requirements.allowed_instance_types
-    excluded_instance_types                                 = var.instance_requirements.excluded_instance_types
-    instance_generations                                    = var.instance_requirements.instance_generations
-    local_storage                                           = var.instance_requirements.local_storage
-    local_storage_types                                     = var.instance_requirements.local_storage_types
-    max_spot_price_as_percentage_of_optimal_on_demand_price = var.instance_requirements.max_spot_price_as_percentage_of_optimal_on_demand_price
-    on_demand_max_price_percentage_over_lowest_price        = var.instance_requirements.on_demand_max_price_percentage_over_lowest_price
-    spot_max_price_percentage_over_lowest_price             = var.instance_requirements.spot_max_price_percentage_over_lowest_price
-    require_hibernate_support                               = var.instance_requirements.require_hibernate_support
+  dynamic "instance_requirements" {
+    iterator = im
+    for_each = var.instance_requirements == null ? [] : [var.instance_requirements]
 
-    baseline_ebs_bandwidth_mbps {
-      min = var.instance_requirements.baseline_ebs_bandwidth_mbps.min
-      max = var.instance_requirements.baseline_ebs_bandwidth_mbps.max
-    }
+    content {
+      allowed_instance_types                                  = im.value.allowed_instance_types
+      excluded_instance_types                                 = im.value.excluded_instance_types
+      instance_generations                                    = im.value.instance_generations
+      local_storage                                           = im.value.local_storage
+      local_storage_types                                     = im.value.local_storage_types
+      max_spot_price_as_percentage_of_optimal_on_demand_price = im.value.max_spot_price_as_percentage_of_optimal_on_demand_price
+      on_demand_max_price_percentage_over_lowest_price        = im.value.on_demand_max_price_percentage_over_lowest_price
+      spot_max_price_percentage_over_lowest_price             = im.value.spot_max_price_percentage_over_lowest_price
+      require_hibernate_support                               = im.value.require_hibernate_support
 
-    memory_mib {
-      min = var.instance_requirements.memory_mib.min
-      max = var.instance_requirements.memory_mib.max
-    }
+      baseline_ebs_bandwidth_mbps {
+        min = im.value.baseline_ebs_bandwidth_mbps.min
+        max = im.value.baseline_ebs_bandwidth_mbps.max
+      }
 
-    network_bandwidth_gbps {
-      min = var.instance_requirements.network_bandwidth_gbps.min
-      max = var.instance_requirements.network_bandwidth_gbps.max
-    }
+      memory_mib {
+        min = im.value.memory_mib.min
+        max = im.value.memory_mib.max
+      }
 
-    network_interface_count {
-      min = var.instance_requirements.network_interface_count.min
-      max = var.instance_requirements.network_interface_count.max
-    }
+      network_bandwidth_gbps {
+        min = im.value.network_bandwidth_gbps.min
+        max = im.value.network_bandwidth_gbps.max
+      }
 
-    total_local_storage_gb {
-      min = var.instance_requirements.total_local_storage_gb.min
-      max = var.instance_requirements.total_local_storage_gb.max
-    }
+      network_interface_count {
+        min = im.value.network_interface_count.min
+        max = im.value.network_interface_count.max
+      }
 
-    vcpu_count {
-      min = var.instance_requirements.vcpu_count.min
-      max = var.instance_requirements.vcpu_count.max
+      total_local_storage_gb {
+        min = im.value.total_local_storage_gb.min
+        max = im.value.total_local_storage_gb.max
+      }
+
+      vcpu_count {
+        min = im.value.vcpu_count.min
+        max = im.value.vcpu_count.max
+      }
     }
   }
 
-  instance_market_options {
-    market_type = var.instance_market_options.market_type
+  dynamic "instance_market_options" {
+    iterator = imo
+    for_each = var.instance_market_options == null ? [] : [var.instance_market_options]
 
-    spot_options {
-      block_duration_minutes         = var.instance_market_options.spot_options.block_duration_minutes
-      instance_interruption_behavior = var.instance_market_options.spot_options.instance_interruption_behavior
-      max_price                      = var.instance_market_options.spot_options.max_price
-      spot_instance_type             = var.instance_market_options.spot_options.spot_instance_type
-      valid_until                    = var.instance_market_options.spot_options.valid_until
+    content{
+      market_type = imo.value.market_type
+      spot_options {
+        block_duration_minutes         = imo.value.spot_options.block_duration_minutes
+        instance_interruption_behavior = imo.value.spot_options.instance_interruption_behavior
+        max_price                      = imo.value.spot_options.max_price
+        spot_instance_type             = imo.value.spot_options.spot_instance_type
+        valid_until                    = imo.value.spot_options.valid_until
+    }
     }
   }
 
@@ -109,7 +118,7 @@ resource "aws_launch_template" "this" {
 
   dynamic "network_interfaces" {
     iterator = nic
-    for_each = var.network_interfaces
+    for_each = var.network_interfaces == null ? [] : var.network_interfaces
     content {
       device_index                = nic.value.device_index
       interface_type              = nic.value.interface_type
@@ -194,12 +203,11 @@ resource "aws_instance" "this" {
 
 
 resource "aws_placement_group" "this" {
-  for_each        = var.partition == null ? {} : { "partition" : var.partition }
-  name            = each.value.name
-  strategy        = each.value.strategy
-  spread_level    = each.value.spread_level
-  partition_count = each.value.partition_count
-  tags            = each.value.tags
+  name            = var.partition.name
+  strategy        = var.partition.strategy
+  spread_level    = var.partition.spread_level
+  partition_count = var.partition.partition_count
+  tags            = var.partition.tags
 }
 
 resource "aws_autoscaling_group" "bar" {
@@ -210,7 +218,7 @@ resource "aws_autoscaling_group" "bar" {
   health_check_type         = var.health_check_type
   desired_capacity          = var.desired_capacity
   force_delete              = var.force_delete
-  placement_group           = aws_placement_group.this["partition"].id
+  placement_group           = aws_placement_group.this.id
   vpc_zone_identifier       = var.subnet_ids
 
   instance_maintenance_policy {
