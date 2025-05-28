@@ -288,20 +288,14 @@ variable "network_interfaces" {
   default = null
 }
 
-variable "partition" {
+variable "placement_group" {
   type = object({
     name            = string
     partition_count = optional(number)
-    spread_level    = optional(string)
-    strategy        = string
+    spread_level    = optional(string, "rack")
+    strategy        = optional(string, "spread")
     tags            = optional(map(string), {})
   })
 
-  default = {
-    name = "default_partition"
-    partition_count = null
-    strategy = "spread"
-    spread_level = "host"
-    tags = {}
-  }
+  default = null
 }

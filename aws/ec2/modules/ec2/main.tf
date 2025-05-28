@@ -203,11 +203,12 @@ resource "aws_instance" "this" {
 
 
 resource "aws_placement_group" "this" {
-  name            = var.partition.name
-  strategy        = var.partition.strategy
-  spread_level    = var.partition.spread_level
-  partition_count = var.partition.partition_count
-  tags            = var.partition.tags
+  count = var.placement_group == null ? 0 : 1
+  name            = var.placement_group.name
+  strategy        = var.placement_group.strategy
+  spread_level    = var.placement_group.spread_level
+  partition_count = var.placement_group.partition_count
+  tags            = var.placement_group.tags
 }
 
 resource "aws_autoscaling_group" "bar" {
@@ -218,7 +219,7 @@ resource "aws_autoscaling_group" "bar" {
   health_check_type         = var.health_check_type
   desired_capacity          = var.desired_capacity
   force_delete              = var.force_delete
-  placement_group           = aws_placement_group.this.id
+  placement_group           = var.placement_group == null ? null : aws_placement_group.this[0].id
   vpc_zone_identifier       = var.subnet_ids
 
   instance_maintenance_policy {
