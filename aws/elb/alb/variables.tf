@@ -40,7 +40,7 @@ variable "lb_tags" {
 
 variable "deletion_protection" {
   type    = bool
-  default = true
+  default = false
 }
 
 
@@ -52,10 +52,14 @@ variable "target_groups" {
     port                 = optional(string, 80)
     protocol             = optional(string, "HTTP")
     deregistration_delay = optional(number, 300)
-    healthcheck = object({
+    target_id            = optional(string)
+    asg_name             = optional(string)
+    listener             = string
+    weight               = optional(number)
+    health_check = object({
       enabled           = optional(bool, true)
       healthy_threshold = optional(number, 3)
-      interval          = optional(number, 30)
+      interval          = optional(number, 60)
       matcher           = optional(number, 200)
       path              = optional(string, "/")
       port              = optional(string, "traffic-port")
@@ -106,17 +110,22 @@ variable "listeners" {
     }))
 
 
-    forward_tg = optional(string)
+    forward_tg = optional(list(object({
+        arn   = string
+        order = optional(number)
+      })
+    ), [])
 
-    weighted_forward = optional(object({
+    weighted_forward = optional(list(object({
       target_groups = set(object({
         arn    = string
-        weight = number
+        weight = optional(number, 1)
       }))
       stickiness = set(object({
         duration = optional(number, 60)
         enabled  = bool
       }))
-    }))
+      })
+    ), [])
   }))
 }

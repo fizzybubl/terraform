@@ -16,8 +16,8 @@ variable "template_name" {
 
 variable "key_name" {
   type        = string
-  default     = "key_name"
-  description = "name for launch template key"
+  default     = null
+  description = "name for kms key to use"
 }
 
 variable "ami_id" {

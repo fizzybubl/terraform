@@ -73,16 +73,16 @@ variable "redirect" {
 
 
 variable "forward_tg" {
-  type = object({
+  type = list(object({
     arn   = string
     order = optional(number)
-  })
+  }))
   default = null
 }
 
 
 variable "weighted_forward" {
-  type = object({
+  type = list(object({
     target_groups = set(object({
       arn    = string
       weight = number
@@ -92,7 +92,7 @@ variable "weighted_forward" {
       enabled  = bool
     }))
     order = optional(number)
-  })
+  }))
 
   default = null
 }

@@ -28,7 +28,7 @@ variable "deregistration_delay" {
   default = 300
 }
 
-variable "healthcheck" {
+variable "health_check" {
   type = object({
     enabled           = optional(bool, true)
     healthy_threshold = optional(number, 3)
@@ -36,7 +36,7 @@ variable "healthcheck" {
     matcher           = optional(number, 200)
     path              = optional(string, "/")
     port              = optional(string, "traffic-port")
-    protocol          = optional(string, null)  # TCP, HTTP, HTTPS, or null for lambda
+    protocol          = optional(string, null) # TCP, HTTP, HTTPS, or null for lambda
     timeout           = optional(number, 30)
   })
   default = null
@@ -54,12 +54,12 @@ variable "stickiness" {
 
 
 variable "asg_name" {
-  type = string
+  type    = string
   default = null
 }
 
 
 variable "target_id" {
-  type = string
+  type    = string
   default = null
 }

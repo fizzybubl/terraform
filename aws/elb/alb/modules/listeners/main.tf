@@ -2,37 +2,43 @@
 resource "aws_lb_listener" "this" {
   load_balancer_arn = var.lb_arn
   port              = var.port
-  protocol          = var.port
+  protocol          = var.protocol
   ssl_policy        = var.ssl_policy
   certificate_arn   = var.certificate_arn
   alpn_policy       = var.alpn_policy
 
-  dynamic "fixed_response" {
-    for_each = var.fixed_response != null ? [var.fixed_response] : []
+  dynamic "default_action" {
+    iterator = fixed_response
+    for_each = var.fixed_response == null ? [] : [var.fixed_response]
     content {
-      content_type = fixed_response.value.content_type
-      message_body = fixed_response.value.message_body
-      region       = fixed_response.value.region
-      status_code  = fixed_response.value.status_code
+      type = "fixed-response"
+      fixed_response {
+        content_type = fixed_response.value.content_type
+        message_body = fixed_response.value.message_body
+        status_code  = fixed_response.value.status_code
+      }
     }
   }
 
-  dynamic "redirect" {
-    for_each = var.redirect != null ? [var.redirect] : []
+  dynamic "default_action" {
+    iterator = redirect
+    for_each = var.redirect == null ?  [] : [var.redirect]
     content {
-      status_code = redirect.value.status_code
-      host        = redirect.value.host
-      path        = redirect.value.path
-      port        = redirect.value.port
-      protocol    = redirect.value.protocol
-      query       = redirect.value.query
-      region      = redirect.value.region
+      type = "redirect"
+      redirect {
+        status_code = redirect.value.status_code
+        host        = redirect.value.host
+        path        = redirect.value.path
+        port        = redirect.value.port
+        protocol    = redirect.value.protocol
+        query       = redirect.value.query
+      }
     }
   }
 
   dynamic "mutual_authentication" {
     iterator = mtls
-    for_each = var.mutual_authentication != null ? [var.mutual_authentication] : []
+    for_each = var.mutual_authentication == null ? [] : [var.mutual_authentication]
     content {
       mode            = mtls.value.mode
       trust_store_arn = mtls.value.trust_store_arn
@@ -41,7 +47,7 @@ resource "aws_lb_listener" "this" {
 
   dynamic "default_action" {
     iterator = cognito
-    for_each = var.cognito != null ? [var.cognito] : []
+    for_each = var.cognito == null ? [] : [var.cognito]
     content {
       type  = "authenticate-cognito"
       order = cognito.value.order
@@ -60,7 +66,7 @@ resource "aws_lb_listener" "this" {
 
   dynamic "default_action" {
     iterator = oidc
-    for_each = var.oidc != null ? [var.oidc] : []
+    for_each = var.oidc == null ? [] : [var.oidc]
     content {
       type  = "authenticate-oidc"
       order = oidc.value.order
@@ -76,7 +82,7 @@ resource "aws_lb_listener" "this" {
   }
 
   dynamic "default_action" {
-    for_each = var.forward_tg != null ? [var.forward_tg] : []
+    for_each = var.forward_tg
     content {
       type             = "forward"
       target_group_arn = default_action.value.arn
@@ -85,7 +91,7 @@ resource "aws_lb_listener" "this" {
   }
 
   dynamic "default_action" {
-    for_each = var.weighted_forward != null ? [var.weighted_forward] : []
+    for_each = var.weighted_forward
 
     content {
       type  = "forward"

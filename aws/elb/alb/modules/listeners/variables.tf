@@ -93,16 +93,16 @@ variable "redirect" {
 
 
 variable "forward_tg" {
-  type = object({
+  type = list(object({
     arn   = string
     order = optional(number)
-  })
-  default = null
+  }))
+  default = []
 }
 
 
 variable "weighted_forward" {
-  type = object({
+  type = list(object({
     order = optional(number)
     target_groups = set(object({
       arn    = string
@@ -112,14 +112,14 @@ variable "weighted_forward" {
       duration = optional(number, 60)
       enabled  = bool
     }))
-  })
+  }))
 
-  default = null
+  default = []
 }
 
 
 variable "rules" {
-  type = object({
+  type = map(object({
     priority     = number
     listener_arn = string
     port         = optional(string)
@@ -197,6 +197,6 @@ variable "rules" {
       path_pattern        = optional(list(string))
       source_ip           = optional(list(string))
     })))
-  })
+  }))
   default = {}
 }

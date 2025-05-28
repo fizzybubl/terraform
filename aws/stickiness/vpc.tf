@@ -1,7 +1,7 @@
 locals {
-  az1 = "euw1-az1"
-  az2 = "euw1-az2"
-  az3 = "euw1-az3"
+  az1    = "euc1-az1"
+  az2    = "euc1-az2"
+  az3    = "euc1-az3"
   az_ids = [local.az1, local.az2, local.az3]
 
   cloud_app_subnets = {
@@ -71,10 +71,10 @@ module "cloud_app" {
   source   = "../vpc/modules/subnet"
   for_each = local.cloud_app_subnets
 
-  vpc_id         = module.cloud_vpc.vpc_id
-  cidr_block     = each.value.cidr_block
-  az_id          = each.value.availability_zone_id
-  subnet_tags         = each.value.tags
+  vpc_id      = module.cloud_vpc.vpc_id
+  cidr_block  = each.value.cidr_block
+  az_id       = each.value.availability_zone_id
+  subnet_tags = each.value.tags
 }
 
 

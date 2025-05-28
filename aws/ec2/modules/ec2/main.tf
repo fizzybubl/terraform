@@ -153,7 +153,8 @@ resource "aws_launch_template" "this" {
 }
 
 resource "aws_autoscaling_group" "this" {
-  name_prefix             = "asg-"
+  count = var.instance ? 0 : 1
+  name             = var.asg_name
   desired_capacity        = var.desired_capacity
   min_size                = var.min_size
   max_size                = var.max_size
@@ -209,44 +210,6 @@ resource "aws_placement_group" "this" {
   spread_level    = var.placement_group.spread_level
   partition_count = var.placement_group.partition_count
   tags            = var.placement_group.tags
-}
-
-resource "aws_autoscaling_group" "bar" {
-  name                      = var.asg_name
-  max_size                  = var.max_size
-  min_size                  = var.min_size
-  health_check_grace_period = var.health_check_grace_period
-  health_check_type         = var.health_check_type
-  desired_capacity          = var.desired_capacity
-  force_delete              = var.force_delete
-  placement_group           = var.placement_group == null ? null : aws_placement_group.this[0].id
-  vpc_zone_identifier       = var.subnet_ids
-
-  instance_maintenance_policy {
-    min_healthy_percentage = 90
-    max_healthy_percentage = 120
-  }
-
-  launch_template {
-    id = aws_launch_template.this.id
-    version = aws_launch_template.this.latest_version
-  }
-
-  tag {
-    key                 = "foo"
-    value               = "bar"
-    propagate_at_launch = true
-  }
-
-  timeouts {
-    delete = "15m"
-  }
-
-  tag {
-    key                 = "lorem"
-    value               = "ipsum"
-    propagate_at_launch = false
-  }
 }
 
 # resource "aws_autoscaling_lifecycle_hook" "foobar" {

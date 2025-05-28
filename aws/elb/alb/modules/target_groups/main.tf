@@ -9,7 +9,7 @@ resource "aws_lb_target_group" "this" {
 
   health_check {
     healthy_threshold = var.health_check.healthy_threshold
-    enabled           = var.health_check.enable
+    enabled           = var.health_check.enabled
     interval          = var.health_check.interval
     matcher           = var.health_check.matcher
     path              = var.health_check.path
@@ -28,14 +28,14 @@ resource "aws_lb_target_group" "this" {
 
 
 resource "aws_autoscaling_attachment" "this" {
-  count = var.asg_name != null ? 1 : 0
+  count                  = var.asg_name == null ? 0 : 1
   lb_target_group_arn    = aws_lb_target_group.this.arn
   autoscaling_group_name = var.asg_name
 }
 
 
 resource "aws_lb_target_group_attachment" "this" {
-  count = var.target_id != null ? 1 : 0
-  target_group_arn    = aws_lb_target_group.this.arn
-  target_id = var.target_id
+  count            = var.target_id == null ? 0 : 1
+  target_group_arn = aws_lb_target_group.this.arn
+  target_id        = var.target_id
 }
