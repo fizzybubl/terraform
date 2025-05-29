@@ -16,14 +16,14 @@ systemctl start httpd
 bgcolor=$(printf "%02x%02x%02x\n" $((RANDOM%256)) $((RANDOM%256)) $((RANDOM%256)))
 TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
 instanceId=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id)
-wget -O /var/www/html/cat.gif "http://thecatapi.com/api/images/get?format=src&type=gif&api_key=8f7dc437-0b9b-47b8-a2c0-65925d593acf"
+# wget -O /var/www/html/cat.gif "http://thecatapi.com/api/images/get?format=src&type=gif&api_key=8f7dc437-0b9b-47b8-a2c0-65925d593acf"
 echo "<html><head>" >> /var/www/html/index.php
 echo "<meta http-equiv=\"Cache-Control\" content=\"no-cache, no-store, must-revalidate\">" >> /var/www/html/index.php
 echo "<meta http-equiv=\"Pragma\" content=\"no-cache\">" >> /var/www/html/index.php
 echo "<meta http-equiv=\"Expires\" content=\"0\">" >> /var/www/html/index.php
 echo "</head><body style=\"background-color:#$bgcolor;\">" >> /var/www/html/index.php
 echo "<center><h1>Instance ID : $instanceId</h1></center><br>" >> /var/www/html/index.php
-echo "<center><img src=\"cat.gif?nocache=<?php echo time(); ?>\">" >> /var/www/html/index.php
+# echo "<center><img src=\"cat.gif?nocache=<?php echo time(); ?>\">" >> /var/www/html/index.php
 echo "</body></html>" >> /var/www/html/index.php
 
 # Step 4 - permissions 

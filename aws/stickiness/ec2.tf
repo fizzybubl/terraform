@@ -6,9 +6,9 @@ data "aws_ami" "ami" {
 }
 
 
-module "my_sg" {
+module "ec2_sg" {
   source      = "../ec2/modules/security_groups" # adjust path
-  name        = "example-sg"
+  name        = "ec2-sg"
   description = "Example security group"
   vpc_id      = module.cloud_vpc.vpc_id
   tags = {
@@ -22,7 +22,7 @@ module "my_sg" {
       from_port   = 80
       to_port     = 80
       protocol    = "tcp"
-      cidr_block  = "0.0.0.0/0" # only one destination here
+      security_group = module.alb_sg.sg_id
     }
     ssh = {
       description = "Allow SSH from a security group"
@@ -58,7 +58,7 @@ module "ec2" {
   instance_type      = "t2.micro"
   ami_id             = data.aws_ami.ami.id
   subnet_ids         = [for key in local.az_ids : module.cloud_app[key].subnet_id]
-  security_group_ids = [module.my_sg.sg_id]
+  security_group_ids = [module.ec2_sg.sg_id]
   user_data_base64   = data.cloudinit_config.user_data.rendered
   health_check_type  = "ELB"
 
