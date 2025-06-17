@@ -28,6 +28,7 @@ variable "ami_id" {
 variable "instance_type" {
   type        = string
   description = "EC2 instance type"
+  default     = null
 }
 
 variable "security_group_ids" {
@@ -176,30 +177,30 @@ variable "enable_monitoring" {
 
 variable "instance_requirements" {
   type = object({
-    baseline_ebs_bandwidth_mbps = object({
+    baseline_ebs_bandwidth_mbps = optional(object({
       min = optional(number)
       max = optional(number)
-    })
-    memory_mib = object({
+    }))
+    memory_mib = optional(object({
       min = optional(number, 0.5)
       max = optional(number)
-    })
-    vcpu_count = object({
+    }))
+    vcpu_count = optional(object({
       min = optional(number, 0.5)
       max = optional(number)
-    })
-    network_bandwidth_gbps = object({
+    }))
+    network_bandwidth_gbps = optional(object({
       min = optional(number)
       max = optional(number)
-    })
-    network_interface_count = object({
+    }))
+    network_interface_count = optional(object({
       min = optional(number)
       max = optional(number)
-    })
-    total_local_storage_gb = object({
+    }))
+    total_local_storage_gb = optional(object({
       min = optional(number)
       max = optional(number)
-    })
+    }))
     allowed_instance_types                                  = optional(list(string))
     excluded_instance_types                                 = optional(list(string))
     instance_generations                                    = optional(list(string))
@@ -216,7 +217,7 @@ variable "instance_requirements" {
 
 variable "instance_market_options" {
   type = object({
-    market_type = string
+    market_type = optional(string, "spot")
     spot_options = object({
       block_duration_minutes         = optional(number, 60)
       instance_interruption_behavior = optional(string, "terminate")
