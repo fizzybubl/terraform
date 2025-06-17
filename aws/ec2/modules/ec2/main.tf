@@ -144,7 +144,10 @@ resource "aws_launch_template" "this" {
 
   tag_specifications {
     resource_type = "volume"
-    tags          = var.tags
+    tags          = merge(
+      var.tags,
+      { Name = "${var.template_name}-instance" }
+    )
   }
 
   lifecycle {
@@ -196,6 +199,7 @@ resource "aws_autoscaling_group" "this" {
 
 resource "aws_instance" "this" {
   count = var.instance ? 1 : 0
+  subnet_id = var.subnet_ids[0]
   launch_template {
     version = aws_launch_template.this.latest_version
     id      = aws_launch_template.this.id

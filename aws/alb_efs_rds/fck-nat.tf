@@ -15,7 +15,7 @@ data "aws_ami" "fck_nat" {
 
 
 resource "aws_security_group" "fck_nat" {
-  name = "fck_nat_sg"
+  name   = "fck_nat_sg"
   vpc_id = module.cloud_vpc.vpc_id
 }
 
@@ -25,7 +25,7 @@ resource "aws_vpc_security_group_ingress_rule" "all_vpc" {
   ip_protocol       = -1
   from_port         = -1
   to_port           = -1
-  cidr_ipv4 = module.cloud_vpc.cidr_block
+  cidr_ipv4         = module.cloud_vpc.cidr_block
 }
 
 
@@ -34,7 +34,7 @@ resource "aws_vpc_security_group_ingress_rule" "egress_all" {
   ip_protocol       = -1
   from_port         = -1
   to_port           = -1
-  cidr_ipv4         =  "0.0.0.0/0"
+  cidr_ipv4         = "0.0.0.0/0"
 }
 
 
@@ -45,12 +45,12 @@ resource "aws_network_interface" "fck_nat_nic" {
   source_dest_check = false
 }
 
-resource "aws_instance" "fck_nat" {                                                   
+resource "aws_instance" "fck_nat" {
   ami           = data.aws_ami.fck_nat.id
   instance_type = "t4g.nano"
 
   network_interface {
     network_interface_id = aws_network_interface.fck_nat_nic.id
     device_index         = 0
-  }                                                                              
+  }
 }

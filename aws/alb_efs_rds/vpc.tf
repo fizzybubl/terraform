@@ -107,16 +107,16 @@ module "cloud_db" {
   az_id          = each.value.availability_zone_id
   create_rtb     = false
   route_table_id = module.cloud_db_rtb.route_table_id
-  subnet_tags         = each.value.tags
+  subnet_tags    = each.value.tags
 }
 
 
 module "cloud_app_rtb" {
   source = "../vpc/modules/subnet"
 
-  vpc_id     = module.cloud_vpc.vpc_id
-  cidr_block = local.cloud_app_subnets[local.az_ids[0]].cidr_block
-  az_id      = local.cloud_app_subnets[local.az_ids[0]].availability_zone_id
+  vpc_id      = module.cloud_vpc.vpc_id
+  cidr_block  = local.cloud_app_subnets[local.az_ids[0]].cidr_block
+  az_id       = local.cloud_app_subnets[local.az_ids[0]].availability_zone_id
   subnet_tags = local.cloud_app_subnets[local.az_ids[0]].tags
   routes = {
     "fck_nat" : {
@@ -136,7 +136,7 @@ module "cloud_app" {
   az_id          = each.value.availability_zone_id
   create_rtb     = false
   route_table_id = module.cloud_app_rtb.route_table_id
-  subnet_tags         = each.value.tags
+  subnet_tags    = each.value.tags
 }
 
 
