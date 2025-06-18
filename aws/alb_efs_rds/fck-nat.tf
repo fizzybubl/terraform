@@ -29,7 +29,16 @@ resource "aws_vpc_security_group_ingress_rule" "all_vpc" {
 }
 
 
-resource "aws_vpc_security_group_ingress_rule" "egress_all" {
+resource "aws_vpc_security_group_ingress_rule" "ec2ic" {
+  security_group_id            = aws_security_group.fck_nat.id
+  ip_protocol                  = "tcp"
+  from_port                    = 22
+  to_port                      = 22
+  referenced_security_group_id = module.ec2ic.sg_id
+}
+
+
+resource "aws_vpc_security_group_egress_rule" "egress_all" {
   security_group_id = aws_security_group.fck_nat.id
   ip_protocol       = -1
   from_port         = -1

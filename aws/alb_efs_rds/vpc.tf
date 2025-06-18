@@ -169,3 +169,44 @@ module "cloud_web" {
   subnet_tags         = each.value.tags
   public_ip_on_launch = true
 }
+
+
+
+data "aws_ec2_managed_prefix_list" "ec2_instance_connect" { # TO DELETE
+  name = "com.amazonaws.${var.region}.ec2-instance-connect"
+}
+
+
+module "ec2ic" {
+  source = "../ec2/modules/security_groups"
+
+  name        = "ec2ic"
+  vpc_id      = module.cloud_vpc.vpc_id
+  description = "SG for ec2ic"
+
+  # ingress_rules = {
+  #   "me" = {
+  #     cidr_block  = "0.0.0.0/0"
+  #     from_port   = -1
+  #     to_port     = -1
+  #     description = "me"
+  #     protocol    = -1
+  #   }
+  # }
+
+  egress_rules = {
+    "all_to_vpc" = {
+      cidr_block  = module.cloud_vpc.cidr_block
+      from_port   = 22
+      to_port     = 22
+      description = "All to vpc"
+      protocol    = "tcp"
+    }
+  }
+}
+
+
+resource "aws_ec2_instance_connect_endpoint" "ep" {
+  subnet_id          = module.cloud_app_rtb.subnet_id
+  security_group_ids = [module.ec2ic.sg_id]
+}
