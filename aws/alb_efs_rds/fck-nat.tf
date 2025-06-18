@@ -1,17 +1,17 @@
-data "aws_ami" "fck_nat" {
-  filter {
-    name   = "name"
-    values = ["fck-nat-al2023-*"]
-  }
+# data "aws_ami" "fck_nat" {
+#   filter {
+#     name   = "name"
+#     values = ["fck-nat-al2023-*"]
+#   }
 
-  filter {
-    name   = "architecture"
-    values = ["arm64"]
-  }
+#   filter {
+#     name   = "architecture"
+#     values = ["arm64"]
+#   }
 
-  owners      = ["568608671756"]
-  most_recent = true
-}
+#   owners      = ["568608671756"]
+#   most_recent = true
+# }
 
 
 resource "aws_security_group" "fck_nat" {
@@ -47,19 +47,40 @@ resource "aws_vpc_security_group_egress_rule" "egress_all" {
 }
 
 
-resource "aws_network_interface" "fck_nat_nic" {
-  subnet_id       = module.cloud_web_rtb.subnet_id
-  security_groups = [aws_security_group.fck_nat.id]
+# resource "aws_network_interface" "fck_nat_nic" {
+#   subnet_id       = module.cloud_web_rtb.subnet_id
+#   security_groups = [aws_security_group.fck_nat.id]
 
-  source_dest_check = false
-}
+#   source_dest_check = false
+# }
 
-resource "aws_instance" "fck_nat" {
-  ami           = data.aws_ami.fck_nat.id
-  instance_type = "t4g.nano"
+# resource "aws_instance" "fck_nat" {
+#   ami           = data.aws_ami.fck_nat.id
+#   instance_type = "t4g.nano"
 
-  network_interface {
-    network_interface_id = aws_network_interface.fck_nat_nic.id
-    device_index         = 0
+#   network_interface {
+#     network_interface_id = aws_network_interface.fck_nat_nic.id
+#     device_index         = 0
+#   }
+# }
+
+
+module "fck-nat" {
+  source = "RaJiska/fck-nat/aws"
+
+  name      = "fck-nat"
+  vpc_id    = module.cloud_vpc.vpc_id
+  subnet_id = module.cloud_web_rtb.subnet_id
+  # ha_mode              = true                 # Enables high-availability mode
+  # eip_allocation_ids   = ["eipalloc-abc1234"] # Allocation ID of an existing EIP
+  # use_cloudwatch_agent = true                 # Enables Cloudwatch agent and have metrics reported
+
+  update_route_tables           = true
+  use_default_security_group    = false
+  additional_security_group_ids = [aws_security_group.fck_nat.id]
+  ssh_cidr_blocks               = [module.cloud_vpc.cidr_block]
+  route_tables_ids = {
+    "app" = module.cloud_app_rtb.route_table_id
+    "db"  = module.cloud_db_rtb.route_table_id
   }
 }
