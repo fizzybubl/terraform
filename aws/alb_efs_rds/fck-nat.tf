@@ -1,86 +1,81 @@
-# data "aws_ami" "fck_nat" {
-#   filter {
-#     name   = "name"
-#     values = ["fck-nat-al2023-*"]
-#   }
-
-#   filter {
-#     name   = "architecture"
-#     values = ["arm64"]
-#   }
-
-#   owners      = ["568608671756"]
-#   most_recent = true
-# }
-
-
-resource "aws_security_group" "fck_nat" {
-  name   = "fck_nat_sg"
-  vpc_id = module.cloud_vpc.vpc_id
-}
-
-
-resource "aws_vpc_security_group_ingress_rule" "all_vpc" {
-  security_group_id = aws_security_group.fck_nat.id
-  ip_protocol       = -1
-  from_port         = -1
-  to_port           = -1
-  cidr_ipv4         = module.cloud_vpc.cidr_block
-}
-
-
-resource "aws_vpc_security_group_ingress_rule" "ec2ic" {
-  security_group_id            = aws_security_group.fck_nat.id
-  ip_protocol                  = "tcp"
-  from_port                    = 22
-  to_port                      = 22
-  referenced_security_group_id = module.ec2ic.sg_id
-}
-
-
-resource "aws_vpc_security_group_egress_rule" "egress_all" {
-  security_group_id = aws_security_group.fck_nat.id
-  ip_protocol       = -1
-  from_port         = -1
-  to_port           = -1
-  cidr_ipv4         = "0.0.0.0/0"
-}
-
-
-# resource "aws_network_interface" "fck_nat_nic" {
-#   subnet_id       = module.cloud_web_rtb.subnet_id
-#   security_groups = [aws_security_group.fck_nat.id]
-
-#   source_dest_check = false
-# }
-
-# resource "aws_instance" "fck_nat" {
-#   ami           = data.aws_ami.fck_nat.id
-#   instance_type = "t4g.nano"
-
-#   network_interface {
-#     network_interface_id = aws_network_interface.fck_nat_nic.id
-#     device_index         = 0
-#   }
-# }
-
-
-module "fck-nat" {
-  source = "RaJiska/fck-nat/aws"
-
-  name      = "fck-nat"
-  vpc_id    = module.cloud_vpc.vpc_id
-  subnet_id = module.cloud_web_rtb.subnet_id
-  # ha_mode              = true                 # Enables high-availability mode
-  # eip_allocation_ids   = ["eipalloc-abc1234"] # Allocation ID of an existing EIP
-  # use_cloudwatch_agent = true                 # Enables Cloudwatch agent and have metrics reported
-
-  update_route_tables           = true
-  use_default_security_group    = false
-  additional_security_group_ids = [aws_security_group.fck_nat.id]
-  ssh_cidr_blocks               = [module.cloud_vpc.cidr_block]
-  route_tables_ids = {
-    "app" = module.cloud_app_rtb.route_table_id
-    "db"  = module.cloud_db_rtb.route_table_id
+data "aws_ami" "fck_nat" {
+  filter {
+    name   = "name"
+    values = ["fck-nat-al2023-*"]
   }
+
+  filter {
+    name   = "architecture"
+    values = ["arm64"]
+  }
+
+  owners      = ["568608671756"]
+  most_recent = true
+}
+
+
+module "fck_nat_sg" {
+  source = "../ec2/modules/security_groups"
+
+  name        = "fck-nat-sg"
+  vpc_id      = module.cloud_vpc.vpc_id
+  description = "SG for FCK NAT"
+
+  ingress_rules = {
+    "fck_nat_ingress" = {
+      cidr_block  = module.cloud_vpc.cidr_block
+      from_port   = -1
+      to_port     = -1
+      description = "All from VPC"
+      protocol    = -1
+    }
+  }
+
+  egress_rules = {
+    "fck_nat_egress" = {
+      cidr_block  = "0.0.0.0/0"
+      from_port   = -1
+      to_port     = -1
+      description = "All egress"
+      protocol    = -1
+    }
+  }
+}
+
+
+resource "aws_network_interface" "fck_nat_nic" {
+  subnet_id               = module.cloud_web_rtb.subnet_id
+  security_groups         = [module.fck_nat_sg.sg_id]
+  private_ip_list         = ["10.0.100.100"]
+  private_ip_list_enabled = true
+
+  source_dest_check = false
+}
+
+
+data "cloudinit_config" "fck_nat" {
+  gzip = false
+  part {
+    filename     = "fck_nat.sh"
+    content_type = "text/x-shellscript"
+    content = templatefile("${path.module}/files/fck_nat.tpl.sh", {
+      eni_id      = aws_network_interface.fck_nat_nic.id
+    })
+  }
+}
+
+
+resource "aws_instance" "fck_nat" {
+  ami           = data.aws_ami.fck_nat.id
+  instance_type = "t4g.nano"
+
+  iam_instance_profile = aws_iam_instance_profile.ec2.name
+  user_data = data.cloudinit_config.fck_nat.rendered
+
+  network_interface {
+    network_interface_id = aws_network_interface.fck_nat_nic.id
+    device_index         = 0
+  }
+
+  depends_on = [ module.ssm ]
 }

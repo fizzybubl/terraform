@@ -172,41 +172,42 @@ module "cloud_web" {
 
 
 
-data "aws_ec2_managed_prefix_list" "ec2_instance_connect" { # TO DELETE
-  name = "com.amazonaws.${var.region}.ec2-instance-connect"
-}
-
-
-module "ec2ic" {
+module "ssm_sg" {
   source = "../ec2/modules/security_groups"
 
-  name        = "ec2ic"
+  name        = "ssm-sg"
   vpc_id      = module.cloud_vpc.vpc_id
-  description = "SG for ec2ic"
+  description = "SG for SSM EP"
 
-  # ingress_rules = {
-  #   "me" = {
-  #     cidr_block  = "0.0.0.0/0"
-  #     from_port   = -1
-  #     to_port     = -1
-  #     description = "me"
-  #     protocol    = -1
-  #   }
-  # }
+  ingress_rules = {
+    "voc_ingress" = {
+      cidr_block  = module.cloud_vpc.cidr_block
+      from_port   = -1
+      to_port     = -1
+      description = "All from VPC"
+      protocol    = -1
+    }
+  }
 
   egress_rules = {
-    "all_to_vpc" = {
+    "vpc_egress" = {
       cidr_block  = module.cloud_vpc.cidr_block
-      from_port   = 22
-      to_port     = 22
+      from_port   = -1
+      to_port     = -1
       description = "All to vpc"
-      protocol    = "tcp"
+      protocol    = -1
     }
   }
 }
 
 
-resource "aws_ec2_instance_connect_endpoint" "ep" {
-  subnet_id          = module.cloud_app_rtb.subnet_id
-  security_group_ids = [module.ec2ic.sg_id]
+module "ssm" {
+  for_each            = toset(["ssm", "ssmmessages", "ec2messages"])
+  source              = "../vpc/modules/vpc_endpoint"
+  private_dns_enabled = true
+  default_sg          = false
+  security_group_ids  = [module.ssm_sg.sg_id]
+  service_name        = "com.amazonaws.${var.region}.${each.value}"
+  vpc_id              = module.cloud_vpc.vpc_id
+  subnet_ids          = [for key, value in module.cloud_app: value.subnet_id]
 }

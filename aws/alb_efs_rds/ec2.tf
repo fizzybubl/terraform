@@ -28,21 +28,14 @@ module "sg_ec2" {
       description = "EFS Access"
       protocol    = "tcp"
     }
-    "ec2ic" = {
-      security_group = module.ec2ic.sg_id
-      from_port      = 22
-      to_port        = 22
-      description    = "EC2 Instance Connect EP Access"
-      protocol       = "tcp"
-    }
   }
 
   egress_rules = {
     "all_to_vpc" = {
-      cidr_block  = module.cloud_vpc.cidr_block
+      cidr_block  = "0.0.0.0/0"
       from_port   = -1
       to_port     = -1
-      description = "All to vpc"
+      description = "All"
       protocol    = -1
     }
   }
@@ -52,7 +45,7 @@ module "sg_ec2" {
 data "cloudinit_config" "user_data" {
   gzip = false
   part {
-    filename     = "user_data.tpl.sh"
+    filename     = "user_data.sh"
     content_type = "text/x-shellscript"
     content = templatefile("${path.module}/files/user_data.tpl.sh", {
       region      = var.region
@@ -73,8 +66,9 @@ module "ec2" {
   instance      = true
   instance_type = "t2.micro"
   # subnet_ids         = concat([module.cloud_app_rtb.subnet_id], [for az_id in local.az_ids : module.cloud_app[az_id].subnet_id if az_id != local.az_ids[0]])
-  subnet_ids         = [module.cloud_app_rtb.subnet_id]
-  security_group_ids = [module.sg_ec2.sg_id]
+  subnet_ids                = [module.cloud_app_rtb.subnet_id]
+  security_group_ids        = [module.sg_ec2.sg_id]
+  iam_instance_profile_name = aws_iam_instance_profile.ec2.name
 
   user_data_base64 = data.cloudinit_config.user_data.rendered
   # instance_requirements = {
@@ -86,4 +80,6 @@ module "ec2" {
   #     min = 500
   #   }
   # }
+
+  depends_on = [ module.ssm ]
 }
