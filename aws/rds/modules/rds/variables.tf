@@ -88,3 +88,41 @@ variable "iops" {
   type    = number
   default = 100
 }
+
+variable "parameter_group_name" {
+  type    = string
+  default = null
+}
+
+
+variable "option_group_name" {
+  type    = string
+  default = null
+}
+
+variable "network_type" {
+  type    = string
+  default = "IPV4"
+}
+
+variable "maintenance_window" {
+  type    = string
+  default = "02:00-04:00"
+}
+
+
+variable "backup_window" {
+  type    = string
+  default = "00:00-02:00"
+}
+
+variable "blue_green_update" {
+  type    = bool
+  default = false
+}
+
+variable "replicate_source_db" {
+  type        = string
+  default     = null
+  description = "arn of the source db"
+}
