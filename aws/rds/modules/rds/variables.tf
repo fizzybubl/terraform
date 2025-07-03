@@ -108,7 +108,7 @@ variable "network_type" {
 
 variable "maintenance_window" {
   type    = string
-  default = "02:00-04:00"
+  default = "Tue:02:00-Tue:04:00"
 }
 
 

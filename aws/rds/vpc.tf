@@ -91,11 +91,10 @@ module "cloud_db" {
   source   = "../vpc/modules/subnet"
   for_each = local.cloud_db_subnets
 
-  vpc_id         = module.cloud_vpc.vpc_id
-  cidr_block     = each.value.cidr_block
-  az_id          = each.value.availability_zone_id
-  route_table_id = module.cloud_db_rtb.route_table_id
-  subnet_tags    = each.value.tags
+  vpc_id      = module.cloud_vpc.vpc_id
+  cidr_block  = each.value.cidr_block
+  az_id       = each.value.availability_zone_id
+  subnet_tags = each.value.tags
 }
 
 
