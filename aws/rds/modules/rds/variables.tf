@@ -63,6 +63,7 @@ variable "subnet_ids" {
 
 variable "instance_role_arn" {
   type        = string
+  default     = ""
   description = "Instace role arn"
 }
 

@@ -9,6 +9,7 @@ resource "aws_db_subnet_group" "this" {
 
 
 resource "aws_db_instance_role_association" "this" {
+  count                  = length(var.instance_role_arn) > 0 ? 1 : 0
   db_instance_identifier = aws_db_instance.this.identifier
   feature_name           = "S3_INTEGRATION"
   role_arn               = var.instance_role_arn
