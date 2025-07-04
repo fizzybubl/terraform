@@ -18,10 +18,10 @@ module "sg_ec2" {
   ingress_rules = {
     "efs" = {
       cidr_block  = module.cloud_vpc.cidr_block
-      from_port   = 2049
-      to_port     = 2049
-      description = "EFS Access"
-      protocol    = "tcp"
+      from_port   = -1
+      to_port     = -1
+      description = "ALL Access"
+      protocol    = -1
     }
   }
 
@@ -44,12 +44,11 @@ data "cloudinit_config" "user_data" {
     content_type = "text/x-shellscript"
     content = templatefile("${path.module}/files/user_data.tpl.sh", {
       region      = var.region
-      db_pw       = var.db_pw.value
-      db_endpoint = module.rds.db_endpoint
-      db_name     = var.db_name.value
-      db_root_pw  = var.db_root_pw.value
-      db_user     = var.db_user.value
-      efs_id      = module.efs.efs_id
+      db_pw       = var.db_pw.ssm_name
+      db_endpoint = var.db_endpoint.ssm_name
+      db_name     = var.db_name.ssm_name
+      db_user     = var.db_user.ssm_name
+      efs_id      = var.efs_id.ssm_name
     })
   }
 }
@@ -58,24 +57,17 @@ data "cloudinit_config" "user_data" {
 module "ec2" {
   source = "../ec2/modules/ec2"
 
-  ami_id   = data.aws_ami.ami.id
-  instance = false
-  # instance_type = "t2.micro"
-  # subnet_ids         = concat([module.cloud_app_rtb.subnet_id], [for az_id in local.az_ids : module.cloud_app[az_id].subnet_id if az_id != local.az_ids[0]])
-  subnet_ids                = [module.cloud_app_rtb.subnet_id]
+  ami_id        = data.aws_ami.ami.id
+  instance      = false
+  instance_type = "t2.micro"
+  subnet_ids    = concat([module.cloud_app_rtb.subnet_id], [for az_id in local.az_ids : module.cloud_app[az_id].subnet_id if az_id != local.az_ids[0]])
+  # subnet_ids                = [module.cloud_app_rtb.subnet_id]
   security_group_ids        = [module.sg_ec2.sg_id]
   iam_instance_profile_name = aws_iam_instance_profile.ec2.name
+  desired_capacity          = 1
+  health_check_type         = "ELB"
 
   user_data_base64 = data.cloudinit_config.user_data.rendered
-  instance_requirements = {
-    allowed_instance_types = ["t2.micro", "t3.micro"]
-    vcpu_count = {
-      min = 1
-    }
-    memory_mib = {
-      min = 500
-    }
-  }
 
   depends_on = [module.ssm, module.rds]
 }

@@ -5,21 +5,35 @@ module "efs_sg" {
   description = "efs"
 
   ingress_rules = {
-    "instance" = {
+    "instance_udp" = {
       description    = "allow all connections to 2049"
-      from_port      = "2049"
-      to_port        = "2049"
-      protocol       = -1
+      from_port      = 2049
+      to_port        = 2049
+      protocol       = "udp"
+      security_group = module.sg_ec2.sg_id
+    }
+    "instance_tcp" = {
+      description    = "allow all connections to 2049"
+      from_port      = 2049
+      to_port        = 2049
+      protocol       = "tcp"
       security_group = module.sg_ec2.sg_id
     }
   }
 
   egress_rules = {
-    "all" = {
+    "all_tcp" = {
       description = "allow all connections"
       from_port   = 1
       to_port     = 65535
-      protocol    = -1
+      protocol    = "tcp"
+      cidr_block  = module.cloud_vpc.cidr_block
+    }
+    "all_udp" = {
+      description = "allow all connections"
+      from_port   = 1
+      to_port     = 65535
+      protocol    = "udp"
       cidr_block  = module.cloud_vpc.cidr_block
     }
   }

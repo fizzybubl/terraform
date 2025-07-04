@@ -54,13 +54,13 @@ variable "target_groups" {
     deregistration_delay = optional(number, 300)
     target_id            = optional(string)
     asg_name             = optional(string)
-    listener             = string
+    listener             = optional(string)
     weight               = optional(number)
     health_check = object({
       enabled           = optional(bool, true)
       healthy_threshold = optional(number, 3)
       interval          = optional(number, 60)
-      matcher           = optional(number, 200)
+      matcher           = optional(string, "200")
       path              = optional(string, "/")
       port              = optional(string, "traffic-port")
       protocol          = optional(string, null) # TCP, HTTP, or HTTPS, null for lambda
