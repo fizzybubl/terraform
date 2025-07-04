@@ -67,3 +67,18 @@ resource "aws_ssm_parameter" "db_root_pw" {
     environment = "dev"
   }
 }
+
+
+resource "aws_ssm_parameter" "efs_id" {
+  name        = var.efs_id.ssm_name
+  description = "Wordpress EFS ID"
+  type        = "String"
+  tier        = "Standard"
+  data_type   = "text"
+  value       = module.efs.efs_id
+  key_id      = "alias/aws/ssm"
+
+  tags = {
+    environment = "dev"
+  }
+}

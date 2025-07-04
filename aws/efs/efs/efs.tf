@@ -13,6 +13,15 @@ resource "aws_efs_file_system" "this" {
 }
 
 
+resource "aws_efs_backup_policy" "this" {
+  file_system_id = aws_efs_file_system.this.id
+  backup_policy {
+    status = var.backup_status
+  }
+}
+
+
+
 resource "aws_efs_mount_target" "this" {
   for_each        = var.subnet_ids
   file_system_id  = aws_efs_file_system.this.id

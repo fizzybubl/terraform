@@ -49,6 +49,7 @@ data "cloudinit_config" "user_data" {
       db_name     = var.db_name.value
       db_root_pw  = var.db_root_pw.value
       db_user     = var.db_user.value
+      efs_id      = module.efs.efs_id
     })
   }
 }

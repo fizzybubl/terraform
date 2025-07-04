@@ -14,7 +14,7 @@ variable "db_pw" {
 }
 
 variable "db_endpoint" {
-  type = object({ ssm_name = string, value = string })
+  type = object({ ssm_name = string })
 }
 
 variable "db_name" {
@@ -27,5 +27,10 @@ variable "db_user" {
 
 variable "db_root_pw" {
   type      = object({ ssm_name = string, value = string })
+  sensitive = true
+}
+
+variable "efs_id" {
+  type      = object({ ssm_name = string })
   sensitive = true
 }

@@ -51,3 +51,8 @@ variable "subnet_ids" {
     security_groups = set(string)
   }))
 }
+
+variable "backup_status" {
+  type = string
+  default = "ENABLED"
+}
