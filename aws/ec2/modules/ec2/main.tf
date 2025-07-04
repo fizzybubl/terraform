@@ -58,33 +58,33 @@ resource "aws_launch_template" "this" {
       require_hibernate_support                               = im.value.require_hibernate_support
 
       baseline_ebs_bandwidth_mbps {
-        min = im.value.baseline_ebs_bandwidth_mbps.min
-        max = im.value.baseline_ebs_bandwidth_mbps.max
+        min = try(im.value.baseline_ebs_bandwidth_mbps.min, null)
+        max = try(im.value.baseline_ebs_bandwidth_mbps.max, null)
       }
 
       memory_mib {
-        min = im.value.memory_mib.min
-        max = im.value.memory_mib.max
+        min = try(im.value.memory_mib.min, null)
+        max = try(im.value.memory_mib.max, null)
       }
 
       network_bandwidth_gbps {
-        min = im.value.network_bandwidth_gbps.min
-        max = im.value.network_bandwidth_gbps.max
+        min = try(im.value.network_bandwidth_gbps.min, null)
+        max = try(im.value.network_bandwidth_gbps.max, null)
       }
 
       network_interface_count {
-        min = im.value.network_interface_count.min
-        max = im.value.network_interface_count.max
+        min = try(im.value.network_interface_count.min, null)
+        max = try(im.value.network_interface_count.max, null)
       }
 
       total_local_storage_gb {
-        min = im.value.total_local_storage_gb.min
-        max = im.value.total_local_storage_gb.max
+        min = try(im.value.total_local_storage_gb.min, null)
+        max = try(im.value.total_local_storage_gb.max, null)
       }
 
       vcpu_count {
-        min = im.value.vcpu_count.min
-        max = im.value.vcpu_count.max
+        min = try(im.value.vcpu_count.min, null)
+        max = try(im.value.vcpu_count.max, null)
       }
     }
   }
@@ -144,7 +144,10 @@ resource "aws_launch_template" "this" {
 
   tag_specifications {
     resource_type = "volume"
-    tags          = var.tags
+    tags          = merge(
+      var.tags,
+      { Name = "${var.template_name}-instance" }
+    )
   }
 
   lifecycle {
@@ -196,6 +199,7 @@ resource "aws_autoscaling_group" "this" {
 
 resource "aws_instance" "this" {
   count = var.instance ? 1 : 0
+  subnet_id = var.subnet_ids[0]
   launch_template {
     version = aws_launch_template.this.latest_version
     id      = aws_launch_template.this.id

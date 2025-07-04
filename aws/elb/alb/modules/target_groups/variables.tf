@@ -33,7 +33,7 @@ variable "health_check" {
     enabled           = optional(bool, true)
     healthy_threshold = optional(number, 3)
     interval          = optional(number, 30)
-    matcher           = optional(number, 200)
+    matcher           = optional(string, "200")
     path              = optional(string, "/")
     port              = optional(string, "traffic-port")
     protocol          = optional(string, null) # TCP, HTTP, HTTPS, or null for lambda
