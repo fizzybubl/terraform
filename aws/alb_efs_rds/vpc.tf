@@ -1,23 +1,27 @@
 locals {
-  az_ids = ["euc1-az1", "euc1-az2", "euc1-az3"]
+  az1 = "euc1-az1"
+  az2 = "euc1-az2"
+  az3 = "euc1-az3"
+
+  az_ids = [local.az1, local.az2, local.az3]
 
   cloud_db_subnets = {
-    "euc1-az1" = {
-      availability_zone_id = "euc1-az1"
+    (local.az1) = {
+      availability_zone_id = local.az1
       cidr_block           = "10.0.1.0/24"
       tags = {
         "Name" : "Private Subnet DB AZ1"
       }
     },
-    "euc1-az2" = {
-      availability_zone_id = "euc1-az2"
+    (local.az2) = {
+      availability_zone_id = local.az2
       cidr_block           = "10.0.2.0/24"
       tags = {
         "Name" : "Private Subnet DB AZ2"
       }
     },
-    "euc1-az3" = {
-      availability_zone_id = "euc1-az3"
+    (local.az3) = {
+      availability_zone_id = local.az3
       cidr_block           = "10.0.3.0/24"
       tags = {
         "Name" : "Private Subnet DB AZ3"
@@ -209,5 +213,5 @@ module "ssm" {
   security_group_ids  = [module.ssm_sg.sg_id]
   service_name        = "com.amazonaws.${var.region}.${each.value}"
   vpc_id              = module.cloud_vpc.vpc_id
-  subnet_ids          = [for key, value in module.cloud_app: value.subnet_id]
+  subnet_ids          = [for key, value in module.cloud_app : value.subnet_id]
 }

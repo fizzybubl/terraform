@@ -59,7 +59,7 @@ data "cloudinit_config" "fck_nat" {
     filename     = "fck_nat.sh"
     content_type = "text/x-shellscript"
     content = templatefile("${path.module}/files/fck_nat.tpl.sh", {
-      eni_id      = aws_network_interface.fck_nat_nic.id
+      eni_id = aws_network_interface.fck_nat_nic.id
     })
   }
 }
@@ -70,12 +70,12 @@ resource "aws_instance" "fck_nat" {
   instance_type = "t4g.nano"
 
   iam_instance_profile = aws_iam_instance_profile.ec2.name
-  user_data = data.cloudinit_config.fck_nat.rendered
+  user_data            = data.cloudinit_config.fck_nat.rendered
 
   network_interface {
     network_interface_id = aws_network_interface.fck_nat_nic.id
     device_index         = 0
   }
 
-  depends_on = [ module.ssm ]
+  depends_on = [module.ssm]
 }
