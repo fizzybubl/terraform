@@ -77,7 +77,7 @@ variable "engine_lifecycle_support" {
 variable "identifier" {
   type        = string
   description = "The name of the RDS instance, if omitted, Terraform will assign a random, unique identifier"
-  default     = null
+  default     = "test-rds-instance"
 }
 
 variable "storage_type" {
@@ -126,4 +126,9 @@ variable "replicate_source_db" {
   type        = string
   default     = null
   description = "arn of the source db"
+}
+
+variable "iam_database_authentication_enabled" {
+  type    = bool
+  default = false
 }
