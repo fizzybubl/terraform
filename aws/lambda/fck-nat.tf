@@ -69,7 +69,7 @@ resource "aws_instance" "fck_nat" {
   ami           = data.aws_ami.fck_nat.id
   instance_type = "t4g.nano"
 
-  user_data            = data.cloudinit_config.fck_nat.rendered
+  user_data = data.cloudinit_config.fck_nat.rendered
 
   network_interface {
     network_interface_id = aws_network_interface.fck_nat_nic.id

@@ -6,17 +6,17 @@ module "efs_sg" {
 
   ingress_rules = {
     "instance_udp" = {
-      description    = "allow all connections to 2049"
-      from_port      = 2049
-      to_port        = 2049
-      protocol       = "udp"
+      description = "allow all connections to 2049"
+      from_port   = 2049
+      to_port     = 2049
+      protocol    = "udp"
       cidr_block  = module.cloud_vpc.cidr_block
     }
     "instance_tcp" = {
-      description    = "allow all connections to 2049"
-      from_port      = 2049
-      to_port        = 2049
-      protocol       = "tcp"
+      description = "allow all connections to 2049"
+      from_port   = 2049
+      to_port     = 2049
+      protocol    = "tcp"
       cidr_block  = module.cloud_vpc.cidr_block
     }
   }
