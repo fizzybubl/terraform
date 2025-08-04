@@ -75,6 +75,4 @@ resource "aws_instance" "fck_nat" {
     network_interface_id = aws_network_interface.fck_nat_nic.id
     device_index         = 0
   }
-
-  depends_on = [module.ssm]
 }

@@ -28,3 +28,25 @@ resource "aws_efs_mount_target" "this" {
   subnet_id       = each.value.subnet_id
   security_groups = each.value.security_groups
 }
+
+
+resource "aws_efs_access_point" "this" {
+  count = var.access_point != null ? 1 : 0
+  file_system_id = aws_efs_file_system.this.id
+
+  posix_user {
+    gid = var.access_point.gid
+    uid = var.access_point.uid
+  }
+
+  root_directory {
+    path = var.access_point.path
+    creation_info {
+      owner_gid   = var.access_point.owner_gid
+      owner_uid   = var.access_point.owner_uid
+      permissions = var.access_point.permissions
+    }
+  }
+
+  tags = var.access_point.tags
+}
