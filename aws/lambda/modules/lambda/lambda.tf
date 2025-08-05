@@ -38,6 +38,7 @@ resource "aws_lambda_function" "this" {
   s3_object_version = var.s3_object_version
   source_code_hash  = null
   runtime           = var.runtime
+  timeout           = var.timeout
 
   dead_letter_config {
     target_arn = var.dlq_arn

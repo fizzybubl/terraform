@@ -67,7 +67,12 @@ variable "s3_object_version" {
 variable "runtime" {
   description = "Runtime environment for the Lambda function"
   type        = string
-  default     = null
+  default     = "python3.12"
+}
+
+variable "timeout" {
+  type    = number
+  default = 60
 }
 
 variable "dlq_arn" {
