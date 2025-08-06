@@ -47,12 +47,27 @@ variable "replication_overwrite" {
 
 variable "subnet_ids" {
   type = map(object({
-    subnet_id = string
+    subnet_id       = string
     security_groups = set(string)
   }))
 }
 
 variable "backup_status" {
-  type = string
+  type    = string
   default = "ENABLED"
+}
+
+
+variable "access_point" {
+  type = object({
+    tags        = optional(map(string), { "Name" : "EFS Access Point" })
+    permissions = optional(string, "0777")
+    uid         = optional(string, "1000")
+    gid         = optional(string, "1000")
+    owner_gid   = optional(string, "1000")
+    owner_uid   = optional(string, "1000")
+    path        = optional(string, "/")
+
+  })
+  default = null
 }

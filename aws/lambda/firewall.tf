@@ -1,0 +1,75 @@
+module "efs_sg" {
+  source      = "../ec2/modules/security_groups"
+  vpc_id      = module.cloud_vpc.vpc_id
+  name        = "efs"
+  description = "efs"
+
+  ingress_rules = {
+    "instance_udp" = {
+      description = "allow all connections to 2049"
+      from_port   = 2049
+      to_port     = 2049
+      protocol    = "udp"
+      cidr_block  = module.cloud_vpc.cidr_block
+    }
+    "instance_tcp" = {
+      description = "allow all connections to 2049"
+      from_port   = 2049
+      to_port     = 2049
+      protocol    = "tcp"
+      cidr_block  = module.cloud_vpc.cidr_block
+    }
+  }
+
+  egress_rules = {
+    "all_tcp" = {
+      description = "allow all connections"
+      from_port   = 1
+      to_port     = 65535
+      protocol    = "tcp"
+      cidr_block  = module.cloud_vpc.cidr_block
+    }
+    "all_udp" = {
+      description = "allow all connections"
+      from_port   = 1
+      to_port     = 65535
+      protocol    = "udp"
+      cidr_block  = module.cloud_vpc.cidr_block
+    }
+  }
+}
+
+
+module "lambda_sg" {
+  source      = "../ec2/modules/security_groups"
+  vpc_id      = module.cloud_vpc.vpc_id
+  name        = "lambda"
+  description = "lambda"
+
+  ingress_rules = {
+    "all" = {
+      description = "allow all connections to 2049"
+      from_port   = -1
+      to_port     = -1
+      protocol    = -1
+      cidr_block  = module.cloud_vpc.cidr_block
+    }
+  }
+
+  egress_rules = {
+    "all" = {
+      description = "allow all connections"
+      from_port   = -1
+      to_port     = -1
+      protocol    = -1
+      cidr_block  = module.cloud_vpc.cidr_block
+    }
+    "all_internet" = {
+      description = "allow all connections"
+      from_port   = -1
+      to_port     = -1
+      protocol    = -1
+      cidr_block  = "0.0.0.0/0"
+    }
+  }
+}
