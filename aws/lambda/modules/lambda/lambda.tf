@@ -1,5 +1,5 @@
 locals {
-  lambda_name = var.function_name != null ? aws_lambda_function.this[0].function_name : var.lambda_name
+  lambda_name = var.new_func ? aws_lambda_function.this[0].function_name : var.function_name
 
   # OUTPUTS
   alias_arn  = var.alias_name != null ? aws_lambda_alias.this[0].arn : null
@@ -24,7 +24,7 @@ resource "aws_lambda_alias" "this" {
 
 
 resource "aws_lambda_function" "this" {
-  count             = var.function_name != null ? 1 : 0
+  count             = var.new_func ? 1 : 0
   function_name     = var.function_name
   role              = var.execution_role_arn
   architectures     = var.architectures
@@ -40,8 +40,11 @@ resource "aws_lambda_function" "this" {
   runtime           = var.runtime
   timeout           = var.timeout
 
-  dead_letter_config {
-    target_arn = var.dlq_arn
+  dynamic "dead_letter_config" {
+    for_each = var.dlq_arn != null ? [var.dlq_arn] : []
+    content {
+      target_arn = each.value
+    }
   }
 
   environment {
@@ -57,17 +60,25 @@ resource "aws_lambda_function" "this" {
     arn              = var.efs_arn
   }
 
-  image_config {
-    command           = var.image_config.command
-    entry_point       = var.image_config.entry_point
-    working_directory = var.image_config.working_directory
+  dynamic "image_config" {
+    for_each = var.image_config != null ? [var.image_config] : []
+
+    content {
+      command           = each.value.command
+      entry_point       = each.value.entry_point
+      working_directory = each.value.working_directory
+    }
   }
 
-  logging_config {
-    application_log_level = var.logging_config.application_log_level
-    log_format            = var.logging_config.log_format
-    log_group             = var.logging_config.log_group
-    system_log_level      = var.logging_config.system_log_level
+  dynamic "logging_config" {
+    for_each = var.logging_config != null ? [var.logging_config] : []
+
+    content {
+      application_log_level = each.value.application_log_level
+      log_format            = each.value.log_format
+      log_group             = each.value.log_group
+      system_log_level      = each.value.system_log_level
+    }
   }
 
   vpc_config {

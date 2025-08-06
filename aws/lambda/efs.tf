@@ -11,4 +11,14 @@ module "efs" {
       security_groups = [module.efs_sg.sg_id]
     }
   }
+
+  access_point = {
+    path        = "/mnt/efs"
+    gid         = "1001"
+    uid         = "1001"
+    owner_gid   = "1001"
+    owner_uid   = "1001"
+    permissions = "0777"
+    tags        = { "Name" = "Lambda Access Point" }
+  }
 }

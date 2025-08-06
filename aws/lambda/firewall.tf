@@ -38,3 +38,38 @@ module "efs_sg" {
     }
   }
 }
+
+
+module "lambda_sg" {
+  source      = "../ec2/modules/security_groups"
+  vpc_id      = module.cloud_vpc.vpc_id
+  name        = "lambda"
+  description = "lambda"
+
+  ingress_rules = {
+    "all" = {
+      description = "allow all connections to 2049"
+      from_port   = -1
+      to_port     = -1
+      protocol    = -1
+      cidr_block  = module.cloud_vpc.cidr_block
+    }
+  }
+
+  egress_rules = {
+    "all" = {
+      description = "allow all connections"
+      from_port   = -1
+      to_port     = -1
+      protocol    = -1
+      cidr_block  = module.cloud_vpc.cidr_block
+    }
+    "all_internet" = {
+      description = "allow all connections"
+      from_port   = -1
+      to_port     = -1
+      protocol    = -1
+      cidr_block  = "0.0.0.0/0"
+    }
+  }
+}

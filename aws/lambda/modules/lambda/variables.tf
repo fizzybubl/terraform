@@ -1,3 +1,9 @@
+variable "new_func" {
+  type    = bool
+  default = true
+}
+
+
 variable "function_name" {
   description = "The name of the Lambda function"
   type        = string
@@ -19,7 +25,7 @@ variable "architectures" {
 variable "package_type" {
   description = "The type of deployment package (Zip or Image)"
   type        = string
-  default     = "zip"
+  default     = "Zip"
 }
 
 variable "handler" {
@@ -145,14 +151,10 @@ variable "alias_name" {
   type        = string
 }
 
-variable "lambda_name" {
-  description = "Name of the Lambda function"
-  type        = string
-}
-
 variable "lambda_version" {
   description = "Lambda function version to which the alias points"
   type        = string
+  default = "$LATEST"
 }
 
 variable "version_weights" {
