@@ -1,3 +1,3 @@
-output "hosted_zone" {
-  value = aws_route53_zone.main
+output "zone_id" {
+  value = try(aws_route53_zone.this[0].zone_id, null)
 }
