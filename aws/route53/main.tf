@@ -6,7 +6,7 @@ module "zone" {
 
   record_data = {
     "frankfurt" : {
-      name           = "test"
+      name           = "test.example.org"
       type           = "A"
       ttl            = "300"
       records        = ["172.31.1.23"]
@@ -16,7 +16,7 @@ module "zone" {
       }
     },
     "dublin" : {
-      name           = "test"
+      name           = "test.example.org"
       type           = "A"
       ttl            = "300"
       records        = ["172.31.2.23"]
@@ -33,7 +33,7 @@ module "zone_2" {
   source = "./hosted_zone"
   record_data = {
     "frankfurt" : {
-      name           = "mtls"
+      name           = "mtls.example.org"
       zone_id        = module.zone.zone_id
       type           = "A"
       ttl            = "300"
@@ -44,7 +44,7 @@ module "zone_2" {
       }
     },
     "dublin" : {
-      name           = "mtls"
+      name           = "mtls.example.org"
       zone_id        = module.zone.zone_id
       type           = "A"
       ttl            = "300"
