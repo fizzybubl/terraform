@@ -7,7 +7,7 @@ resource "aws_route53_zone" "this" {
     for_each = var.vpc_ids
 
     content {
-      vpc_id = vpc.value.vpc_id
+      vpc_id     = vpc.value.vpc_id
       vpc_region = vpc.value.region
     }
   }
@@ -15,13 +15,13 @@ resource "aws_route53_zone" "this" {
 
 
 resource "aws_route53_record" "this" {
-  for_each       = var.record_data
-  zone_id        = coalesce(each.value.zone_id, try(aws_route53_zone.this[0].zone_id, null))
-  name           = each.value.name
-  type           = each.value.type
-  ttl            = each.value.ttl
-  records        = each.value.records
-  set_identifier = each.value.set_identifier
+  for_each        = var.record_data
+  zone_id         = coalesce(each.value.zone_id, try(aws_route53_zone.this[0].zone_id, null))
+  name            = each.value.name
+  type            = each.value.type
+  ttl             = each.value.ttl
+  records         = each.value.records
+  set_identifier  = each.value.set_identifier
   health_check_id = each.value.health_check_id
 
   dynamic "failover_routing_policy" {

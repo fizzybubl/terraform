@@ -1,6 +1,7 @@
 variable "record_data" {
   type = map(object({
-    zone_id = string
+    name                             = string
+    zone_id                          = string
     ttl                              = optional(string, null)
     type                             = optional(string, null)
     records                          = optional(list(string), null)
@@ -10,8 +11,8 @@ variable "record_data" {
     latency_routing_policy           = optional(object({ region = string }), null)
     weighted_routing_policy          = optional(object({ weight = number }), null)
     multivalue_answer_routing_policy = optional(string, null)
-    health_check_id = optional(string, null)
-    set_identifier = string
+    health_check_id                  = optional(string, null)
+    set_identifier                   = string
     alias = optional(object({
       name                   = string
       zone_id                = string

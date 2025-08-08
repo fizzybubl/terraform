@@ -5,13 +5,13 @@ variable "zone_name" {
 
 
 variable "zone_description" {
-  type = string
+  type    = string
   default = null
 }
 
 
 variable "vpc_ids" {
-  type = list(object({vpc_id = string, region = string}))
+  type    = list(object({ vpc_id = string, region = string }))
   default = []
 }
 
