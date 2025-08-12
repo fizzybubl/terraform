@@ -48,3 +48,15 @@ variable "record_data" {
   }))
   default = {}
 }
+
+
+variable "dnssec_ksk" {
+  description = " Config of the key used to verify the Zone Signing Keys in DNSKEY records."
+  type = object({
+    name    = string
+    arn     = string
+    zone_id = optional(string)
+    status  = optional(string, "ACTIVE")
+  })
+  default = null
+}
