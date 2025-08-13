@@ -56,3 +56,18 @@ module "zone_2" {
     }
   }
 }
+
+
+module "cross_account_assoc" {
+  source = "./cross_account_association"
+  vpc_association = {
+    vpc_id = data.aws_vpc.dev.id
+    vpc_region = "eu-central-1"
+    zone_id = module.zone.zone_id
+  }
+
+  providers = {
+    aws.r53_owner = aws
+    aws.vpc_owner = aws.dev
+  }
+}

@@ -1,4 +1,4 @@
-variable "zone_vpc_association" {
+variable "vpc_association" {
   description = "Association data indicating zone_id and vpc_id to associate."
   type = object({
     zone_id    = string
