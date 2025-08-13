@@ -13,6 +13,6 @@ provider "aws" {
 
 provider "aws" {
   alias   = "dev"
-  profile = "admin"
+  profile = "admin-dev"
   region  = "eu-central-1"
 }
