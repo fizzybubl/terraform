@@ -28,28 +28,3 @@ resource "aws_route53_hosted_zone_dnssec" "this" {
     aws_route53_key_signing_key.example
   ]
 }
-for_each = compact([each.value.latency_routing_policy])
-    content {
-      region = lrp.value.region
-    }
-  }
-
-  dynamic "weighted_routing_policy" {
-    iterator = wrp
-    for_each = compact([each.value.weighted_routing_policy])
-    content {
-      weight = wrp.value.weight
-    }
-  }
-
-  multivalue_answer_routing_policy = each.value.multivalue_answer_routing_policy
-
-  dynamic "alias" {
-    for_each = compact([each.value.alias])
-    content {
-      name                   = alias.value.name
-      zone_id                = alias.value.zone_id
-      evaluate_target_health = alias.value.evaluate_target_health
-    }
-  }
-}
