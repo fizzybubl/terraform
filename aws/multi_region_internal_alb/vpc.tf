@@ -144,3 +144,52 @@ resource "aws_vpc_peering_connection_accepter" "name" {
     Name = "Accepter"
   }
 }
+
+
+
+module "ssm_sg" {
+  source = "../ec2/modules/security_groups"
+
+  name        = "ssm-sg"
+  vpc_id      = aws_vpc.fra.id
+  description = "SG for SSM EP"
+
+  ingress_rules = {
+    "vpc_ingress" = {
+      cidr_block  = aws_vpc.fra.cidr_block
+      from_port   = -1
+      to_port     = -1
+      description = "All from VPC"
+      protocol    = -1
+    }
+    "peer_ingress" = {
+      cidr_block  = aws_vpc.dub.cidr_block
+      from_port   = -1
+      to_port     = -1
+      description = "All from VPC"
+      protocol    = -1
+    }
+  }
+
+  egress_rules = {
+    "vpc_egress" = {
+      cidr_block  = "0.0.0.0/0"
+      from_port   = -1
+      to_port     = -1
+      description = "All to vpc"
+      protocol    = -1
+    }
+  }
+}
+
+
+module "ssm" {
+  for_each            = toset(["ssm", "ssmmessages", "ec2messages"])
+  source              = "../vpc/modules/vpc_endpoint"
+  private_dns_enabled = true
+  default_sg          = false
+  security_group_ids  = [module.ssm_sg.sg_id]
+  service_name        = "com.amazonaws.eu-central-1.${each.value}"
+  vpc_id              = aws_vpc.fra.id
+  subnet_ids          = [for key, subnet in aws_subnet.private_fra : subnet.id]
+}

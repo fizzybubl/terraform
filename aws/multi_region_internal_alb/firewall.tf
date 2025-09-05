@@ -7,6 +7,13 @@ resource "aws_security_group" "fra" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
+    cidr_blocks = [aws_vpc.dub.cidr_block]
+  }
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = [aws_vpc.fra.cidr_block]
   }
 
@@ -15,6 +22,13 @@ resource "aws_security_group" "fra" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = [aws_vpc.fra.cidr_block]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   tags = {
@@ -35,11 +49,18 @@ resource "aws_security_group" "dub" {
     cidr_blocks = [aws_vpc.dub.cidr_block]
   }
 
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = [aws_vpc.fra.cidr_block]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = [aws_vpc.dub.cidr_block]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   tags = {
