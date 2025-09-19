@@ -12,16 +12,14 @@ resource "aws_instance" "private_instance" {
   ami           = data.aws_ami.ami.id # Example Amazon Linux 2 AMI (eu-west-1). Update as needed.
   instance_type = "t3.micro"
 
-  subnet_id              = aws_subnet.private_fra["euc1-az1"].id
-  vpc_security_group_ids = [module.ssm_sg.sg_id]
+  subnet_id                   = aws_subnet.private_fra["euc1-az1"].id
+  vpc_security_group_ids      = [module.ssm_sg.sg_id]
   associate_public_ip_address = false
-  iam_instance_profile = aws_iam_instance_profile.ec2.name
+  iam_instance_profile        = aws_iam_instance_profile.ec2.name
 
   tags = {
     Name = "private-ec2"
   }
-
-  depends_on = [ module.ssm ]
 }
 
 

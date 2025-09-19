@@ -11,3 +11,8 @@ output "cidr_block" {
 output "igw_id" {
   value = var.igw ? aws_internet_gateway.this[0].id : null
 }
+
+
+output "owner_id" {
+  value = aws_vpc.this.owner_id
+}

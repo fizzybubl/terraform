@@ -41,7 +41,9 @@ resource "aws_instance" "fck_nat" {
   instance_type = var.instance_type
 
   user_data = data.cloudinit_config.fck_nat.rendered
-  primary_network_interface {
+  
+  network_interface {
     network_interface_id = aws_network_interface.fck_nat_nic.id
+    device_index = 0
   }
 }
