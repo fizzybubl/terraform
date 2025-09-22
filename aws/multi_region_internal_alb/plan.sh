@@ -1,12 +1,13 @@
 #!/bin/sh
+set -e
 
 
-STACK=$1
+stack=$1
 
 cd infra
-teraform plan
+terraform plan
 
-if ["$STACK" = "new"]; then
+if [ "$stack" = "new" ]; then
     terraform apply
     cd ../r53_new
     terraform plan

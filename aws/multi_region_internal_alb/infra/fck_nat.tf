@@ -3,6 +3,10 @@ module "fck_nat_fra" {
   subnet_id          = aws_subnet.public_fra.id
   security_group_ids = [module.fck_nat_sg_fra.sg_id]
   private_ip_list    = ["10.0.150.100"]
+
+  providers = {
+    aws = aws.fra
+  }
 }
 
 
@@ -12,6 +16,10 @@ module "fck_nat_dub" {
   subnet_id          = aws_subnet.public_dub.id
   security_group_ids = [module.fck_nat_sg_dub.sg_id]
   private_ip_list    = ["10.100.150.100"]
+
+  providers = {
+    aws = aws.dub
+  }
 }
 
 
@@ -41,6 +49,10 @@ module "fck_nat_sg_fra" {
       protocol    = -1
     }
   }
+
+  providers = {
+    aws = aws.fra
+  }
 }
 
 
@@ -69,5 +81,9 @@ module "fck_nat_sg_dub" {
       description = "All egress"
       protocol    = -1
     }
+  }
+
+  providers = {
+    aws = aws.dub
   }
 }

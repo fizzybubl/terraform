@@ -102,7 +102,7 @@ resource "aws_route_table" "public_dub" {
   vpc_id   = module.vpc_dub.vpc_id
 
   route {
-    cidr_block = module.vpc_fra.cidr_block
+    cidr_block = module.vpc_dub.cidr_block
     gateway_id = "local"
   }
 
@@ -180,6 +180,12 @@ resource "aws_route_table_association" "public_fra" {
   route_table_id = aws_route_table.public_fra.id
 }
 
+
+resource "aws_route_table_association" "public_dub" {
+  provider = aws.dub
+  subnet_id      = aws_subnet.public_dub.id
+  route_table_id = aws_route_table.public_dub.id
+}
 
 resource "aws_route_table_association" "dub" {
   for_each       = local.dub
