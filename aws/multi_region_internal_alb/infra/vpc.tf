@@ -1,5 +1,5 @@
 module "vpc_fra" {
-  source               = "../vpc/modules/vpc_v3"
+  source               = "../../vpc/modules/vpc_v3"
   vpc_cidr             = "10.0.0.0/16"
   enable_dns_support   = true
   enable_dns_hostnames = true
@@ -8,11 +8,15 @@ module "vpc_fra" {
   providers = {
     aws = aws.fra
   }
+
+  vpc_tags = {
+    Name = "Fra"
+  }
 }
 
 
 module "vpc_dub" {
-  source               = "../vpc/modules/vpc_v3"
+  source               = "../../vpc/modules/vpc_v3"
   vpc_cidr             = "10.100.0.0/16"
   enable_dns_support   = true
   enable_dns_hostnames = true
@@ -20,6 +24,10 @@ module "vpc_dub" {
 
   providers = {
     aws = aws.dub
+  }
+
+  vpc_tags = {
+    Name = "Dub"
   }
 }
 
@@ -88,6 +96,27 @@ resource "aws_route_table" "public_fra" {
 }
 
 
+
+resource "aws_route_table" "public_dub" {
+  provider = aws.dub
+  vpc_id   = module.vpc_dub.vpc_id
+
+  route {
+    cidr_block = module.vpc_fra.cidr_block
+    gateway_id = "local"
+  }
+
+  route {
+    cidr_block           = "0.0.0.0/0"
+    gateway_id = module.vpc_dub.igw_id
+  }
+
+  tags = {
+    Name = "Public Dub"
+  }
+}
+
+
 resource "aws_route_table" "fra" {
   provider = aws.fra
   vpc_id   = module.vpc_fra.vpc_id
@@ -99,7 +128,7 @@ resource "aws_route_table" "fra" {
 
   route {
     cidr_block           = "0.0.0.0/0"
-    network_interface_id = module.fck_nat.eni_id
+    network_interface_id = module.fck_nat_fra.eni_id
   }
 
   route {
@@ -126,6 +155,11 @@ resource "aws_route_table" "dub" {
   route {
     cidr_block                = module.vpc_fra.cidr_block
     vpc_peering_connection_id = aws_vpc_peering_connection.foo.id
+  }
+
+  route {
+    cidr_block           = "0.0.0.0/0"
+    network_interface_id = module.fck_nat_dub.eni_id
   }
 
   tags = {
@@ -211,7 +245,7 @@ resource "aws_vpc_peering_connection_accepter" "name" {
 
 
 module "ssm_sg" {
-  source = "../ec2/modules/security_groups"
+  source = "../../ec2/modules/security_groups"
 
   name        = "ssm-sg"
   vpc_id      = module.vpc_fra.vpc_id
