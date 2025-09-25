@@ -40,9 +40,9 @@ locals {
 
 
 resource "aws_subnet" "public_fra" {
-  vpc_id               = module.vpc_fra.vpc_id
-  cidr_block           = "10.0.150.0/24"
-  availability_zone_id = "euc1-az1"
+  vpc_id                  = module.vpc_fra.vpc_id
+  cidr_block              = "10.0.150.0/24"
+  availability_zone_id    = "euc1-az1"
   map_public_ip_on_launch = true
 
   provider = aws.fra
@@ -86,7 +86,7 @@ resource "aws_route_table" "public_fra" {
   }
 
   route {
-    cidr_block           = "0.0.0.0/0"
+    cidr_block = "0.0.0.0/0"
     gateway_id = module.vpc_fra.igw_id
   }
 
@@ -107,7 +107,7 @@ resource "aws_route_table" "public_dub" {
   }
 
   route {
-    cidr_block           = "0.0.0.0/0"
+    cidr_block = "0.0.0.0/0"
     gateway_id = module.vpc_dub.igw_id
   }
 
@@ -182,7 +182,7 @@ resource "aws_route_table_association" "public_fra" {
 
 
 resource "aws_route_table_association" "public_dub" {
-  provider = aws.dub
+  provider       = aws.dub
   subnet_id      = aws_subnet.public_dub.id
   route_table_id = aws_route_table.public_dub.id
 }
@@ -267,6 +267,45 @@ module "ssm_sg" {
     }
     "peer_ingress" = {
       cidr_block  = module.vpc_dub.cidr_block
+      from_port   = -1
+      to_port     = -1
+      description = "All from VPC"
+      protocol    = -1
+    }
+  }
+
+  egress_rules = {
+    "vpc_egress" = {
+      cidr_block  = "0.0.0.0/0"
+      from_port   = -1
+      to_port     = -1
+      description = "All to vpc"
+      protocol    = -1
+    }
+  }
+}
+
+
+module "ssm_sg_dub" {
+  providers = {
+    aws = aws.dub
+  }
+  source = "../../ec2/modules/security_groups"
+
+  name        = "ssm-sg"
+  vpc_id      = module.vpc_dub.vpc_id
+  description = "SG for SSM EP"
+
+  ingress_rules = {
+    "vpc_ingress" = {
+      cidr_block  = module.vpc_dub.cidr_block
+      from_port   = -1
+      to_port     = -1
+      description = "All from VPC"
+      protocol    = -1
+    }
+    "peer_ingress" = {
+      cidr_block  = module.vpc_fra.cidr_block
       from_port   = -1
       to_port     = -1
       description = "All from VPC"

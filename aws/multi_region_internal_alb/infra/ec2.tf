@@ -53,3 +53,31 @@ resource "aws_iam_instance_profile" "ec2" {
   role        = aws_iam_role.ec2.name
   path        = "/"
 }
+
+
+### DUB
+data "aws_ami" "ami_dub" {
+  provider    = aws.dub
+  most_recent = true
+  owners      = ["amazon"]
+  filter {
+    name   = "name"
+    values = ["al2023-ami-2023*-x86_64"]
+  }
+}
+
+
+resource "aws_instance" "private_instance_dub" {
+  provider      = aws.dub
+  ami           = data.aws_ami.ami_dub.id # Example Amazon Linux 2 AMI (eu-west-1). Update as needed.
+  instance_type = "t3.micro"
+
+  subnet_id                   = aws_subnet.private_dub["euw1-az1"].id
+  vpc_security_group_ids      = [module.ssm_sg_dub.sg_id]
+  associate_public_ip_address = false
+  iam_instance_profile        = aws_iam_instance_profile.ec2.name
+
+  tags = {
+    Name = "private-ec2"
+  }
+}
