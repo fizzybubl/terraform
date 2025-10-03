@@ -1,12 +1,12 @@
 terraform {
   required_providers {
     aws = {
-        version = "> 6.0"
-        source = "hashicorp/aws"
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
     }
   }
 
   backend "local" {
-    
+
   }
 }
