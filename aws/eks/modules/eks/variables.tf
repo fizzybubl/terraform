@@ -71,6 +71,44 @@ variable "kubernetes_network_config" {
 
 
 variable "support_type" {
-  type = string
+  type    = string
   default = "STANDARD"
+}
+
+
+variable "access_entries" {
+  type = map(object({
+    principal_arn     = string
+    kubernetes_groups = optional(list(string))
+    type              = optional(string, "STANDARD")
+    user_name         = optional(string)
+  }))
+  default = []
+}
+
+
+variable "access_entries_policies" {
+  type = map(object({
+    principal_arn = string
+    policy_arn    = string
+    access_scope = object({
+      type       = string
+      namespaces = list(string)
+    })
+  }))
+  default = []
+}
+
+
+variable "addons" {
+  type = map(object({
+    addon_name           = string
+    addon_version        = string
+    configuration_values = optional(map(string))
+    role_arn             = optional(string)
+    pod_identity_association = optional(object({
+      role_arn        = string
+      service_account = string
+    }))
+  }))
 }
