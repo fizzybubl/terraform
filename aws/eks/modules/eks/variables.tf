@@ -61,6 +61,11 @@ variable "security_group_ids" {
 }
 
 
+variable "node_security_group_ids" {
+  type = list(string)
+}
+
+
 variable "kubernetes_network_config" {
   type = object({
     elastic_load_balancing = optiona(bool)
@@ -111,4 +116,51 @@ variable "addons" {
       service_account = string
     }))
   }))
+}
+
+
+variable "pod_identities" {
+  type = map(object({
+    service_account = string
+    namespace       = string
+    role_arn        = string
+  }))
+}
+
+
+variable "node_groups_config" {
+  type = map(object({
+    name                       = optional(string)
+    node_group_name_prefix     = optional(string)
+    node_role_arn              = optional(string)
+    subnet_ids                 = list(string)
+    capacity_type              = optional(string, "ON_DEMAND")
+    instance_types             = list(string)
+    labels                     = optional(map(string))
+    min_size                   = optional(number, 1)
+    max_size                   = optional(number, 1)
+    desired_size               = optional(number, 1)
+    max_unavailable            = optional(number)
+    max_unavailable_percentage = optional(number)
+  }))
+}
+
+
+variable "user_data" {
+  type = string
+}
+
+
+variable "default_worker_role" {
+  type    = bool
+  default = true
+}
+
+variable "create_launch_template" {
+  type    = bool
+  default = true
+}
+
+variable "image_id" {
+  type = string
 }
