@@ -48,7 +48,11 @@ containerSecurityContext: {}
 
 deployment:
   # deployment.annotations -- Annotations to add to the Deployment object.
-  annotations: {}
+  annotations:
+    prometheus.io/scrape: true
+    prometheus.io/port: 8085
+    cluster-autoscaler.kubernetes.io/safe-to-evict: false
+    # eks.amazonaws.com/role-arn: "${cluster_autoscaler_role}"
 
 # dnsConfig -- [Pod's DNS Config](https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-dns-config)
 dnsConfig: {}
@@ -241,7 +245,9 @@ rbac:
   clusterScoped: true
   serviceAccount:
     # rbac.serviceAccount.annotations -- Additional Service Account annotations.
-    annotations: {}
+    annotations: 
+      eks.amazonaws.com/role-arn: "${cluster_autoscaler_role}"
+
     # rbac.serviceAccount.create -- If `true` and `rbac.create` is also true, a Service Account will be created.
     create: true
     # rbac.serviceAccount.name -- The name of the ServiceAccount to use. If not set and create is `true`, a name is generated using the fullname template.

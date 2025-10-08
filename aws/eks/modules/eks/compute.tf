@@ -31,7 +31,7 @@ resource "aws_iam_role_policy_attachment" "AmazonEC2ContainerRegistryReadOnly" {
 
 resource "aws_eks_node_group" "this" {
   for_each               = var.node_groups_config
-  cluster_name           = aws_eks_cluster.this.name
+  cluster_name           = aws_eks_cluster.this.id
   version                = var.version
   node_group_name        = each.value.name
   node_group_name_prefix = each.value.name_prefix
@@ -87,7 +87,7 @@ resource "aws_launch_template" "this" {
     resource_type = "instance"
     tags = {
       "kubernetes.io/cluster/${aws_eks_cluster.this.name}"     = "owned",
-      "eks:cluster-name"                                       = aws_eks_cluster.this.name,
+      "eks:cluster-name"                                       = aws_eks_cluster.this.id,
       "k8s.io/cluster-autoscaler/enabled"                      = true,
       "k8s.io/cluster-autoscaler/${aws_eks_cluster.this.name}" = true
     }

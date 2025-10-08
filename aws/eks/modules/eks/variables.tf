@@ -166,6 +166,10 @@ variable "image_id" {
 }
 
 variable "cluster_autoscaler_values" {
-  type = string
+  type    = string
   default = null
+}
+
+variable "region" {
+  type = string
 }
