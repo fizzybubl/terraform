@@ -164,3 +164,8 @@ variable "create_launch_template" {
 variable "image_id" {
   type = string
 }
+
+variable "cluster_autoscaler_values" {
+  type = string
+  default = null
+}
