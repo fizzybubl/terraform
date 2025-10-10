@@ -33,7 +33,7 @@ resource "aws_subnet" "private_fra" {
 }
 
 resource "aws_route_table" "public_fra" {
-  vpc_id   = module.vpc_fra.vpc_id
+  vpc_id = module.vpc_fra.vpc_id
 
   route {
     cidr_block = module.vpc_fra.cidr_block
@@ -52,7 +52,7 @@ resource "aws_route_table" "public_fra" {
 
 
 resource "aws_route_table" "fra" {
-  vpc_id   = module.vpc_fra.vpc_id
+  vpc_id = module.vpc_fra.vpc_id
 
   route {
     cidr_block = module.vpc_fra.cidr_block

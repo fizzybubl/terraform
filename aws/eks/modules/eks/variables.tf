@@ -68,10 +68,11 @@ variable "node_security_group_ids" {
 
 variable "kubernetes_network_config" {
   type = object({
-    elastic_load_balancing = optiona(bool)
+    elastic_load_balancing = optional(bool)
     ip_family              = optional(string)
     service_ipv4_cidr      = optional(string, "172.20.0.0/16")
   })
+  default = {}
 }
 
 
@@ -125,6 +126,7 @@ variable "pod_identities" {
     namespace       = string
     role_arn        = string
   }))
+  default = {}
 }
 
 
@@ -148,6 +150,7 @@ variable "node_groups_config" {
 
 variable "user_data" {
   type = string
+  default = null
 }
 
 

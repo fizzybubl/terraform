@@ -81,7 +81,7 @@ resource "aws_launch_template" "this" {
     }
   }
 
-  user_data = var.user_data
+  user_data = templatefile("${path.module}/files/user_data.sh")
 
   tag_specifications {
     resource_type = "instance"
