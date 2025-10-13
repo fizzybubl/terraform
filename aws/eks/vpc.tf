@@ -1,5 +1,5 @@
 module "vpc_fra" {
-  source               = "../../vpc/modules/vpc_v3"
+  source               = "../vpc/modules/vpc_v3"
   vpc_cidr             = "10.0.0.0/16"
   enable_dns_support   = true
   enable_dns_hostnames = true
@@ -84,7 +84,7 @@ resource "aws_route_table_association" "public_fra" {
 
 
 module "ssm_sg" {
-  source = "../../ec2/modules/security_groups"
+  source = "../ec2/modules/security_groups"
 
   name        = "ssm-sg"
   vpc_id      = module.vpc_fra.vpc_id
@@ -93,13 +93,6 @@ module "ssm_sg" {
   ingress_rules = {
     "vpc_ingress" = {
       cidr_block  = module.vpc_fra.cidr_block
-      from_port   = -1
-      to_port     = -1
-      description = "All from VPC"
-      protocol    = -1
-    }
-    "peer_ingress" = {
-      cidr_block  = module.vpc_dub.cidr_block
       from_port   = -1
       to_port     = -1
       description = "All from VPC"

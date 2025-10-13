@@ -4,7 +4,7 @@ resource "aws_eks_cluster" "this" {
   bootstrap_self_managed_addons = var.bootstrap_self_managed_addons
   enabled_cluster_log_types     = var.enabled_cluster_log_types
   role_arn                      = aws_iam_role.cluster.arn
-  version                       = var.version
+  version                       = var.eks_version
 
 
   access_config {

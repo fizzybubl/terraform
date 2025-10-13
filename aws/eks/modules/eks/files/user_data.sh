@@ -12,5 +12,4 @@ spec:
     name: "${cluster_name}"
     apiServerEndpoint: "${api_server_endpoint}"
     certificateAuthority: "${certificate_authority}"
-    cidr: "${service_cidr}"
 --BOUNDARY--

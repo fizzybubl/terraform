@@ -1,5 +1,6 @@
 resource "helm_release" "autoscaler" {
-  chart            = "https://kubernetes.github.io/autoscaler/cluster-autoscaler"
+  repository       = "https://kubernetes.github.io/autoscaler"
+  chart            = "cluster-autoscaler"
   name             = "cluster-autoscaler"
   atomic           = true
   namespace        = "infra"
@@ -8,7 +9,7 @@ resource "helm_release" "autoscaler" {
     templatefile("${path.module}/files/cluster_autoscaler.yaml",
       {
         cluster_name            = var.cluster_name,
-        eks_version             = var.version,
+        eks_version             = var.eks_version,
         region                  = var.region,
         cluster_autoscaler_role = aws_iam_role.cluster_autoscaler.arn
     })

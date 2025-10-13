@@ -14,7 +14,7 @@ variable "authentication_mode" {
 }
 
 
-variable "version" {
+variable "eks_version" {
   type    = string
   default = "1.32"
 }
@@ -97,10 +97,10 @@ variable "access_entries_policies" {
   type = map(object({
     principal_arn = string
     policy_arn    = string
-    access_scope = object({
+    access_scope = optional(object({
       type       = string
       namespaces = optional(list(string), [])
-    })
+    }))
   }))
   default = {}
 }
@@ -132,8 +132,8 @@ variable "pod_identities" {
 variable "node_groups_config" {
   type = map(object({
     name                       = optional(string)
-    node_group_name_prefix     = optional(string)
-    node_role_arn              = optional(string)
+    name_prefix                = optional(string)
+    role_arn                   = optional(string)
     subnet_ids                 = list(string)
     capacity_type              = optional(string, "ON_DEMAND")
     instance_types             = list(string)
@@ -141,8 +141,9 @@ variable "node_groups_config" {
     min_size                   = optional(number, 1)
     max_size                   = optional(number, 1)
     desired_size               = optional(number, 1)
-    max_unavailable            = optional(number)
+    max_unavailable            = optional(number, 1)
     max_unavailable_percentage = optional(number)
+    disk_size                  = optional(number)
   }))
 }
 

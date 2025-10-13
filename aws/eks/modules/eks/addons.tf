@@ -33,7 +33,7 @@ resource "aws_eks_addon" "this" {
   cluster_name             = aws_eks_cluster.this.name
   addon_name               = each.key
   addon_version            = each.value.version
-  service_account_role_arn = aws_iam_role.addon[each.key].arn
+  service_account_role_arn = try(aws_iam_role.addon[each.key].arn, null)
   dynamic "pod_identity_association" {
     for_each = each.value.pod_identity_association != null ? [each.value.pod_identity_association] : []
     iterator = pia

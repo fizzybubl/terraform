@@ -9,7 +9,7 @@ resource "aws_iam_role" "readonly_1" {
         "Effect" : "Allow",
         "Action" : "sts:AssumeRole",
         "Principal" : {
-          "AWS" : "arn:aws:iam::${data.aws_caller_identity.account_id}:root"
+          "AWS" : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
         }
       }
     ]
@@ -26,7 +26,7 @@ resource "aws_iam_role" "readonly_2" {
         "Effect" : "Allow",
         "Action" : "sts:AssumeRole",
         "Principal" : {
-          "AWS" : "arn:aws:iam::${data.aws_caller_identity.account_id}:root"
+          "AWS" : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
         }
       }
     ]

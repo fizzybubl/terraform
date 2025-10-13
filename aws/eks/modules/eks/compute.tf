@@ -1,7 +1,6 @@
 # Worker policies
 resource "aws_iam_role" "default_worker_role" {
-  count = var.default_worker_role ? 1 : 0
-  name  = "Default_EKS_WorkerNodeServiceRole"
+  name = "Default_EKS_WorkerNodeServiceRole"
 
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
@@ -32,10 +31,10 @@ resource "aws_iam_role_policy_attachment" "AmazonEC2ContainerRegistryReadOnly" {
 resource "aws_eks_node_group" "this" {
   for_each               = var.node_groups_config
   cluster_name           = aws_eks_cluster.this.id
-  version                = var.version
+  version                = var.eks_version
   node_group_name        = each.value.name
   node_group_name_prefix = each.value.name_prefix
-  node_role_arn          = coalesce(each.value.role_arn, aws_iam_role.default_worker_role[0])
+  node_role_arn          = coalesce(each.value.role_arn, aws_iam_role.default_worker_role.arn)
   subnet_ids             = each.value.subnet_ids
   capacity_type          = each.value.capacity_type
   instance_types         = each.value.instance_types
@@ -81,15 +80,19 @@ resource "aws_launch_template" "this" {
     }
   }
 
-  user_data = templatefile("${path.module}/files/user_data.sh")
+  user_data = templatefile("${path.module}/files/user_data.sh", {
+    cluster_name          = var.cluster_name
+    api_server_endpoint   = aws_eks_cluster.this.endpoint
+    certificate_authority = aws_eks_cluster.this.certificate_authority[0].data
+  })
 
   tag_specifications {
     resource_type = "instance"
     tags = {
-      "kubernetes.io/cluster/${aws_eks_cluster.this.name}"     = "owned",
-      "eks:cluster-name"                                       = aws_eks_cluster.this.id,
-      "k8s.io/cluster-autoscaler/enabled"                      = true,
-      "k8s.io/cluster-autoscaler/${aws_eks_cluster.this.name}" = true
+      "kubernetes.io/cluster/${aws_eks_cluster.this.id}"     = "owned",
+      "eks:cluster-name"                                     = aws_eks_cluster.this.id,
+      "k8s.io/cluster-autoscaler/enabled"                    = true,
+      "k8s.io/cluster-autoscaler/${aws_eks_cluster.this.id}" = true
     }
   }
 

@@ -1,5 +1,5 @@
 module "fck_nat_fra" {
-  source             = "../../fck-nat"
+  source             = "../fck-nat"
   subnet_id          = aws_subnet.public_fra.id
   security_group_ids = [module.fck_nat_sg_fra.sg_id]
   private_ip_list    = ["10.0.150.100"]
@@ -7,7 +7,7 @@ module "fck_nat_fra" {
 
 
 module "fck_nat_sg_fra" {
-  source = "../../ec2/modules/security_groups"
+  source = "../ec2/modules/security_groups"
 
   name        = "fck-nat-sg"
   vpc_id      = module.vpc_fra.vpc_id

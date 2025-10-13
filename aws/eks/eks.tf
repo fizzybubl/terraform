@@ -9,7 +9,7 @@ module "eks" {
   image_id                = nonsensitive(data.aws_ssm_parameter.ami_id.value)
   security_group_ids      = [aws_security_group.fra.id]
   node_security_group_ids = [aws_security_group.fra.id]
-  subnet_ids              = [for subnet in local.fra : aws_subnet.private_fra[subnet].id]
+  subnet_ids              = [for key, subnet in aws_subnet.private_fra : subnet.id]
   addons = {
     "vpc-cni" = {
       policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
@@ -48,6 +48,9 @@ module "eks" {
     admin = {
       policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
       principal_arn = data.aws_caller_identity.current.arn
+      access_scope = {
+        type = "cluster"
+      }
     }
     test_1 = {
       policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSViewPolicy"
@@ -66,5 +69,18 @@ module "eks" {
       }
     }
   }
-  node_groups_config = {}
+  node_groups_config = {
+    stateless = {
+      node_group_name_prefix = "stateless-workload"
+      subnet_ids             = [for key, subnet in aws_subnet.private_fra : subnet.id]
+      capacity_type          = "SPOT"
+      instance_types         = ["t3.micro", "t3.medium", "t3.small", "m6a.large"]
+      labels = {
+        type = "stateless"
+      }
+      min_size     = 1
+      max_size     = 10
+      desired_size = 3
+    }
+  }
 }
