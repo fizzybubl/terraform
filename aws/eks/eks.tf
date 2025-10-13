@@ -32,5 +32,39 @@ module "eks" {
       version = "v0.8.0-eksbuild.2"
     }
   }
+  access_entries = {
+    admin = {
+      principal_arn = data.aws_caller_identity.current.arn
+    }
+    test_1 = {
+      principal_arn = aws_iam_role.readonly_1.arn
+    }
+    test_2 = {
+      principal_arn = aws_iam_role.readonly_2.arn
+    }
+  }
+
+  access_entries_policies = {
+    admin = {
+      policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+      principal_arn = data.aws_caller_identity.current.arn
+    }
+    test_1 = {
+      policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSViewPolicy"
+      principal_arn = aws_iam_role.readonly_1.arn
+      access_scope = {
+        type       = "namespace"
+        namespaces = ["application"]
+      }
+    }
+    test_2 = {
+      policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSAdminPolicy"
+      principal_arn = aws_iam_role.readonly_1.arn
+      access_scope = {
+        type       = "namespace"
+        namespaces = ["monitoring"]
+      }
+    }
+  }
   node_groups_config = {}
 }

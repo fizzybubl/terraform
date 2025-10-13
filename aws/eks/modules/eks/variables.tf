@@ -89,7 +89,7 @@ variable "access_entries" {
     type              = optional(string, "STANDARD")
     user_name         = optional(string)
   }))
-  default = []
+  default = {}
 }
 
 
@@ -99,10 +99,10 @@ variable "access_entries_policies" {
     policy_arn    = string
     access_scope = object({
       type       = string
-      namespaces = list(string)
+      namespaces = optional(list(string), [])
     })
   }))
-  default = []
+  default = {}
 }
 
 
