@@ -43,7 +43,7 @@ resource "aws_eks_cluster" "this" {
   # after EKS Cluster handling. Otherwise, EKS will not be able to
   # properly delete EKS managed EC2 infrastructure such as Security Groups.
   depends_on = [
-    aws_iam_role_policy_attachment.cluster_AmazonEKSClusterPolicy,
+    aws_iam_role_policy_attachment.AmazonEKSClusterPolicy, aws_iam_role_policy_attachment.AmazonEKSServicePolicy,
   ]
 }
 
@@ -66,7 +66,29 @@ resource "aws_iam_role" "cluster" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "cluster_AmazonEKSClusterPolicy" {
+resource "aws_iam_role_policy_attachment" "AmazonEKSClusterPolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
   role       = aws_iam_role.cluster.name
+}
+
+resource "aws_iam_role_policy_attachment" "AmazonEKSServicePolicy" {
+  role       = aws_iam_role.cluster.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
+}
+
+
+
+### OIDC
+data "aws_partition" "current" {}
+
+
+data "tls_certificate" "cluster_cert" {
+  url = aws_eks_cluster.this.identity[0].oidc[0].issuer
+}
+
+
+resource "aws_iam_openid_connect_provider" "cluster_oidc" {
+  url             = aws_eks_cluster.this.identity[0].oidc[0].issuer
+  client_id_list  = ["sts.${data.aws_partition.current.dns_suffix}"]
+  thumbprint_list = [data.tls_certificate.cluster_cert.certificates[0].sha1_fingerprint]
 }

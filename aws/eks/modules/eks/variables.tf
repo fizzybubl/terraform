@@ -108,10 +108,9 @@ variable "access_entries_policies" {
 
 variable "addons" {
   type = map(object({
-    addon_name           = string
-    addon_version        = string
+    version              = string
     configuration_values = optional(map(string))
-    role_arn             = optional(string)
+    policy_arn           = optional(string)
     pod_identity_association = optional(object({
       role_arn        = string
       service_account = string
@@ -149,7 +148,7 @@ variable "node_groups_config" {
 
 
 variable "user_data" {
-  type = string
+  type    = string
   default = null
 }
 
