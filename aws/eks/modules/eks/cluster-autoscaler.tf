@@ -14,6 +14,8 @@ resource "helm_release" "autoscaler" {
         cluster_autoscaler_role = aws_iam_role.cluster_autoscaler.arn
     })
   )]
+
+  depends_on = [ aws_eks_node_group.this ]
 }
 
 

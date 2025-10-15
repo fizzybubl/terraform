@@ -4,7 +4,6 @@ Content-Type: multipart/mixed; boundary="BOUNDARY"
 --BOUNDARY
 Content-Type: application/node.eks.aws
 
----
 apiVersion: node.eks.aws/v1alpha1
 kind: NodeConfig
 spec:
