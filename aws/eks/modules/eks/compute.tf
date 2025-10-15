@@ -31,7 +31,7 @@ resource "aws_iam_role_policy_attachment" "AmazonEC2ContainerRegistryReadOnly" {
 resource "aws_eks_node_group" "this" {
   for_each               = var.node_groups_config
   cluster_name           = aws_eks_cluster.this.id
-  version                = var.eks_version
+  # version                = var.eks_version
   node_group_name        = each.value.name
   node_group_name_prefix = each.value.name_prefix
   node_role_arn          = coalesce(each.value.role_arn, aws_iam_role.default_worker_role.arn)
@@ -76,15 +76,15 @@ resource "aws_launch_template" "this" {
   block_device_mappings {
     device_name = "/dev/xvda"
     ebs {
-      volume_size = 8
+      volume_size = 20
     }
   }
 
-  user_data = templatefile("${path.module}/files/user_data.sh", {
+  user_data = base64encode(templatefile("${path.module}/files/user_data.sh", {
     cluster_name          = var.cluster_name
     api_server_endpoint   = aws_eks_cluster.this.endpoint
     certificate_authority = aws_eks_cluster.this.certificate_authority[0].data
-  })
+  }))
 
   tag_specifications {
     resource_type = "instance"

@@ -116,6 +116,7 @@ variable "addons" {
       service_account = string
     }))
   }))
+  default = {}
 }
 
 
@@ -145,6 +146,7 @@ variable "node_groups_config" {
     max_unavailable_percentage = optional(number)
     disk_size                  = optional(number)
   }))
+  default = {}
 }
 
 

@@ -42,4 +42,6 @@ resource "aws_eks_addon" "this" {
       role_arn        = pia.value.role_arn
     }
   }
+
+  depends_on = [ aws_eks_node_group.this ]
 }

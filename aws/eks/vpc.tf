@@ -81,34 +81,3 @@ resource "aws_route_table_association" "public_fra" {
   subnet_id      = aws_subnet.public_fra.id
   route_table_id = aws_route_table.public_fra.id
 }
-
-
-module "ssm_sg" {
-  source = "../ec2/modules/security_groups"
-
-  name        = "ssm-sg"
-  vpc_id      = module.vpc_fra.vpc_id
-  description = "SG for SSM EP"
-
-  ingress_rules = {
-    "vpc_ingress" = {
-      cidr_block  = module.vpc_fra.cidr_block
-      from_port   = -1
-      to_port     = -1
-      description = "All from VPC"
-      protocol    = -1
-    }
-  }
-
-  egress_rules = {
-    "vpc_egress" = {
-      cidr_block  = "0.0.0.0/0"
-      from_port   = -1
-      to_port     = -1
-      description = "All to vpc"
-      protocol    = -1
-    }
-  }
-}
-
-

@@ -1,14 +1,15 @@
 variable "ingress_rules" {
   description = "Map of named ingress rule objects"
   type = map(object({
-    description       = string
-    from_port         = number
-    to_port           = number
-    protocol          = string
-    cidr_block        = optional(string)
-    ipv6_cidr_block   = optional(string)
-    security_group    = optional(string)
-    prefix_list_id    = optional(string)
+    self            = optional(bool, false)
+    description     = string
+    from_port       = number
+    to_port         = number
+    protocol        = string
+    cidr_block      = optional(string)
+    ipv6_cidr_block = optional(string)
+    security_group  = optional(string)
+    prefix_list_id  = optional(string)
   }))
   default = null
 
@@ -19,25 +20,26 @@ variable "ingress_rules" {
           (rule.cidr_block != null ? 1 : 0) +
           (rule.ipv6_cidr_block != null ? 1 : 0) +
           (rule.security_group != null ? 1 : 0) +
-          (rule.prefix_list_id != null ? 1 : 0)
+          (rule.prefix_list_id != null ? 1 : 0) + (rule.self ? 1 : 0)
         ) == 1
       )
     ])
-    error_message = "Each ingress rule must have exactly one of cidr_block, ipv6_cidr_block, security_group, or prefix_list_id set."
+    error_message = "Each ingress rule must have exactly one of cidr_block, ipv6_cidr_block, security_group, self or prefix_list_id set."
   }
 }
 
 variable "egress_rules" {
   description = "Map of named egress rule objects"
   type = map(object({
-    description       = string
-    from_port         = number
-    to_port           = number
-    protocol          = string
-    cidr_block        = optional(string)
-    ipv6_cidr_block   = optional(string)
-    security_group    = optional(string)
-    prefix_list_id    = optional(string)
+    self            = optional(bool, false)
+    description     = string
+    from_port       = number
+    to_port         = number
+    protocol        = string
+    cidr_block      = optional(string)
+    ipv6_cidr_block = optional(string)
+    security_group  = optional(string)
+    prefix_list_id  = optional(string)
   }))
   default = null
 

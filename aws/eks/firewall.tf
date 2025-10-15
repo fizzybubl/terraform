@@ -1,30 +1,78 @@
-resource "aws_security_group" "fra" {
-  name        = "fra-sg"
-  description = "Allow traffic only within the VPC"
-  vpc_id      = module.vpc_fra.vpc_id
+module "nodes_sg" {
+  source = "../ec2/modules/security_groups"
 
-  ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = [module.vpc_fra.cidr_block]
+  name        = "nodes-sg"
+  vpc_id      = module.vpc_fra.vpc_id
+  description = "SG for Node Groups"
+
+  ingress_rules = {
+    "fck_nat_ingress" = {
+      cidr_block  = module.vpc_fra.cidr_block
+      from_port   = -1
+      to_port     = -1
+      description = "All from VPC"
+      protocol    = -1
+    }
   }
 
-  #   egress {
-  #     from_port   = 0
-  #     to_port     = 0
-  #     protocol    = "-1"
-  #     cidr_blocks = [module.vpc_fra.cidr_block]
-  #   }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+  egress_rules = {
+    "fck_nat_egress" = {
+      cidr_block  = "0.0.0.0/0"
+      from_port   = -1
+      to_port     = -1
+      description = "All egress"
+      protocol    = -1
+    }
   }
 
   tags = {
-    Name = "Fra SG"
+    "Name" = "nodes-test-loki"
+  }
+}
+
+
+module "control_plane_sg" {
+  source = "../ec2/modules/security_groups"
+
+  name        = "control-plane-sg"
+  vpc_id      = module.vpc_fra.vpc_id
+  description = "SG for Control Plane"
+
+  ingress_rules = {
+    "vpc" = {
+      cidr_block  = module.vpc_fra.cidr_block
+      from_port   = -1
+      to_port     = -1
+      description = "All from VPC"
+      protocol    = -1
+    }
+    "nodes" = {
+      security_group = module.nodes_sg.sg_id
+      from_port      = -1
+      to_port        = -1
+      description    = "All from VPC"
+      protocol       = -1
+    }
+    "self" = {
+      self        = true
+      from_port   = -1
+      to_port     = -1
+      description = "All from VPC"
+      protocol    = -1
+    }
+  }
+
+  egress_rules = {
+    "fck_nat_egress" = {
+      cidr_block  = "0.0.0.0/0"
+      from_port   = -1
+      to_port     = -1
+      description = "All egress"
+      protocol    = -1
+    }
+  }
+
+  tags = {
+    "Name" = "cluster-test-loki"
   }
 }
