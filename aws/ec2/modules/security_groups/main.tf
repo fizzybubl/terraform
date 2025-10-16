@@ -16,7 +16,7 @@ resource "aws_vpc_security_group_ingress_rule" "this" {
 
   cidr_ipv4                    = each.value.cidr_block
   cidr_ipv6                    = each.value.ipv6_cidr_block
-  referenced_security_group_id = each.value.security_group
+  referenced_security_group_id = each.value.self ? aws_security_group.this.id : each.value.security_group
   prefix_list_id               = each.value.prefix_list_id
 }
 

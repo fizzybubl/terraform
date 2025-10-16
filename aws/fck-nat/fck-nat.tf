@@ -14,6 +14,38 @@ data "aws_ami" "fck_nat" {
 }
 
 
+resource "aws_iam_role" "ec2" {
+  name = "access-to-ssm"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+        Action = ["sts:AssumeRole"]
+      }
+    ]
+  })
+  tags = {
+    "Name" : "Access To SSM"
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "ssm" {
+  role       = aws_iam_role.ec2.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+
+resource "aws_iam_instance_profile" "ec2" {
+  name_prefix = "fck-nat"
+  role        = aws_iam_role.ec2.name
+  path        = "/"
+}
+
+
 resource "aws_network_interface" "fck_nat_nic" {
   subnet_id               = var.subnet_id
   security_groups         = var.security_group_ids
@@ -37,13 +69,13 @@ data "cloudinit_config" "fck_nat" {
 
 
 resource "aws_instance" "fck_nat" {
-  ami           = data.aws_ami.fck_nat.id
-  instance_type = var.instance_type
+  ami                  = data.aws_ami.fck_nat.id
+  instance_type        = var.instance_type
+  iam_instance_profile = aws_iam_instance_profile.ec2.name
+  user_data            = data.cloudinit_config.fck_nat.rendered
 
-  user_data = data.cloudinit_config.fck_nat.rendered
-  
   network_interface {
     network_interface_id = aws_network_interface.fck_nat_nic.id
-    device_index = 0
+    device_index         = 0
   }
 }

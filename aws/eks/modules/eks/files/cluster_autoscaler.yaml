@@ -1,0 +1,166 @@
+affinity: {}
+
+additionalLabels: {}
+
+autoDiscovery:
+  clusterName:  ${cluster_name}
+
+  # autoDiscovery.namespace -- Enable autodiscovery via cluster namespace for for `cloudProvider=clusterapi`
+  namespace:  # default
+
+  # autoDiscovery.tags -- ASG tags to match, run through `tpl`.
+  tags:
+    - k8s.io/cluster-autoscaler/enabled
+    - k8s.io/cluster-autoscaler/${cluster_name}
+
+  # autoDiscovery.roles -- Magnum node group roles to match.
+  roles:
+    - worker
+
+  # autoDiscovery.labels -- Cluster-API labels to match  https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/cloudprovider/clusterapi/README.md#configuring-node-group-auto-discovery
+  labels: []
+
+
+# awsRegion -- AWS region (required if `cloudProvider=aws`)
+awsRegion: ${region}
+cloudProvider: aws
+
+# containerSecurityContext -- [Security context for container](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
+containerSecurityContext: {}
+
+deployment:
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8085"
+    cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+
+# dnsConfig -- [Pod's DNS Config](https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-dns-config)
+dnsConfig: {}
+dnsPolicy: ClusterFirst
+
+# envFromConfigMap -- ConfigMap name to use as envFrom.
+envFromConfigMap: ""
+
+# envFromSecret -- Secret name to use as envFrom.
+envFromSecret: ""
+
+## Priorities Expander
+# expanderPriorities -- The expanderPriorities is used if `extraArgs.expander` contains `priority` and expanderPriorities is also set with the priorities.
+# If `extraArgs.expander` contains `priority`, then expanderPriorities is used to define cluster-autoscaler-priority-expander priorities.
+# See: https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/expander/priority/readme.md
+expanderPriorities: {}
+
+# extraArgs -- Additional container arguments.
+# Refer to https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/FAQ.md#what-are-the-parameters-to-ca for the full list of cluster autoscaler
+# parameters and their default values.
+# Everything after the first _ will be ignored allowing the use of multi-string arguments.
+extraArgs:
+  logtostderr: true
+  stderrthreshold: info
+  v: 4
+customArgs: []
+
+# extraEnv -- Additional container environment variables.
+extraEnv: {}
+
+# extraEnvConfigMaps -- Additional container environment variables from ConfigMaps.
+extraEnvConfigMaps: {}
+
+# extraEnvSecrets -- Additional container environment variables from Secrets.
+extraEnvSecrets: {}
+
+# extraObjects -- Extra K8s manifests to deploy
+extraObjects: []
+
+# extraVolumeMounts -- Additional volumes to mount.
+extraVolumeMounts: []
+extraVolumes: []
+
+extraVolumeSecrets: {}
+
+initContainers: []
+fullnameOverride: ""
+hostNetwork: false
+
+image:
+  repository: registry.k8s.io/autoscaling/cluster-autoscaler
+  tag: v${eks_version}.0
+  pullPolicy: IfNotPresent
+  pullSecrets: []
+
+kubeTargetVersionOverride: ""
+nameOverride: ""
+nodeSelector: {}
+podAnnotations: {}
+
+# podDisruptionBudget -- Pod disruption budget.
+podDisruptionBudget:
+  maxUnavailable: 1
+  # minAvailable: 2
+
+# podLabels -- Labels to add to each pod.
+podLabels: {}
+
+priorityClassName: "system-cluster-critical"
+
+# priorityConfigMapAnnotations -- Annotations to add to `cluster-autoscaler-priority-expander` ConfigMap.
+priorityConfigMapAnnotations: {}
+
+rbac:
+  create: true
+  clusterScoped: true
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: ${cluster_autoscaler_role}
+    create: true
+    name: "cluster-autoscaler-sa"
+    automountServiceAccountToken: true
+  # rbac.additionalRules -- Additional rules for role/clusterrole
+  additionalRules: []
+
+# replicaCount -- Desired number of pods
+replicaCount: 1
+
+# resources -- Pod resource requests and limits.
+resources:
+  limits:
+    cpu: 100m
+    memory: 300Mi
+  requests:
+    cpu: 100m
+    memory: 300Mi
+
+# revisionHistoryLimit -- The number of revisions to keep.
+revisionHistoryLimit: 10
+
+# securityContext -- [Security context for pod](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
+securityContext: {}
+
+service:
+  create: true
+  annotations: {}
+  labels: {}
+  externalIPs: []
+
+  clusterIP: ""
+
+  loadBalancerIP: ""
+  loadBalancerSourceRanges: []
+  servicePort: 8085
+  portName: http
+  type: ClusterIP
+
+# tolerations -- List of node taints to tolerate (requires Kubernetes >= 1.6).
+tolerations: []
+
+# topologySpreadConstraints -- You can use topology spread constraints to control how Pods are spread across your cluster among failure-domains such as regions, zones, nodes, and other user-defined topology domains. (requires Kubernetes >= 1.19).
+topologySpreadConstraints: []
+  # - maxSkew: 1
+  #   topologyKey: topology.kubernetes.io/zone
+  #   whenUnsatisfiable: DoNotSchedule
+  #   labelSelector:
+  #     matchLabels:
+  #       app.kubernetes.io/instance: cluster-autoscaler
+
+# updateStrategy -- [Deployment update strategy](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy)
+updateStrategy: {}
