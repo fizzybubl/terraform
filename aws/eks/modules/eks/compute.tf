@@ -27,6 +27,11 @@ resource "aws_iam_role_policy_attachment" "AmazonEC2ContainerRegistryReadOnly" {
   role       = aws_iam_role.default_worker_role.name
 }
 
+resource "aws_iam_role_policy_attachment" "ssm" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  role       = aws_iam_role.default_worker_role.name
+}
+
 
 resource "aws_eks_node_group" "this" {
   for_each               = var.node_groups_config
@@ -61,10 +66,6 @@ resource "aws_eks_node_group" "this" {
     max_unavailable            = each.value.max_unavailable
     max_unavailable_percentage = each.value.max_unavailable_percentage
   }
-
-  lifecycle {
-    ignore_changes = [scaling_config[0].desired_size]
-  }
 }
 
 
@@ -84,6 +85,7 @@ resource "aws_launch_template" "this" {
     cluster_name          = var.cluster_name
     api_server_endpoint   = aws_eks_cluster.this.endpoint
     certificate_authority = aws_eks_cluster.this.certificate_authority[0].data
+    service_cidr          = var.kubernetes_network_config.service_ipv4_cidr
   }))
 
   tag_specifications {

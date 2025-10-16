@@ -6,6 +6,7 @@ module "eks" {
   source                  = "./modules/eks"
   cluster_name            = "test-loki"
   region                  = var.region
+  profile                 = var.profile
   image_id                = nonsensitive(data.aws_ssm_parameter.ami_id.value)
   security_group_ids      = [module.control_plane_sg.sg_id]
   node_security_group_ids = [module.nodes_sg.sg_id]
@@ -33,9 +34,9 @@ module "eks" {
     }
   }
   access_entries = {
-    admin = {
-      principal_arn = data.aws_caller_identity.current.arn
-    }
+    # admin = {
+    #   principal_arn = data.aws_caller_identity.current.arn
+    # }
     test_1 = {
       principal_arn = aws_iam_role.readonly_1.arn
     }
@@ -45,13 +46,13 @@ module "eks" {
   }
 
   access_entries_policies = {
-    admin = {
-      policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-      principal_arn = data.aws_caller_identity.current.arn
-      access_scope = {
-        type = "cluster"
-      }
-    }
+    # admin = {
+    #   policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+    #   principal_arn = data.aws_caller_identity.current.arn
+    #   access_scope = {
+    #     type = "cluster"
+    #   }
+    # }
     test_1 = {
       policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSViewPolicy"
       principal_arn = aws_iam_role.readonly_1.arn
@@ -80,7 +81,7 @@ module "eks" {
       }
       min_size     = 1
       max_size     = 10
-      desired_size = 1
+      desired_size = 3
     }
   }
 }

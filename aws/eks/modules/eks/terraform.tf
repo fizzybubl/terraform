@@ -18,8 +18,8 @@ provider "helm" {
     cluster_ca_certificate = base64decode(aws_eks_cluster.this.certificate_authority[0].data)
 
     exec = {
-      api_version = "client.authentication.k8s.io/v1beta1"
-      args        = ["eks", "get-token", "--cluster-name", var.cluster_name]
+      api_version = "client.authentication.k8s.io/v1"
+      args        = ["eks", "--region", var.region, "--profile", var.profile,  "get-token", "--cluster-name", var.cluster_name]
       command     = "aws"
     }
   }

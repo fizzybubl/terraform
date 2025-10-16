@@ -1,5 +1,6 @@
 resource "aws_iam_role" "addon" {
   for_each = local.addons_with_irsa
+  name_prefix = "${var.cluster_name}-${each.key}"
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
@@ -11,8 +12,8 @@ resource "aws_iam_role" "addon" {
         "Action" : "sts:AssumeRoleWithWebIdentity",
         "Condition" : {
           "StringEquals" : {
-            "oidc.eks.region-code.amazonaws.com/id/EXAMPLED539D4633E53DE1B71EXAMPLE:aud" : "sts.amazonaws.com",
-            "oidc.eks.region-code.amazonaws.com/id/EXAMPLED539D4633E53DE1B71EXAMPLE:sub" : "system:serviceaccount:kube-system:${local.addon_to_sa[each.key]}"
+            "${local.oidc_issuer}:aud" : "sts.amazonaws.com",
+            "${local.oidc_issuer}:sub" : "system:serviceaccount:kube-system:${local.addon_to_sa[each.key]}"
           }
         }
       }
@@ -42,6 +43,4 @@ resource "aws_eks_addon" "this" {
       role_arn        = pia.value.role_arn
     }
   }
-
-  depends_on = [ aws_eks_node_group.this ]
 }

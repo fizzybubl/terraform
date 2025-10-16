@@ -22,7 +22,7 @@ variable "eks_version" {
 
 variable "bootstrap_self_managed_addons" {
   type    = bool
-  default = false
+  default = true
 }
 
 
@@ -176,5 +176,10 @@ variable "cluster_autoscaler_values" {
 }
 
 variable "region" {
+  type = string
+}
+
+
+variable "profile" {
   type = string
 }
