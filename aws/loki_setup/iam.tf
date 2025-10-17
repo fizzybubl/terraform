@@ -1,5 +1,5 @@
 resource "aws_iam_role" "loki_access" {
-  name_prefix = "loki_s3_role"
+  name = "LokiServiceAccountRole"
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
