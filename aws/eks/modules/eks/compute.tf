@@ -34,8 +34,8 @@ resource "aws_iam_role_policy_attachment" "ssm" {
 
 
 resource "aws_eks_node_group" "this" {
-  for_each               = var.node_groups_config
-  cluster_name           = aws_eks_cluster.this.id
+  for_each     = var.node_groups_config
+  cluster_name = aws_eks_cluster.this.id
   # version                = var.eks_version
   node_group_name        = each.value.name
   node_group_name_prefix = each.value.name_prefix
@@ -47,8 +47,8 @@ resource "aws_eks_node_group" "this" {
   labels                 = each.value.labels
 
   launch_template {
-    version = aws_launch_template.this.latest_version
-    name    = aws_launch_template.this.name
+    version = aws_launch_template.this[each.key].latest_version
+    name    = aws_launch_template.this[each.key].name
   }
 
 
@@ -70,14 +70,16 @@ resource "aws_eks_node_group" "this" {
 
 
 resource "aws_launch_template" "this" {
-  name                   = "${var.cluster_name}-template"
-  image_id               = var.image_id
-  vpc_security_group_ids = var.node_security_group_ids
+  for_each               = var.node_groups_config
+  name                   = "${each.key}-${var.cluster_name}-template"
+  image_id               = try(each.value.image_id, var.image_id)
+  vpc_security_group_ids = try(each.value.security_group_ids, var.node_security_group_ids)
 
   block_device_mappings {
     device_name = "/dev/xvda"
     ebs {
-      volume_size = 20
+      volume_size = each.value.volume_size
+      volume_type = each.value.volume_type
     }
   }
 

@@ -3,7 +3,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.0"
+      version = "> 5.0"
     }
     helm = {
       source = "hashicorp/helm"
@@ -19,7 +19,7 @@ provider "helm" {
 
     exec = {
       api_version = "client.authentication.k8s.io/v1"
-      args        = ["eks", "--region", var.region, "--profile", var.profile,  "get-token", "--cluster-name", var.cluster_name]
+      args        = ["eks", "--region", var.region, "--profile", var.profile, "get-token", "--cluster-name", var.cluster_name]
       command     = "aws"
     }
   }

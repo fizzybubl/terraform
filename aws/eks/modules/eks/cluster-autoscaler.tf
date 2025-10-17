@@ -77,10 +77,10 @@ resource "aws_iam_role_policy_attachment" "cluster_autoscaler" {
 
 output "cluster_autoscaler" {
   value = templatefile("${path.module}/files/cluster_autoscaler.yaml",
-      {
-        cluster_name            = aws_eks_cluster.this.id,
-        eks_version             = var.eks_version,
-        region                  = var.region,
-        cluster_autoscaler_role = aws_iam_role.cluster_autoscaler.arn
-    })
+    {
+      cluster_name            = aws_eks_cluster.this.id,
+      eks_version             = var.eks_version,
+      region                  = var.region,
+      cluster_autoscaler_role = aws_iam_role.cluster_autoscaler.arn
+  })
 }

@@ -1,5 +1,5 @@
 resource "aws_iam_role" "addon" {
-  for_each = local.addons_with_irsa
+  for_each    = local.addons_with_irsa
   name_prefix = "${var.cluster_name}-${each.key}"
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",

@@ -145,6 +145,8 @@ variable "node_groups_config" {
     max_unavailable            = optional(number, 1)
     max_unavailable_percentage = optional(number)
     disk_size                  = optional(number)
+    volume_size                = optional(number, 20)
+    volume_type                = optional(string, "gp3")
   }))
   default = {}
 }
